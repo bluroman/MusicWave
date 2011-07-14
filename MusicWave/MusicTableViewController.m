@@ -60,7 +60,6 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 @implementation MusicTableViewController
 
-static NSString *kCellIdentifier = @"Cell";
 
 //@synthesize delegate;					// The main view controller is the delegate for this class.
 @synthesize mediaItemCollectionTable;	// The table shown in this class's view.
@@ -73,41 +72,17 @@ static NSString *kCellIdentifier = @"Cell";
 
 @synthesize managedObjectContext=__managedObjectContext;
 
-// Configures the table view.
-/*- (void) viewDidLoad {
-
-    [super viewDidLoad];
-	
-	[self.addMusicButton setTitle: NSLocalizedString (@"AddMusicFromTableView", @"Add button shown on table view for invoking the media item picker")];
-	
-    self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];      
-}*/
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Set the table view's row height
     self.mediaItemCollectionTable.rowHeight = 58.0;
-    
-    //[self.addMusicButton setTitle: NSLocalizedString (@"AddMusicFromTableView", @"Add button shown on table view for invoking the media item picker")];
-	
-    //self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    //self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    //self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    //self.title = @"My List";
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
-    //self.mediaItemCollectionTable.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
     self.mediaItemCollectionTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
 }
 
 // When the user taps Done, invokes the delegate's method that dismisses the table view.
 - (IBAction) doneShowingMusicList: (id) sender {
-
-	//[self.delegate musicTableViewControllerDidFinish: self];
 	[(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
 }
 
@@ -121,24 +96,16 @@ static NSString *kCellIdentifier = @"Cell";
 	picker.delegate						= self;
 	picker.allowsPickingMultipleItems	= YES;
 	picker.prompt						= NSLocalizedString (@"Select songs to my List", @"Prompt to user to choose some songs to play");
-	
-	//[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleDefault animated:YES];
-
-	[self presentModalViewController: picker animated: YES];
+    [self presentModalViewController: picker animated: YES];
 	[picker release];
 }
 
 
 // Responds to the user tapping Done after choosing music.
 - (void) mediaPicker: (MPMediaPickerController *) mediaPicker didPickMediaItems: (MPMediaItemCollection *) mediaItemCollection {
-  
-	[self dismissModalViewControllerAnimated: YES];
-	//[self.delegate updatePlayerQueueWithMediaCollection: mediaItemCollection];
-    //[(iPodSongsViewController *)mainViewController updateUserSongListWithMediaCollection:mediaItemCollection];
+    [self dismissModalViewControllerAnimated: YES];
     [self updateUserSongListWithMediaCollection:mediaItemCollection];
 	[self.mediaItemCollectionTable reloadData];
-
-	//[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque animated:YES];
 }
 
 
@@ -146,8 +113,6 @@ static NSString *kCellIdentifier = @"Cell";
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker {
 
 	[self dismissModalViewControllerAnimated: YES];
-
-	//[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleBlackOpaque animated:YES];
 }
 
 - (void)configureCell:(PlayListTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
@@ -172,8 +137,6 @@ static NSString *kCellIdentifier = @"Cell";
         cell.nowPlaying = NO;
         cell.accessoryView = nil;
     }
-
-    //cell.textLabel.text = [[managedObject valueForKey:@"timeStamp"] description];
 }
 
 - (void)alertOKCancelAction
@@ -185,10 +148,8 @@ static NSString *kCellIdentifier = @"Cell";
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSLog(@"clicked button index:%d", buttonIndex);
-    //ExampleAppDataObject* theDataObject = [self theAppDataObject];
     if (buttonIndex == 1) {
         NSLog(@"delete indexPath.row:%d", self.deleteIndexPath.row);
-        //[theDataObject.userSongList removeObjectAtIndex:self.deleteIndexPath.row];
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
         [context deleteObject:[self.fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
         
