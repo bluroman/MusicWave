@@ -145,19 +145,16 @@
         BookMark *bookMark = [self.bookMarkArray objectAtIndex:indexPath.row];
         if ([bookMark.position floatValue]== [currentSong.pos1 floatValue]) {
             currentSong.pos1 = [NSNumber numberWithFloat:0.];
+            [(iPodSongsViewController *)mainViewController unregisterTimeObserver];
         }
         if ([bookMark.position floatValue] == [currentSong.pos2 floatValue]) {
             currentSong.pos2 = [NSNumber numberWithFloat:0.];
+             [(iPodSongsViewController *)mainViewController unregisterTimeObserver];
         }
         [self.bookMarkArray removeObjectAtIndex:indexPath.row];
         
         [self.currentSong removeBookmarksObject:bookMark];
         
-        //NSManagedObjectContext *context = ingredient.managedObjectContext;
-        //[context deleteObject:ingredient];
-        
-        //[self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationTop];
-        //[currentSong sortBookMark];
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }   
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
@@ -191,9 +188,9 @@
     
     NSLog(@"bookmark list table view did select:%d", indexPath.row);
     [((iPodSongsViewController *)mainViewController).startPickerView scrollToElement:(indexPath.row + 1) animated:NO];
-    //[tableView reloadData];
-    //[tableView deselectRowAtIndexPath: indexPath animated: YES];
-    //[(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
+    if (((iPodSongsViewController *)mainViewController).playState == playBackStatePaused) {
+        [(iPodSongsViewController *)mainViewController play];
+    }
 }
 
 @end
