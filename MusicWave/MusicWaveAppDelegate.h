@@ -2,7 +2,7 @@
 //  MusicWaveAppDelegate.h
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 14..
+//  Created by hun nam on 11. 7. 11..
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 

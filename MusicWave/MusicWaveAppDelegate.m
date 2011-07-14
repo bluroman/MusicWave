@@ -2,13 +2,14 @@
 //  MusicWaveAppDelegate.m
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 14..
+//  Created by hun nam on 11. 7. 11..
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
 #import "MusicWaveAppDelegate.h"
 
-#import "RootViewController.h"
+//#import "RootViewController.h"
+#import "iPodSongsViewController.h"
 
 @implementation MusicWaveAppDelegate
 
@@ -27,8 +28,16 @@
 {
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
-    self.window.rootViewController = self.navigationController;
+    //self.window.rootViewController = self.navigationController;
+    [self.window addSubview:self.navigationController.view];
     [self.window makeKeyAndVisible];
+    
+    //UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[iPodSongsViewController alloc] init]];
+	//[self.window addSubview:nav.view];
+	//[self.window makeKeyAndVisible];
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+	[[AVAudioSession sharedInstance] setActive: YES error: nil];
     return YES;
 }
 
@@ -46,6 +55,7 @@
      Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
      If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
      */
+    [self saveContext];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -80,8 +90,8 @@
 
 - (void)awakeFromNib
 {
-    RootViewController *rootViewController = (RootViewController *)[self.navigationController topViewController];
-    rootViewController.managedObjectContext = self.managedObjectContext;
+    //RootViewController *rootViewController = (RootViewController *)[self.navigationController topViewController];
+    //rootViewController.managedObjectContext = self.managedObjectContext;
 }
 
 - (void)saveContext
