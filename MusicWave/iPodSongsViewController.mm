@@ -29,7 +29,7 @@
 @synthesize startPickerView, endPickerView;
 @synthesize playListViewController;
 @synthesize avPlayer;
-//@synthesize playState;
+@synthesize playState;
 @synthesize bookMarkArray;
 @synthesize repeatModeView;
 @synthesize songTitleLabel, songArtistLabel;
@@ -451,6 +451,14 @@
     [avPlayer release];
     avPlayer = nil;
     [toolBar setItems:nil];
+}
+- (void) unregisterTimeObserver{
+    if (timeObserver != nil) {
+        NSLog(@"remove time observer %d", __LINE__);
+        [avPlayer removeTimeObserver:timeObserver];
+        timeObserver = nil;
+    }
+
 }
 - (void)registerTimeObserver {
     if (repeatMode) {
@@ -1070,43 +1078,6 @@
     
     self.navigationItem.titleView = btn;
     
-    
-    /*CGRect titleFrame = CGRectMake(0, 0, 320, 60);//TODO: Can we get the size of the text?
-    titleView = [[UIView alloc] initWithFrame:titleFrame];
-    //titleLabel.backgroundColor = [UIColor cyanColor];
-    
-    CGRect songTitleFrame = CGRectMake(0, 10, 200, 16);
-    songTitleLabel = [[UILabel alloc] initWithFrame:songTitleFrame];
-    songTitleLabel.backgroundColor = [UIColor clearColor];
-    songTitleLabel.font = [UIFont boldSystemFontOfSize:16.0];
-    //label.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-    songTitleLabel.textAlignment = UITextAlignmentCenter;
-    songTitleLabel.textColor = [UIColor whiteColor];
-    songTitleLabel.adjustsFontSizeToFitWidth = NO;
-    //The two lines below are the only ones that have changed
-    songTitleLabel.text = self.title;
-    
-    
-    [titleView addSubview:songTitleLabel];
-    
-    CGRect artistTitleFrame = CGRectMake(0, 30, 200, 16);
-    songArtistLabel = [[UILabel alloc] initWithFrame:artistTitleFrame];
-    songArtitstLabel.backgroundColor = [UIColor clearColor];
-    songArtitstLabel.font = [UIFont boldSystemFontOfSize:10.0];
-    //label.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-    songArtitstLabel.textAlignment = UITextAlignmentCenter;
-    songArtistLabel.adjustsFontSizeToFitWidth = NO;
-    songArtitstLabel.textColor = [UIColor blackColor];
-    //The two lines below are the only ones that have changed
-    songArtitstLabel.text = @"Aritist";
-    
-    
-    [titleView addSubview:songArtistLabel];
-    self.navigationItem.titleView = titleView;*/
-    
-    //[self.navigationItem.titleView addSubview:songTitleLabel];
-    //[self.navigationItem.titleView addSubview:songArtitstLabel];
-
     self.currentSong = nil;
     //scrollView.delegate = self;
     HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
