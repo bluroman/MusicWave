@@ -70,7 +70,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @property (nonatomic, retain) V8HorizontalPickerView *endPickerView;
 @property (nonatomic, retain) PlayListViewController *playListViewController;
 @property (nonatomic, retain) AVPlayer *avPlayer;
-//@property (nonatomic, readwrite) enum playBackState playState;
+@property (nonatomic, readwrite) enum playBackState playState;
 @property (nonatomic, retain) UIImageView *repeatModeView;
 @property (nonatomic, retain) UILabel *songTitleLabel;
 @property (nonatomic, retain) UILabel *songArtistLabel;
@@ -79,6 +79,8 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 
 - (void) updatePosition;
 - (void) pause;
+- (void) play;
+- (void) unregisterTimeObserver;
 - (void) extractDataFromAsset:(AVURLAsset *)songAsset;
 - (void) setCurrentPostion: (CGFloat)value;
 - (void) startGetDrawingInfoThread:(AVURLAsset *)currentAsset;
