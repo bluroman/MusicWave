@@ -272,7 +272,7 @@
 	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
 	currentSelectedIndex = index;
-    NSLog(@"scroll to element index:%d", index);
+    //NSLog(@"scroll to element index:%d", index);
 
 	// notify delegate of the selected index
 	SEL delegateCall = @selector(horizontalPickerView:didSelectElementAtIndex:);

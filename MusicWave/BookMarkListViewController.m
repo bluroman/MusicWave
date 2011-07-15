@@ -186,7 +186,7 @@
 {
     // Navigation logic may go here. Create and push another view controller.
     
-    NSLog(@"bookmark list table view did select:%d", indexPath.row);
+    //NSLog(@"bookmark list table view did select:%d", indexPath.row);
     [((iPodSongsViewController *)mainViewController).startPickerView scrollToElement:(indexPath.row + 1) animated:NO];
     if (((iPodSongsViewController *)mainViewController).playState == playBackStatePaused) {
         [(iPodSongsViewController *)mainViewController play];

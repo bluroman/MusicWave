@@ -44,7 +44,7 @@
 	
     //[HUD showWhileExecuting:@selector(myTask) onTarget:self withObject:nil animated:YES];
     [HUD show:YES];
-    NSLog(@"HUD retain count:%d", [HUD retainCount]);
+    //NSLog(@"HUD retain count:%d", [HUD retainCount]);
     
     //[HUD showWhileExecuting:@selector(extractDataFromAsset:) onTarget:self withObject:currentAsset animated:YES];
 
@@ -82,23 +82,23 @@
     for ( AVMetadataItem* item in metadata ) {
         NSString *key = [item commonKey];
         NSString *value = [item stringValue];
-        NSLog(@"key = %@, value = %@", key, value);
+        //NSLog(@"key = %@, value = %@", key, value);
     }
     for (AVAssetTrack* track in songAsset.tracks) {
-        NSLog(@"track.id: %d", track.trackID);
-        NSLog(@"track.mediaType: %@", track.mediaType);
+        //NSLog(@"track.id: %d", track.trackID);
+        //NSLog(@"track.mediaType: %@", track.mediaType);
         CMFormatDescriptionRef fmt = (CMFormatDescriptionRef)[track.formatDescriptions objectAtIndex:0];
         AudioStreamBasicDescription* desc = (AudioStreamBasicDescription *)CMAudioFormatDescriptionGetStreamBasicDescription(fmt);
-        NSLog(@"track samplerate:%f", desc->mSampleRate);
-        NSLog(@"track formatID:%lu", desc->mFormatID);
-        NSLog(@"track formatFlags:%lu", desc->mFormatFlags);
-        NSLog(@"track BytesPerPacket:%lu", desc->mBytesPerPacket);
-        NSLog(@"track BytesPerFrame:%lu", desc->mBytesPerFrame);
-        NSLog(@"track BitsPerChannel:%lu", desc->mBitsPerChannel);
-        NSLog(@"track FramesPerPacket:%lu", desc->mFramesPerPacket);
-        NSLog(@"track ChannelsPerFrame:%lu", desc->mChannelsPerFrame);
-        NSLog(@"track.enabled: %d", track.enabled);
-        NSLog(@"track.selfContained: %d", track.selfContained);
+        //NSLog(@"track samplerate:%f", desc->mSampleRate);
+        //NSLog(@"track formatID:%lu", desc->mFormatID);
+        //NSLog(@"track formatFlags:%lu", desc->mFormatFlags);
+        //NSLog(@"track BytesPerPacket:%lu", desc->mBytesPerPacket);
+        //NSLog(@"track BytesPerFrame:%lu", desc->mBytesPerFrame);
+        //NSLog(@"track BitsPerChannel:%lu", desc->mBitsPerChannel);
+        //NSLog(@"track FramesPerPacket:%lu", desc->mFramesPerPacket);
+        //NSLog(@"track ChannelsPerFrame:%lu", desc->mChannelsPerFrame);
+        //NSLog(@"track.enabled: %d", track.enabled);
+        //NSLog(@"track.selfContained: %d", track.selfContained);
         songSampleRate = desc->mSampleRate;
         channelsPerFrame = desc->mChannelsPerFrame;
         if (channelsPerFrame == 1) {
@@ -122,7 +122,7 @@
     AVAssetReaderTrackOutput * output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:audioReadSettings];
     [reader addOutput:output];
     [output release];
-    NSLog(@"songAsset duration:%f", CMTimeGetSeconds(songAsset.duration));
+    //NSLog(@"songAsset duration:%f", CMTimeGetSeconds(songAsset.duration));
     
     CMTime duration = CMTimeMakeWithSeconds(CMTimeGetSeconds(songAsset.duration), 1.0);
     
@@ -146,7 +146,7 @@
     //float progress = (float)((float)i / (float)mMaxSamples);
     
     [reader startReading];
-    NSLog(@"start reading reader status:%d", reader.status);
+    //NSLog(@"start reading reader status:%d", reader.status);
     while (reader.status == AVAssetReaderStatusReading){
         AVAssetReaderTrackOutput * trackOutput = (AVAssetReaderTrackOutput *)[reader.outputs objectAtIndex:0];
         CMSampleBufferRef sampleBufferRef = [trackOutput copyNextSampleBuffer];
@@ -175,7 +175,7 @@
                         flag = 0;
                         position += start;
                         
-                        NSLog(@"4410th frame:%f at position:%d", frame[position] / 32768.0f, position);
+                        //NSLog(@"4410th frame:%f at position:%d", frame[position] / 32768.0f, position);
                         temp[i] = frame[position] / 32768.0f;
                         i++;
                     }
@@ -195,12 +195,12 @@
                     //NSLog(@"Remaining:%d", remaining);
                     if (remaining == len || remaining == 0) {
                         remaining_count++;
-                        NSLog(@"remaing lost:%d", remaining_count);
+                        //NSLog(@"remaing lost:%d", remaining_count);
                     }
                     if (remaining < len) break;
                 }
                 float percent = 100.0 * (float)i/mMaxSamples;
-                NSLog(@"Progress:%f ,%i, %i, %f, %d", (float)i/mMaxSamples, i, mMaxSamples, percent, (int)percent);
+                //NSLog(@"Progress:%f ,%i, %i, %f, %d", (float)i/mMaxSamples, i, mMaxSamples, percent, (int)percent);
                 progress = (float)i / mMaxSamples;
                 HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", (int)percent];
                 
@@ -212,10 +212,10 @@
             
             //HUD.progress = (float)(i / mMaxSamples);
         }
-        NSLog(@"reader status:%d total:%d, sample count:%d, remaining_lost:%d", reader.status, totalSize, count, remaining_count);
+        //NSLog(@"reader status:%d total:%d, sample count:%d, remaining_lost:%d", reader.status, totalSize, count, remaining_count);
     }
     if (reader.status == AVAssetReaderStatusCompleted) {
-        NSLog(@"completed reading");
+        //NSLog(@"completed reading");
         progress = 1.0f;
         //HUD.progress = 1.0f;
         HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", progress *100];
@@ -227,7 +227,7 @@
     if (mod == 2) {
         sampling = 10 / mod;
     }
-    NSLog(@"start graph");
+    //NSLog(@"start graph");
     //HUD.mode = MBProgressHUDModeIndeterminate;
     HUD.labelText = @"Drawing";
     HUD.detailsLabelText = @"Graph";
@@ -275,7 +275,7 @@
         j += sampling;
     }
     delete[] temp;
-    NSLog(@"ending graph");
+    //NSLog(@"ending graph");
     //graphView.currentSong = currentSong;
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"x" ascending:YES];
@@ -327,20 +327,20 @@
     //NSURL *songURL = [currentSong.song valueForProperty:MPMediaItemPropertyAssetURL];
     AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
     for (AVAssetTrack* track in songAsset.tracks) {
-        NSLog(@"track.id: %d", track.trackID);
-        NSLog(@"track.mediaType: %@", track.mediaType);
+        //NSLog(@"track.id: %d", track.trackID);
+        //NSLog(@"track.mediaType: %@", track.mediaType);
         CMFormatDescriptionRef fmt = (CMFormatDescriptionRef)[track.formatDescriptions objectAtIndex:0];
         AudioStreamBasicDescription* desc = (AudioStreamBasicDescription *)CMAudioFormatDescriptionGetStreamBasicDescription(fmt);
-        NSLog(@"track samplerate:%f", desc->mSampleRate);
-        NSLog(@"track formatID:%lu", desc->mFormatID);
-        NSLog(@"track formatFlags:%lu", desc->mFormatFlags);
-        NSLog(@"track BytesPerPacket:%lu", desc->mBytesPerPacket);
-        NSLog(@"track BytesPerFrame:%lu", desc->mBytesPerFrame);
-        NSLog(@"track BitsPerChannel:%lu", desc->mBitsPerChannel);
-        NSLog(@"track FramesPerPacket:%lu", desc->mFramesPerPacket);
-        NSLog(@"track ChannelsPerFrame:%lu", desc->mChannelsPerFrame);
-        NSLog(@"track.enabled: %d", track.enabled);
-        NSLog(@"track.selfContained: %d", track.selfContained);
+        //NSLog(@"track samplerate:%f", desc->mSampleRate);
+        //NSLog(@"track formatID:%lu", desc->mFormatID);
+        //NSLog(@"track formatFlags:%lu", desc->mFormatFlags);
+        //NSLog(@"track BytesPerPacket:%lu", desc->mBytesPerPacket);
+        //NSLog(@"track BytesPerFrame:%lu", desc->mBytesPerFrame);
+        //NSLog(@"track BitsPerChannel:%lu", desc->mBitsPerChannel);
+        //NSLog(@"track FramesPerPacket:%lu", desc->mFramesPerPacket);
+        //NSLog(@"track ChannelsPerFrame:%lu", desc->mChannelsPerFrame);
+        //NSLog(@"track.enabled: %d", track.enabled);
+        //NSLog(@"track.selfContained: %d", track.selfContained);
         songSampleRate = desc->mSampleRate;
         channelsPerFrame = desc->mChannelsPerFrame;
     }
@@ -356,7 +356,7 @@
     self.songTitleLabel.text = currentSong.songTitle;
     self.songArtistLabel.text = currentSong.songArtist;
     playState = playBackStateNone;
-    NSLog(@"state none:%d line:%d", playState, __LINE__);
+    //NSLog(@"state none:%d line:%d", playState, __LINE__);
     repeatMode = NO;
     if (timeObserver != nil) {
         [avPlayer removeTimeObserver:timeObserver];
@@ -376,8 +376,8 @@
         
         AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
         [self startGetDrawingInfoThread:songAsset];
-        NSLog(@"Start drawing graphview URL:%@", currentSong.songURL);
-        NSLog(@"current song retain count:%d", [currentSong retainCount]);
+        //NSLog(@"Start drawing graphview URL:%@", currentSong.songURL);
+        //NSLog(@"current song retain count:%d", [currentSong retainCount]);
     }
     else {
         //graphView.currentSong = currentSong;
@@ -432,7 +432,7 @@
     playState = playBackStateNone;
     [startPickerView reloadData];
     [endPickerView reloadData];
-    NSLog(@"state none:%d line:%d", playState, __LINE__);
+    //NSLog(@"state none:%d line:%d", playState, __LINE__);
     repeatMode = NO;
     if (repeatMode) {
         repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
@@ -453,7 +453,7 @@
 }
 - (void) unregisterTimeObserver{
     if (timeObserver != nil) {
-        NSLog(@"remove time observer %d", __LINE__);
+        //NSLog(@"remove time observer %d", __LINE__);
         [avPlayer removeTimeObserver:timeObserver];
         timeObserver = nil;
     }
@@ -474,21 +474,21 @@
                 endViewInfo = [graphView.viewInfoArray objectAtIndex:[currentSong.pos1 floatValue]];
             }
             else {
-                NSLog(@"This is very weird case");
+                //NSLog(@"This is very weird case");
                 if (timeObserver != nil) {
-                    NSLog(@"remove time observer %d", __LINE__);
+                    //NSLog(@"remove time observer %d", __LINE__);
                     [avPlayer removeTimeObserver:timeObserver];
                     timeObserver = nil;
                 }
                 return;
             }
             if (timeObserver != nil) {
-                NSLog(@"remove time observer %d", __LINE__);
+                //NSLog(@"remove time observer %d", __LINE__);
                 [avPlayer removeTimeObserver:timeObserver];
                 timeObserver = nil;
             }
             CMTime endTime = CMTimeMakeWithSeconds([endViewInfo.time floatValue], 1);
-            NSLog(@"Register time observer %d", __LINE__);
+            //NSLog(@"Register time observer %d", __LINE__);
             timeObserver = [avPlayer addBoundaryTimeObserverForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:endTime]] queue:NULL usingBlock:^(void) {
                 //NSLog(@"time observer fired %d", __LINE__);
                 //[avPlayer removeTimeObserver:timeObserver];
@@ -501,7 +501,7 @@
     else 
     {
         if (timeObserver != nil) {
-            NSLog(@"remove time observer %d", __LINE__);
+            //NSLog(@"remove time observer %d", __LINE__);
             [avPlayer removeTimeObserver:timeObserver];
             timeObserver = nil;
         }
@@ -552,7 +552,7 @@
     updateTimer = nil;
     [avPlayer pause];
     playState = playBackStatePaused;
-    NSLog(@"state pause:%d", playState);
+    //NSLog(@"state pause:%d", playState);
 }
 
 - (void) play
@@ -576,7 +576,7 @@
     [avPlayer play];
     
     playState = playBackStatePlaying;
-    NSLog(@"state play:%d", playState);
+    //NSLog(@"state play:%d", playState);
 }
 
 - (void) fastforward
@@ -603,7 +603,7 @@
     }
     [self registerTimeObserver];
     
-    NSLog(@"repeatMode:%d", repeatMode);
+    //NSLog(@"repeatMode:%d", repeatMode);
 }
 - (void) rewind
 {
@@ -730,10 +730,10 @@
 }
 - (IBAction) tapBookMarkButton:(id)sender {
     int tag = ((UIButton *)sender).tag;
-    NSLog(@"Tapping bookmark button:%d", tag);
+    //NSLog(@"Tapping bookmark button:%d", tag);
     int bookMarkCount = [self.bookMarkArray count];
     if (bookMarkCount < tag) {
-        NSLog(@"No book mark available in %d", tag);
+        //NSLog(@"No book mark available in %d", tag);
         return;
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:(tag - 1)];
@@ -765,7 +765,7 @@
 }
 - (IBAction) tapMainButton:(id)sender {
     
-    NSLog(@"play state:%d", playState);
+    //NSLog(@"play state:%d", playState);
 	
 	if (playState == playBackStatePaused || playState == playBackStatePlaying) {
         [self addBookMarkOnPixel:[graphView currentPixel]];
@@ -773,21 +773,21 @@
         [startPickerView reloadData];
         [endPickerView reloadData];
         int bookMarkCount = [self.bookMarkArray count];
-        for ( int i = 0; i < bookMarkCount; i++) {
+        /*for ( int i = 0; i < bookMarkCount; i++) {
             BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:i];
             NSLog(@"BookMark count:%d, position:%f, time:%f", bookMarkCount, [tempBookMark.position floatValue], [tempBookMark.duration floatValue]);
-        }
+        }*/
     }
 }
 
 - (void) scrollViewDidScroll: (UIScrollView *) aScrollView
 {
     CGPoint offset = aScrollView.contentOffset;
-    NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
+    //NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
     CGFloat start = offset.x;
     CGFloat end = offset.x + 320;
     if ([graphView.viewInfoArray count] == 0) {
-        NSLog(@"viewInfoArray delete");
+        //NSLog(@"viewInfoArray delete");
         return;
     }
     if (start < 0) {
@@ -812,7 +812,7 @@
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)aScrollView
 {
     CGPoint offset = aScrollView.contentOffset;
-    NSLog(@"scroll did end decelerating offset x:%f y:%f", offset.x, offset.y);
+    //NSLog(@"scroll did end decelerating offset x:%f y:%f", offset.x, offset.y);
 }
 
 - (void)didReceiveMemoryWarning
@@ -1015,19 +1015,19 @@
     //[volumeView release];
 }
 - (void)applicationWillResign {
-    NSLog(@"application will resign");
+    //NSLog(@"application will resign");
 }
 - (void)applicationWillEnterForeground {
-    NSLog(@"application will enter foreground");
+    //NSLog(@"application will enter foreground");
     if (avPlayer.rate == 0.0f && playState == playBackStatePlaying) {
-        NSLog(@"avPlayer rate is 0");
-        NSLog(@"self playstae:%d", playState);
+        //NSLog(@"avPlayer rate is 0");
+        //NSLog(@"self playstae:%d", playState);
         [self pause];
     }
     else
     {
-        NSLog(@"avPlayer rate is %f", avPlayer.rate);
-        NSLog(@"self playstate:%d", playState);
+        //NSLog(@"avPlayer rate is %f", avPlayer.rate);
+        //NSLog(@"self playstate:%d", playState);
     }
 }
 
@@ -1113,7 +1113,7 @@
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 	[self becomeFirstResponder];
-    NSLog(@"main view did load");
+    //NSLog(@"main view did load");
     
 }
 #pragma mark - HorizontalPickerView DataSource Methods
@@ -1147,7 +1147,7 @@
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	//self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
-    NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
     if (index == 0) {
         if (picker.tag == 0) {
             currentSong.pos1 = [NSNumber numberWithFloat:0.f];
@@ -1161,7 +1161,7 @@
     
     int bookMarkCount = [self.bookMarkArray count];
     if (bookMarkCount < index) {
-        NSLog(@"No book mark available in %d", index);
+        //NSLog(@"No book mark available in %d", index);
         return;
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:index - 1];
@@ -1172,7 +1172,7 @@
         currentSong.pos2 = tempBookMark.position;
     }
         ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
-    NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
+    //NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
     //[self updatePosition];
     CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2;
@@ -1192,7 +1192,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"main view will appear");
+    //NSLog(@"main view will appear");
     [graphView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];
     [endPickerView reloadData];

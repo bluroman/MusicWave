@@ -116,11 +116,11 @@
 }
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
     CGPoint pointInView = [[touches anyObject] locationInView:self];
-    NSLog(@"Start touches:pointInView x:%f, y:%f", pointInView.x, pointInView.y);
+    //NSLog(@"Start touches:pointInView x:%f, y:%f", pointInView.x, pointInView.y);
     
     
     if ([self.viewInfoArray count] < pointInView.x) {
-        NSLog(@"something wrong with view info array");
+        //NSLog(@"something wrong with view info array");
         return;
     }
     self.currentPixel = pointInView.x;
@@ -128,20 +128,20 @@
     //Get duration of the point and send it to viewcontroller
     iPodSongsViewController *controller = (iPodSongsViewController *)parent;
     ViewInfo *tempViewInfo = [self.viewInfoArray objectAtIndex:self.currentPixel];
-    NSLog(@"touches current time:%f", [tempViewInfo.time floatValue]);
+    //NSLog(@"touches current time:%f", [tempViewInfo.time floatValue]);
     [controller setCurrentPostion:[tempViewInfo.time floatValue]];
 }
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
-    CGPoint pointInView = [[touches anyObject] locationInView:self];
-    NSLog(@"Moved pointInView x:%f, y:%f", pointInView.x, pointInView.y);
+    //CGPoint pointInView = [[touches anyObject] locationInView:self];
+    //NSLog(@"Moved pointInView x:%f, y:%f", pointInView.x, pointInView.y);
    
 }
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
-    CGPoint pointInView = [[touches anyObject] locationInView:self];
-    NSLog(@"Ended pointInView x:%f, y:%f", pointInView.x, pointInView.y);
+    //CGPoint pointInView = [[touches anyObject] locationInView:self];
+    //NSLog(@"Ended pointInView x:%f, y:%f", pointInView.x, pointInView.y);
         
 }
 
@@ -178,7 +178,7 @@
     CGContextStrokePath(context);//center line
     
     if (count < 1) {
-        NSLog(@"something wrong with draw view info");
+        //NSLog(@"something wrong with draw view info");
         return;
     }
     CGMutablePathRef maxPath = CGPathCreateMutable();
@@ -211,7 +211,7 @@
     //CGPathRelease(minPath);
     CGPathRelease(path);
     
-      NSLog(@"view width:%f, view height:%f, graph height:%f", viewRect.size.width, viewRect.size.height, graphHeight);
+      //NSLog(@"view width:%f, view height:%f, graph height:%f", viewRect.size.width, viewRect.size.height, graphHeight);
 }
 
 

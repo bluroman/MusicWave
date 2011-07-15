@@ -49,7 +49,7 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
-    NSLog(@"book Mark cell selected:%d", selected);
+    //NSLog(@"book Mark cell selected:%d", selected);
     if(selected)
     {
         UIImageView *soundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_play.png"]];
@@ -127,7 +127,7 @@
 	}
     if (bookMark) {
         UInt32 duration = [bookMark.duration floatValue] * 100;
-        NSLog(@"Duration:%lu", duration);
+        //NSLog(@"Duration:%lu", duration);
         UInt32 minutes = duration / (60 * 100);
         UInt32 seconds = (duration / 100)  - (minutes * 60);
         UInt32 millsec = duration % 100;

@@ -31,27 +31,27 @@
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
     //CGPoint pointInView = [[touches allObjects] locationInView:volumeView];
     //NSLog(@"Start touches:pointInView x:%f, y:%f", pointInView.x, pointInView.y);
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint touchPoint = [touch locationInView:touch.view];
-    NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
+    //UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    //CGPoint touchPoint = [touch locationInView:touch.view];
+    //NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
     //[self setScrollEnabled:NO];
     [[self.subviews objectAtIndex:0] touchesBegan:touches withEvent:event];
     
 }
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint touchPoint = [touch locationInView:touch.view];
-    NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
+    //UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    //CGPoint touchPoint = [touch locationInView:touch.view];
+    //NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
     [[self.subviews objectAtIndex:0] touchesMoved:touches withEvent:event];
 
 }
 
 - (void)touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint touchPoint = [touch locationInView:touch.view];
-    NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
+    //UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    //CGPoint touchPoint = [touch locationInView:touch.view];
+    //NSLog(@"[%s] touched point :: %f, %f", __FUNCTION__, touchPoint.x, touchPoint.y);
     //[self setScrollEnabled:YES];
     [[self.subviews objectAtIndex:0] touchesEnded:touches withEvent:event];
 

@@ -150,9 +150,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 	[alert release];
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSLog(@"clicked button index:%d", buttonIndex);
+    //NSLog(@"clicked button index:%d", buttonIndex);
     if (buttonIndex == 1) {
-        NSLog(@"delete indexPath.row:%d", self.deleteIndexPath.row);
+        //NSLog(@"delete indexPath.row:%d", self.deleteIndexPath.row);
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
         [context deleteObject:[self.fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
         
@@ -217,7 +217,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     NSMutableArray *previousUserSongList = [[self.fetchedResultsController fetchedObjects] mutableCopy];
     
     if (previousUserSongList == nil) {
-        NSLog(@"previousUserSongList nil");
+        //NSLog(@"previousUserSongList nil");
     }
     //[request release];
 	if (mediaItemCollection) {
@@ -228,10 +228,10 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
             id myObject;
             while ((myObject = [enumer nextObject]) != nil) {
                 MPMediaItem *tempMediaItem = (MPMediaItem *) myObject;
-                NSLog(@"Title: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyTitle]);
-                NSLog(@"Artist: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyArtist]);
-                NSLog(@"Persistent Id: %llu", [[tempMediaItem valueForProperty:MPMediaItemPropertyPersistentID] unsignedLongLongValue]);
-                NSLog(@"----------------------------");
+                //NSLog(@"Title: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyTitle]);
+                //NSLog(@"Artist: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyArtist]);
+                //NSLog(@"Persistent Id: %llu", [[tempMediaItem valueForProperty:MPMediaItemPropertyPersistentID] unsignedLongLongValue]);
+                //NSLog(@"----------------------------");
                 [self insertNewSong:tempMediaItem];
             }
 		} else {
@@ -245,12 +245,12 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
                     if ([tempPersistentId unsignedLongLongValue] == [tempSong.persistentId unsignedLongLongValue])
                     {
                         //NSLog(@"equal temp:%llu , song:%llu", [tempPersistentId unsignedLongLongValue], [tempSong.persistentId unsignedLongLongValue]);
-                        NSLog(@"Exist song title:%@", tempSong.songTitle);
+                        //NSLog(@"Exist song title:%@", tempSong.songTitle);
                         exist = YES;
                     }
                 }
                 if (exist == NO) {
-                    NSLog(@"not equal add to song List");
+                    //NSLog(@"not equal add to song List");
                     [self insertNewSong:tempMediaItem];
                 }
             }
@@ -301,7 +301,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 {
     // Navigation logic may go here. Create and push another view controller.
     
-    NSLog(@"play list table view did select:%d", indexPath.row);
+    //NSLog(@"play list table view did select:%d", indexPath.row);
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
     ((iPodSongsViewController *)mainViewController).currentSong = song;
     [(iPodSongsViewController *)mainViewController updateCurrentSong];
@@ -316,8 +316,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
         Song *deleteSong = [self.fetchedResultsController objectAtIndexPath:indexPath];
         if ([deleteSong isEqual:((iPodSongsViewController *)mainViewController).currentSong])
         {
-            NSLog(@"current song is deleted warning");
-            NSLog(@"if Yes, all playing contents cleared");
+            //NSLog(@"current song is deleted warning");
+            //NSLog(@"if Yes, all playing contents cleared");
             self.deleteIndexPath = indexPath;
             [self alertOKCancelAction];
             

@@ -40,8 +40,7 @@
         return;
     }
     if ([self.currentSong.pos1 floatValue] == [self.currentSong.pos2 floatValue]) {
-        NSLog(@"always same........");
-        //return;
+        //NSLog(@"always same........");
     }
     else if ([self.currentSong.pos1 floatValue] > 0 && [self.currentSong.pos2 floatValue]> 0) {
         if ([self.currentSong.pos2 floatValue] > [self.currentSong.pos1 floatValue]) {
@@ -57,7 +56,9 @@
             CGContextFillPath(context);
         }
     }
-    else NSLog(@"other case happens in draw rectangle pos1:%f, pos2:%f", [self.currentSong.pos1 floatValue], [self.currentSong.pos2 floatValue]);
+    else {
+        //NSLog(@"other case happens in draw rectangle pos1:%f, pos2:%f", [self.currentSong.pos1 floatValue], [self.currentSong.pos2 floatValue]);
+    }
     
     CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 1.0);
     layer.opacity = 1.0f;
