@@ -76,7 +76,7 @@
 
 
 #define IMAGE_SIZE          0.0
-#define EDITING_INSET       10.0
+#define EDITING_INSET       0.0
 #define TEXT_LEFT_MARGIN    21.0
 #define TEXT_RIGHT_MARGIN   5.0
 #define PREP_TIME_WIDTH     0.0
