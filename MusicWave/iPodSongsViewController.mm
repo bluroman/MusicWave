@@ -38,9 +38,9 @@
     
     [self.view setAlpha:0.7f];
 	HUD.mode = MBProgressHUDModeIndeterminate;
-    HUD.labelText = @"Loading";
+    HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
     
-    HUD.detailsLabelText = @"Information";
+    HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
 	
     //[HUD showWhileExecuting:@selector(myTask) onTarget:self withObject:nil animated:YES];
     [HUD show:YES];
@@ -80,8 +80,8 @@
     
     NSArray *metadata = [songAsset commonMetadata];
     for ( AVMetadataItem* item in metadata ) {
-        NSString *key = [item commonKey];
-        NSString *value = [item stringValue];
+        //NSString *key = [item commonKey];
+        //NSString *value = [item stringValue];
         //NSLog(@"key = %@, value = %@", key, value);
     }
     for (AVAssetTrack* track in songAsset.tracks) {
@@ -229,8 +229,8 @@
     }
     //NSLog(@"start graph");
     //HUD.mode = MBProgressHUDModeIndeterminate;
-    HUD.labelText = @"Drawing";
-    HUD.detailsLabelText = @"Graph";
+    HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
+    HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
     NSManagedObjectContext *context = [currentSong managedObjectContext];
     while (j < mMaxSamples) {
         //ViewInfo *currentInfo = [ViewInfo alloc];
@@ -772,8 +772,8 @@
         [graphView.bookMarkLayer setNeedsDisplay];
         [startPickerView reloadData];
         [endPickerView reloadData];
-        int bookMarkCount = [self.bookMarkArray count];
-        /*for ( int i = 0; i < bookMarkCount; i++) {
+        /*int bookMarkCount = [self.bookMarkArray count];
+        for ( int i = 0; i < bookMarkCount; i++) {
             BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:i];
             NSLog(@"BookMark count:%d, position:%f, time:%f", bookMarkCount, [tempBookMark.position floatValue], [tempBookMark.duration floatValue]);
         }*/
@@ -811,7 +811,7 @@
 }
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)aScrollView
 {
-    CGPoint offset = aScrollView.contentOffset;
+    //CGPoint offset = aScrollView.contentOffset;
     //NSLog(@"scroll did end decelerating offset x:%f y:%f", offset.x, offset.y);
 }
 

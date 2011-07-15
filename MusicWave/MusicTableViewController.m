@@ -145,7 +145,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (void)alertOKCancelAction
 {
 	// open a alert with an OK and cancel button
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Are you sure to delete now playing Item?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", @"My Music alert title") message:NSLocalizedString(@"Are you sure to delete now playing Item?", @"My Music alert message") delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"My Music delete cancel") otherButtonTitles:NSLocalizedString(@"OK", @"My Music delete ok"), nil];
 	[alert show];
 	[alert release];
 }
