@@ -427,8 +427,7 @@
     totalTimeLabel.text = @"00:00";
     samplingRateLabel.text = @"";
     playbackTimeLabel.text = @"00:00";
-    self.title = @"MusicWave";
-    self.songTitleLabel.text = self.title;
+    self.songTitleLabel.text = @"MusicWave";
     self.songArtistLabel.text = @"";
     playState = playBackStateNone;
     [startPickerView reloadData];
@@ -1042,9 +1041,11 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //self.navigationController.navigationBar.translucent = YES;
-	self.navigationItem.leftBarButtonItem = BARBUTTON(@"My List", @selector(goToMyList:));
+    self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
+    self.navigationItem.leftBarButtonItem = BARBUTTON(@"My List", @selector(goToMyList:));
+    self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
     self.navigationItem.rightBarButtonItem = BARBUTTON(@"BookMarks", @selector(goToBookMark:));
-    self.title = @"MusicWave";
+    self.title = @"Back";
     avPlayer = nil;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     
@@ -1059,7 +1060,7 @@
     self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
     self.songTitleLabel.textColor = [UIColor whiteColor];
-    self.songTitleLabel.text = self.title;
+    self.songTitleLabel.text = @"MusicWave";
     self.songTitleLabel.highlightedTextColor = [UIColor blackColor];
     [btn addSubview:self.songTitleLabel];
     //[label release];
