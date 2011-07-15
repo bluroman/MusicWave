@@ -67,6 +67,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 										//		programmatically supports localization.
 @synthesize mainViewController;
 @synthesize deleteIndexPath;
+@synthesize navigationItem;
 
 @synthesize fetchedResultsController=__fetchedResultsController;
 
@@ -76,6 +77,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 {
     [super viewDidLoad];
     // Set the table view's row height
+    self.navigationItem.title = NSLocalizedString(@"My List", @"Music List Title");
+    self.navigationItem.prompt = NSLocalizedString(@"Select song to play", @"Music table view prompt");
     self.mediaItemCollectionTable.rowHeight = 58.0;
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
     self.mediaItemCollectionTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
@@ -95,7 +98,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 	
 	picker.delegate						= self;
 	picker.allowsPickingMultipleItems	= YES;
-	picker.prompt						= NSLocalizedString (@"Select songs to my List", @"Prompt to user to choose some songs to play");
+	picker.prompt						= NSLocalizedString (@"Select songs to my List", @"Music picker prompt");
     [self presentModalViewController: picker animated: YES];
 	[picker release];
 }
@@ -366,6 +369,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [__managedObjectContext release];
     [mainViewController release];
     [deleteIndexPath release];
+    [navigationItem release];
     [super dealloc];
 }
 #pragma mark - Fetched results controller

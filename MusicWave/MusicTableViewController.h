@@ -58,6 +58,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 	IBOutlet UIBarButtonItem				*addMusicButton;
     UIViewController *mainViewController;
     NSIndexPath *deleteIndexPath;
+    IBOutlet UINavigationItem *navigationItem;
     //NSFetchedResultsController *fetchedResultsController;
     //NSManagedObjectContext *managedObjectContext;
 }
@@ -69,6 +70,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 @property (nonatomic, retain) NSIndexPath *deleteIndexPath;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) UINavigationItem *navigationItem;
 - (void) updateUserSongListWithMediaCollection: (MPMediaItemCollection *) mediaItemCollection;
 
 - (IBAction) showMediaPicker: (id) sender;

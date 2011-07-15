@@ -1042,10 +1042,10 @@
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //self.navigationController.navigationBar.translucent = YES;
     self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
-    self.navigationItem.leftBarButtonItem = BARBUTTON(@"My List", @selector(goToMyList:));
+    self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music List",@"Title for My List"), @selector(goToMyList:));
     self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
-    self.navigationItem.rightBarButtonItem = BARBUTTON(@"BookMarks", @selector(goToBookMark:));
-    self.title = @"Back";
+    self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
+    self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
     avPlayer = nil;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     
@@ -1060,7 +1060,7 @@
     self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
     self.songTitleLabel.textColor = [UIColor whiteColor];
-    self.songTitleLabel.text = @"MusicWave";
+    self.songTitleLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
     self.songTitleLabel.highlightedTextColor = [UIColor blackColor];
     [btn addSubview:self.songTitleLabel];
     //[label release];
