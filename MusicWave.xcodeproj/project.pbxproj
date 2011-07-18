@@ -74,6 +74,7 @@
 		288AE41713CEDFDF00453026 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE41313CEDFDF00453026 /* AVFoundation.framework */; };
 		288AE41813CEDFDF00453026 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE41413CEDFDF00453026 /* MediaPlayer.framework */; };
 		288AE41913CEDFDF00453026 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE41513CEDFDF00453026 /* QuartzCore.framework */; };
+		28F6316D13D00D72000172FF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28F6316B13D00D72000172FF /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +164,8 @@
 		288AE41313CEDFDF00453026 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		288AE41413CEDFDF00453026 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		288AE41513CEDFDF00453026 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		28F6316C13D00D72000172FF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		28F6316E13D00D7D000172FF /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +280,7 @@
 				288AE3E513CEDF9900453026 /* btn_re_on.png */,
 				288AE35C13CEDE2F00453026 /* MusicWave-Info.plist */,
 				288AE35D13CEDE2F00453026 /* InfoPlist.strings */,
+				28F6316B13D00D72000172FF /* Localizable.strings */,
 				288AE36013CEDE2F00453026 /* MusicWave-Prefix.pch */,
 				288AE36113CEDE2F00453026 /* main.m */,
 			);
@@ -379,6 +383,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ko,
 			);
 			mainGroup = 288AE34313CEDE2E00453026;
 			productRefGroup = 288AE34F13CEDE2F00453026 /* Products */;
@@ -437,6 +442,7 @@
 				288AE40F13CEDF9900453026 /* btn_prev_on.png in Resources */,
 				288AE41013CEDF9900453026 /* btn_re_off.png in Resources */,
 				288AE41113CEDF9900453026 /* btn_re_on.png in Resources */,
+				28F6316D13D00D72000172FF /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,6 +482,15 @@
 				288AE35E13CEDE2F00453026 /* en */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		28F6316B13D00D72000172FF /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28F6316C13D00D72000172FF /* en */,
+				28F6316E13D00D7D000172FF /* ko */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
