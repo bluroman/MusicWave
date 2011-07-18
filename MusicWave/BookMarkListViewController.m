@@ -154,6 +154,15 @@
         [self.bookMarkArray removeObjectAtIndex:indexPath.row];
         
         [self.currentSong removeBookmarksObject:bookMark];
+        NSManagedObjectContext *context = [self.currentSong managedObjectContext];
+        // Save the context.
+        NSError *error = nil;
+        if (![context save:&error])
+        {
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            abort();
+        }
+
         
         [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }   
