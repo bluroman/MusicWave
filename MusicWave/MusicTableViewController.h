@@ -59,8 +59,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     UIViewController *mainViewController;
     NSIndexPath *deleteIndexPath;
     IBOutlet UINavigationItem *navigationItem;
-    //NSFetchedResultsController *fetchedResultsController;
-    //NSManagedObjectContext *managedObjectContext;
+    NSFetchedResultsController *fetchedResultsController;
+    NSManagedObjectContext *managedObjectContext;
 }
 
 //@property (nonatomic, assign) id <MusicTableViewControllerDelegate>	delegate;

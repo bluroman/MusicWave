@@ -69,9 +69,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 @synthesize deleteIndexPath;
 @synthesize navigationItem;
 
-@synthesize fetchedResultsController=__fetchedResultsController;
+@synthesize fetchedResultsController;
 
-@synthesize managedObjectContext=__managedObjectContext;
+@synthesize managedObjectContext;
 
 - (void)viewDidLoad
 {
@@ -304,6 +304,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     //NSLog(@"play list table view did select:%d", indexPath.row);
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
     ((iPodSongsViewController *)mainViewController).currentSong = song;
+    //((iPodSongsViewController *)mainViewController).selectedCurrentSong = YES;
     [(iPodSongsViewController *)mainViewController updateCurrentSong];
     [tableView deselectRowAtIndexPath: indexPath animated: YES];
     [(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
@@ -365,8 +366,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 
 - (void)dealloc {
-    [__fetchedResultsController release];
-    [__managedObjectContext release];
+    [fetchedResultsController release];
+    [managedObjectContext release];
     [mainViewController release];
     [deleteIndexPath release];
     [navigationItem release];
@@ -376,9 +377,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (NSFetchedResultsController *)fetchedResultsController
 {
-    if (__fetchedResultsController != nil)
+    if (fetchedResultsController != nil)
     {
-        return __fetchedResultsController;
+        return fetchedResultsController;
     }
     
     /*
@@ -422,7 +423,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 	    abort();
 	}
     
-    return __fetchedResultsController;
+    return fetchedResultsController;
 }    
 
 #pragma mark - Fetched results controller delegate
