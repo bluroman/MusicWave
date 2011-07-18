@@ -33,6 +33,8 @@
 @synthesize bookMarkArray;
 @synthesize repeatModeView;
 @synthesize songTitleLabel, songArtistLabel;
+@synthesize managedObjectContext;
+//@synthesize selectedCurrentSong;
 
 - (void)startGetDrawingInfoThread:(AVURLAsset *)currentAsset {
     
@@ -67,6 +69,12 @@
     [self.view setAlpha:1.0f];
     //NSURL *songURL = [currentSong.song valueForProperty:MPMediaItemPropertyAssetURL];
     [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
+    NSLog(@"currentSong pos1:%f, pos2:%f", [currentSong.pos1 floatValue], [currentSong.pos2 floatValue]);
+    
+    [self.endPickerView scrollToElement:[self restorePickerIndex:currentSong.pos2] animated:YES];
+    [self.startPickerView scrollToElement:[self restorePickerIndex:currentSong.pos1] animated:YES];
+    
+
     //[self setCurrentPostion:0.0f];
 }
 - (void) extractDataFromAsset:(AVURLAsset *)songAsset {
@@ -366,6 +374,19 @@
         repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
     }
     else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
+    
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
+	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+	
+	NSMutableArray *sortedBookMarks = [[NSMutableArray alloc] initWithArray:[currentSong.bookmarks allObjects]];
+	[sortedBookMarks sortUsingDescriptors:sortDescriptors];
+	self.bookMarkArray = sortedBookMarks;
+    
+    
+	[sortDescriptor release];
+	[sortDescriptors release];
+	[sortedBookMarks release];
+
     [self drawingCurrentGraphView];
     
 }
@@ -395,21 +416,13 @@
         [sortDescriptor release];
         [sortDescriptors release];
         [tempViewInfoArray release];
+        
+        
 
         id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
         [self loadComplete:idVar];
     }
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
-	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-	
-	NSMutableArray *sortedBookMarks = [[NSMutableArray alloc] initWithArray:[currentSong.bookmarks allObjects]];
-	[sortedBookMarks sortUsingDescriptors:sortDescriptors];
-	self.bookMarkArray = sortedBookMarks;
     
-	[sortDescriptor release];
-	[sortDescriptors release];
-	[sortedBookMarks release];
-
 
 }
 - (void)deleteCurrentSong {
@@ -659,7 +672,7 @@
     [songTitleLabel release];
     [songArtistLabel release];
     [repeatModeView release];
-    
+    [managedObjectContext release];
     [super dealloc];
 }
 
@@ -697,6 +710,9 @@
 }
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller {
 	[controller dismissModalViewControllerAnimated: YES];
+    //if (self.selectedCurrentSong) {
+        //[self updateCurrentSong];
+    //}
 }
 
 - (IBAction) selectSongs:(id)sender {
@@ -712,8 +728,8 @@
     
     MusicTableViewController *controller = [[MusicTableViewController alloc] initWithNibName: @"MusicTableView" bundle: nil];
     controller.mainViewController = self;
-    MusicWaveAppDelegate *appDelegate = (MusicWaveAppDelegate *)[[UIApplication sharedApplication] delegate];
-    controller.managedObjectContext = appDelegate.managedObjectContext;
+    //MusicWaveAppDelegate *appDelegate = (MusicWaveAppDelegate *)[[UIApplication sharedApplication] delegate];
+    controller.managedObjectContext = self.managedObjectContext;
     controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     
     [self presentModalViewController: controller animated: YES];
@@ -743,6 +759,7 @@
 }
 -(void)addBookMarkOnPixel:(CGFloat)pixel {
     NSManagedObjectContext *context = [currentSong managedObjectContext];
+    NSError *error = nil;
     
     BookMark *bookMark = [NSEntityDescription insertNewObjectForEntityForName:@"BookMark" inManagedObjectContext:context];
    
@@ -750,18 +767,39 @@
     bookMark.duration = tempViewInfo.time;
     bookMark.position = [NSNumber numberWithFloat:pixel];
     bookMark.keepDate = [NSDate date];
+    [self.bookMarkArray addObject:bookMark];
     [currentSong addBookmarksObject:bookMark];
     
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
-	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-	
-	NSMutableArray *sortedBookMarks = [[NSMutableArray alloc] initWithArray:[currentSong.bookmarks allObjects]];
-	[sortedBookMarks sortUsingDescriptors:sortDescriptors];
-	self.bookMarkArray = sortedBookMarks;
+    if (![context save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
     
-	[sortDescriptor release];
-	[sortDescriptors release];
-	[sortedBookMarks release];
+    //NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
+	//NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
+	
+	//NSMutableArray *sortedBookMarks = [[NSMutableArray alloc] initWithArray:[currentSong.bookmarks allObjects]];
+	//[sortedBookMarks sortUsingDescriptors:sortDescriptors];
+	//self.bookMarkArray = sortedBookMarks;
+    
+	//[sortDescriptor release];
+	//[sortDescriptors release];
+	//[sortedBookMarks release];
+}
+- (int) restorePickerIndex:(NSNumber *)position {
+    int bookMarkCount = [self.bookMarkArray count];
+    if (bookMarkCount == 0) {
+        return 0;
+    }
+    for (int i = 0; i < bookMarkCount; i++) {
+        BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:i];
+        NSLog(@"position:%f, temp:%f", [position floatValue], [tempBookMark.position floatValue]);
+        if ([position floatValue] == [tempBookMark.position floatValue]) {
+            NSLog(@"picker view index:%i", i);
+            return i + 1;
+        }
+    }
+    return 0;
 }
 - (IBAction) tapMainButton:(id)sender {
     
@@ -1042,22 +1080,23 @@
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //self.navigationController.navigationBar.translucent = YES;
     self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
-    self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music List",@"Title for My List"), @selector(goToMyList:));
+    self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music",@"Title for My List"), @selector(goToMyList:));
     self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
     self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
     self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
     avPlayer = nil;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
+    //NSLog(@"left bar button width:%f, right bar button width:%f, navigation bar width:%f", self.navigationItem.leftBarButtonItem.width, self.navigationItem.rightBarButtonItem.width, self.navigationController.navigationBar.bounds.size.width);
     
-    UIView *btn = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+    UIView *btn = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 180, 44)];
     //btn.backgroundColor = [UIColor whiteColor];
     
     //UILabel *label;
-    self.songTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 160, 32)];
+    self.songTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, btn.bounds.size.width, 32)];
     self.songTitleLabel.tag = 1;
     self.songTitleLabel.backgroundColor = [UIColor clearColor];
     self.songTitleLabel.font = [UIFont boldSystemFontOfSize:16];
-    self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
+    //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
     self.songTitleLabel.textColor = [UIColor whiteColor];
     self.songTitleLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
@@ -1065,7 +1104,7 @@
     [btn addSubview:self.songTitleLabel];
     //[label release];
     
-    self.songArtistLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 36, 160, 12)];
+    self.songArtistLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 32, btn.bounds.size.width, 12)];
     self.songArtistLabel.tag = 2;
     self.songArtistLabel.backgroundColor = [UIColor clearColor];
     self.songArtistLabel.font = [UIFont boldSystemFontOfSize:12];
@@ -1079,7 +1118,7 @@
     
     self.navigationItem.titleView = btn;
     
-    self.currentSong = nil;
+    //self.currentSong = nil;
     //scrollView.delegate = self;
     HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
     [self.navigationController.view addSubview:HUD];
@@ -1147,7 +1186,10 @@
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	//self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
-    //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    NSManagedObjectContext *context = [currentSong managedObjectContext];
+    NSError *error;
+
     if (index == 0) {
         if (picker.tag == 0) {
             currentSong.pos1 = [NSNumber numberWithFloat:0.f];
@@ -1156,12 +1198,20 @@
             currentSong.pos2 = [NSNumber numberWithFloat:0.f];
         }
         [graphView.bookMarkLayer setNeedsDisplay];
+        if (context == nil) {
+            //NSLog(@"context nil");
+            return;
+        }
+        if (![context save:&error]) {
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            abort();
+        }
         return;
     }
     
     int bookMarkCount = [self.bookMarkArray count];
     if (bookMarkCount < index) {
-        //NSLog(@"No book mark available in %d", index);
+        NSLog(@"No book mark available in %d", index);
         return;
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:index - 1];
@@ -1171,8 +1221,9 @@
     else {
         currentSong.pos2 = tempBookMark.position;
     }
-        ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
-    //NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
+    NSLog(@"Save currentSong pos1:%f, pos2:%f", [currentSong.pos1 floatValue], [currentSong.pos2 floatValue]);
+    ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
+    NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
     //[self updatePosition];
     CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2;
@@ -1187,7 +1238,11 @@
     [graphView.bookMarkLayer setNeedsDisplay];
     [graphView setCurrentPlaybackPosition:[tempViewInfo.time floatValue]];
     [self registerTimeObserver];
-    //[graphView.layer setNeedsDisplay];
+    
+    if (![context save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
 }
 
 - (void) viewWillAppear:(BOOL)animated {

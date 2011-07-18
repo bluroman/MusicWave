@@ -52,9 +52,12 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     UIBackgroundTaskIdentifier bgTaskId;
     id timeObserver;
     UIImageView *repeatModeView;
+    NSManagedObjectContext *managedObjectContext;
+    //BOOL selectedCurrentSong;
 }
 @property (nonatomic, retain) MyMediaPickerDelegate *mediaControllerDelegate;
 @property (nonatomic, retain) IBOutlet UIView *graphView;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 //@property (nonatomic, retain) NSMutableArray *songArray;
 //@property (nonatomic, retain) NSMutableArray *viewInfoArray;
 @property (nonatomic, retain) NSMutableArray *bookMarkArray;
@@ -74,6 +77,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @property (nonatomic, retain) UIImageView *repeatModeView;
 @property (nonatomic, retain) UILabel *songTitleLabel;
 @property (nonatomic, retain) UILabel *songArtistLabel;
+//@property (nonatomic, assign) BOOL selectedCurrentSong;
 - (IBAction) selectSongs: (id)sender;
 - (IBAction) tapMainButton: (id)sender;
 
@@ -91,4 +95,5 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 -(void) setUpAVPlayerForURL: (NSURL*) url;
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller;
 - (void) deleteCurrentSong;
+- (int) restorePickerIndex:(NSNumber *)position;
 @end
