@@ -7,12 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class iPodSongsViewController;
 @interface MusicWaveAppDelegate : NSObject <UIApplicationDelegate> {
-
+    iPodSongsViewController *mainViewController;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet iPodSongsViewController *mainViewController;
 
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
@@ -20,6 +21,8 @@
 
 - (void)saveContext;
 - (NSURL *)applicationDocumentsDirectory;
+- (NSString *)applicationDocumentDirectory;
+- (void) createEditableCopyOfDatabaseIfNeeded;
 
 @property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
 

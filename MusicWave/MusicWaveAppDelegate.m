@@ -24,12 +24,16 @@
 
 @synthesize navigationController=_navigationController;
 
+@synthesize mainViewController;
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     //self.window.rootViewController = self.navigationController;
+    mainViewController.managedObjectContext = self.managedObjectContext;
     [self.window addSubview:self.navigationController.view];
+    //[self createEditableCopyOfDatabaseIfNeeded];
     [self.window makeKeyAndVisible];
     
     //UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[iPodSongsViewController alloc] init]];
@@ -139,7 +143,7 @@
  Returns the managed object model for the application.
  If the model doesn't already exist, it is created from the application's model.
  */
-- (NSManagedObjectModel *)managedObjectModel
+/*- (NSManagedObjectModel *)managedObjectModel
 {
     if (__managedObjectModel != nil)
     {
@@ -148,13 +152,70 @@
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"MusicWave" withExtension:@"momd"];
     __managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];    
     return __managedObjectModel;
+}*/
+
+- (NSManagedObjectModel *)managedObjectModel {
+	
+    if (__managedObjectModel != nil) {
+        return __managedObjectModel;
+    }
+    __managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
+    return __managedObjectModel;
 }
+
 
 /**
  Returns the persistent store coordinator for the application.
  If the coordinator doesn't already exist, it is created and the application's store added to it.
  */
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
+/**
+ Returns the persistent store coordinator for the application.
+ If the coordinator doesn't already exist, it is created and the application's store added to it.
+ */
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+	
+    if (__persistentStoreCoordinator != nil) {
+        return __persistentStoreCoordinator;
+    }
+    
+	NSString *storePath = [[self applicationDocumentDirectory] stringByAppendingPathComponent:@"MusicWave.sqlite"];
+	/*
+	 Set up the store.
+	 For the sake of illustration, provide a pre-populated default store.
+	 */
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	// If the expected store doesn't exist, copy the default store.
+	if (![fileManager fileExistsAtPath:storePath]) {
+		NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:@"MusicWave" ofType:@"sqlite"];
+		if (defaultStorePath) {
+			[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
+		}
+	}
+	
+	NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
+	
+	NSError *error;
+    __persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+    if (![__persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:nil error:&error]) {
+		/*
+		 Replace this implementation with code to handle the error appropriately.
+		 
+		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
+		 
+		 Typical reasons for an error here include:
+		 * The persistent store is not accessible
+		 * The schema for the persistent store is incompatible with current managed object model
+		 Check the error message to determine what the actual problem was.
+		 */
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		abort();
+    }    
+    
+    return __persistentStoreCoordinator;
+}
+
+
+/*- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
     if (__persistentStoreCoordinator != nil)
     {
@@ -167,35 +228,12 @@
     __persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
     if (![__persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error])
     {
-        /*
-         Replace this implementation with code to handle the error appropriately.
-         
-         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-         
-         Typical reasons for an error here include:
-         * The persistent store is not accessible;
-         * The schema for the persistent store is incompatible with current managed object model.
-         Check the error message to determine what the actual problem was.
-         
-         
-         If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
-         
-         If you encounter schema incompatibility errors during development, you can reduce their frequency by:
-         * Simply deleting the existing store:
-         [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
-         
-         * Performing automatic lightweight migration by passing the following dictionary as the options parameter: 
-         [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
-         
-         Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
-         
-         */
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+               NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }    
     
     return __persistentStoreCoordinator;
-}
+}*/
 
 #pragma mark - Application's Documents directory
 
@@ -205,6 +243,28 @@
 - (NSURL *)applicationDocumentsDirectory
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
+
+- (NSString *)applicationDocumentDirectory {
+	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
+
+- (void) createEditableCopyOfDatabaseIfNeeded
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentDirectory = [self applicationDocumentDirectory];
+    NSString *writableDBPath = [documentDirectory stringByAppendingPathComponent:@"MusicWave.sqlite"];
+    
+    BOOL dbexists = [fileManager fileExistsAtPath:writableDBPath];
+    if (!dbexists) {
+        NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"MusicWave.sqlite"];
+        
+        NSError *error;
+        BOOL success = [fileManager copyItemAtPath:defaultDBPath toPath:writableDBPath error:&error];
+        if (!success) {
+            NSAssert1(0, @"Failed to create writable database file with message '%@'.", [error localizedDescription]);
+        }
+    }
 }
 
 @end
