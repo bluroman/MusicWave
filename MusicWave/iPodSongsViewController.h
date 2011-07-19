@@ -53,6 +53,8 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     id timeObserver;
     UIImageView *repeatModeView;
     NSManagedObjectContext *managedObjectContext;
+    CGFloat startPickerPosition;
+    CGFloat endPickerPosition;
     //BOOL selectedCurrentSong;
 }
 @property (nonatomic, retain) MyMediaPickerDelegate *mediaControllerDelegate;
@@ -77,6 +79,8 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @property (nonatomic, retain) UIImageView *repeatModeView;
 @property (nonatomic, retain) UILabel *songTitleLabel;
 @property (nonatomic, retain) UILabel *songArtistLabel;
+@property (nonatomic, assign) CGFloat startPickerPosition;
+@property (nonatomic, assign) CGFloat endPickerPosition;
 //@property (nonatomic, assign) BOOL selectedCurrentSong;
 - (IBAction) selectSongs: (id)sender;
 - (IBAction) tapMainButton: (id)sender;

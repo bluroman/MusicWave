@@ -345,7 +345,7 @@
 
 	switch (self.indicatorPosition) {
 		case V8HorizontalPickerIndicatorTop: {
-			y = 0.0f;
+			y = 2.0f;
 			break;
 		}
 		case V8HorizontalPickerIndicatorBottom: {

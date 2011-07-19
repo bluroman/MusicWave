@@ -89,7 +89,7 @@
     
     [bookMarkLayer setNeedsDisplay];
     
-    [current.layer setPosition:CGPointMake(0.0, 90.0)];
+    [current.layer setPosition:CGPointMake(0.0 + current.layer.bounds.size.width / 2, current.layer.bounds.size.height / 2)];
 }
 - (void)setUpBookMarkLayer {
     
@@ -102,6 +102,10 @@
     
         
 }
+- (void)settingStartEndPosition: (CGFloat)start endPosition:(CGFloat)end {
+    bookMarkLayerDelegate.startPosition = start;
+    bookMarkLayerDelegate.endPosition = end;
+}
 - (void) setCurrentPlaybackPosition:(CGFloat)value {
     int i = 0;
     ViewInfo *tempViewInfo = nil;
@@ -112,7 +116,7 @@
     }
     self.currentPixel = [tempViewInfo.x floatValue];
     //NSLog(@"Now currentPixel:%f", self.currentPixel);
-    [current.layer setPosition:CGPointMake(self.currentPixel, 90.0)];
+    [current.layer setPosition:CGPointMake(self.currentPixel, current.layer.bounds.size.height / 2)];
 }
 - (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
     CGPoint pointInView = [[touches anyObject] locationInView:self];
@@ -124,7 +128,7 @@
         return;
     }
     self.currentPixel = pointInView.x;
-    [current.layer setPosition:CGPointMake(self.currentPixel, 90.0)];
+    [current.layer setPosition:CGPointMake(self.currentPixel, self.current.layer.bounds.size.height/2)];
     //Get duration of the point and send it to viewcontroller
     iPodSongsViewController *controller = (iPodSongsViewController *)parent;
     ViewInfo *tempViewInfo = [self.viewInfoArray objectAtIndex:self.currentPixel];

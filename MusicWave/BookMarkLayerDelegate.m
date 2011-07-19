@@ -13,6 +13,7 @@
 
 @implementation BookMarkLayerDelegate
 @synthesize currentSong;
+@synthesize startPosition, endPosition;
 
 -(id)init
 {
@@ -20,6 +21,8 @@
 	if(self != nil)
     {
         currentSong = nil;
+        startPosition = 0.f;
+        endPosition = 0.f;
     }
     return self;
 }
@@ -39,20 +42,20 @@
     if (self.currentSong == nil) {
         return;
     }
-    if ([self.currentSong.pos1 floatValue] == [self.currentSong.pos2 floatValue]) {
+    if (self.startPosition == self.endPosition) {
         //NSLog(@"always same........");
     }
-    else if ([self.currentSong.pos1 floatValue] > 0 && [self.currentSong.pos2 floatValue]> 0) {
-        if ([self.currentSong.pos2 floatValue] > [self.currentSong.pos1 floatValue]) {
+    else if (self.startPosition > 0 && self.endPosition > 0) {
+        if (self.endPosition > self.startPosition) {
             //layer.opacity = 0.2f;
             CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:231.0/255.0f blue:0.0/255.0f alpha:0.2f].CGColor);
-            CGContextAddRect(context, CGRectMake([self.currentSong.pos1 floatValue], 0.0, [self.currentSong.pos2 floatValue] - [self.currentSong.pos1 floatValue], bounds.size.height));
+            CGContextAddRect(context, CGRectMake(self.startPosition, 0.0, self.endPosition - self.startPosition, bounds.size.height));
             CGContextFillPath(context);
         }
         else {
             //layer.opacity = 0.2f;
             CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:231.0/255.0f blue:0.0/255.0f alpha:0.2f].CGColor);
-            CGContextAddRect(context, CGRectMake([self.currentSong.pos2 floatValue], 0.0, [self.currentSong.pos1 floatValue] - [self.currentSong.pos2 floatValue], bounds.size.height));
+            CGContextAddRect(context, CGRectMake(self.endPosition, 0.0, self.startPosition - self.endPosition, bounds.size.height));
             CGContextFillPath(context);
         }
     }

@@ -2,7 +2,7 @@
 //  Song.h
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 11..
+//  Created by hun nam on 11. 7. 19..
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
@@ -18,14 +18,12 @@
 @private
 }
 @property (nonatomic, retain) NSNumber * doneGraphDrawing;
-@property (nonatomic, retain) NSNumber * pos1;
-@property (nonatomic, retain) NSNumber * pos2;
-@property (nonatomic, retain) NSString * songURL;
-@property (nonatomic, retain) NSString * songTitle;
-@property (nonatomic, retain) NSString * songArtist;
-@property (nonatomic, retain) NSNumber * songDuration;
 @property (nonatomic, retain) UIImage * artworkImage;
 @property (nonatomic, retain) NSNumber * persistentId;
+@property (nonatomic, retain) NSString * songURL;
+@property (nonatomic, retain) NSString * songTitle;
+@property (nonatomic, retain) NSNumber * songDuration;
+@property (nonatomic, retain) NSString * songArtist;
 @property (nonatomic, retain) NSSet* bookmarks;
 @property (nonatomic, retain) NSSet* viewinfos;
 

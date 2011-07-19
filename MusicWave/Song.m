@@ -2,7 +2,7 @@
 //  Song.m
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 11..
+//  Created by hun nam on 11. 7. 19..
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
 //
 
@@ -36,14 +36,12 @@
 @end
 @implementation Song
 @dynamic doneGraphDrawing;
-@dynamic pos1;
-@dynamic pos2;
-@dynamic songURL;
-@dynamic songTitle;
-@dynamic songArtist;
-@dynamic songDuration;
 @dynamic artworkImage;
 @dynamic persistentId;
+@dynamic songURL;
+@dynamic songTitle;
+@dynamic songDuration;
+@dynamic songArtist;
 @dynamic bookmarks;
 @dynamic viewinfos;
 

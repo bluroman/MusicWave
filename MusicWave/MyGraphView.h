@@ -40,6 +40,7 @@
 - (void)drawViewInfoArray;
 - (void)setCurrentPlaybackPosition: (CGFloat)value;
 - (void)setUpBookMarkLayer;
+- (void)settingStartEndPosition: (CGFloat)start endPosition:(CGFloat)end;
 
 //- (id)init;
 
