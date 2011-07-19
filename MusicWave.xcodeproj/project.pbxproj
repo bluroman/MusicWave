@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2800938313D5AED8001E1F36 /* BookMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938213D5AED8001E1F36 /* BookMark.m */; };
+		2800938613D5AED8001E1F36 /* Song.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938513D5AED8001E1F36 /* Song.m */; };
+		2800938913D5AED8001E1F36 /* ViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938813D5AED8001E1F36 /* ViewInfo.m */; };
 		288AE35313CEDE2F00453026 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35213CEDE2F00453026 /* UIKit.framework */; };
 		288AE35513CEDE2F00453026 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35413CEDE2F00453026 /* Foundation.framework */; };
 		288AE35713CEDE2F00453026 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35613CEDE2F00453026 /* CoreGraphics.framework */; };
@@ -14,8 +17,6 @@
 		288AE35F13CEDE2F00453026 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 288AE35D13CEDE2F00453026 /* InfoPlist.strings */; };
 		288AE36213CEDE2F00453026 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE36113CEDE2F00453026 /* main.m */; };
 		288AE38213CEDE6E00453026 /* V8HorizontalPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE38013CEDE6E00453026 /* V8HorizontalPickerView.m */; };
-		288AE38713CEDE8B00453026 /* ViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE38413CEDE8B00453026 /* ViewInfo.m */; };
-		288AE38813CEDE8B00453026 /* BookMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE38613CEDE8B00453026 /* BookMark.m */; };
 		288AE38C13CEDEF200453026 /* MusicWaveAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE38A13CEDEF200453026 /* MusicWaveAppDelegate.m */; };
 		288AE38D13CEDEF200453026 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 288AE38B13CEDEF200453026 /* MainWindow.xib */; };
 		288AE3A813CEDF2A00453026 /* MusicWave.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 288AE38E13CEDF2900453026 /* MusicWave.xcdatamodel */; };
@@ -30,7 +31,6 @@
 		288AE3B113CEDF2A00453026 /* BookMarkListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 288AE39F13CEDF2A00453026 /* BookMarkListViewController.xib */; };
 		288AE3B213CEDF2A00453026 /* MusicTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE3A113CEDF2A00453026 /* MusicTableViewController.m */; };
 		288AE3B313CEDF2A00453026 /* MusicTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 288AE3A213CEDF2A00453026 /* MusicTableView.xib */; };
-		288AE3B413CEDF2A00453026 /* Song.m in Sources */ = {isa = PBXBuildFile; fileRef = 288AE3A413CEDF2A00453026 /* Song.m */; };
 		288AE3B513CEDF2A00453026 /* iPodSongsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 288AE3A613CEDF2A00453026 /* iPodSongsViewController.mm */; };
 		288AE3B613CEDF2A00453026 /* iPodSongsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 288AE3A713CEDF2A00453026 /* iPodSongsViewController.xib */; };
 		288AE3B813CEDF4300453026 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 288AE3B713CEDF4300453026 /* Default.png */; };
@@ -79,6 +79,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2800938113D5AED8001E1F36 /* BookMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BookMark.h; sourceTree = "<group>"; };
+		2800938213D5AED8001E1F36 /* BookMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BookMark.m; sourceTree = "<group>"; };
+		2800938413D5AED8001E1F36 /* Song.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Song.h; sourceTree = "<group>"; };
+		2800938513D5AED8001E1F36 /* Song.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Song.m; sourceTree = "<group>"; };
+		2800938713D5AED8001E1F36 /* ViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewInfo.h; sourceTree = "<group>"; };
+		2800938813D5AED8001E1F36 /* ViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewInfo.m; sourceTree = "<group>"; };
 		288AE34E13CEDE2F00453026 /* MusicWave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		288AE35213CEDE2F00453026 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288AE35413CEDE2F00453026 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -91,10 +97,6 @@
 		288AE37F13CEDE6E00453026 /* V8HorizontalPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = V8HorizontalPickerView.h; sourceTree = "<group>"; };
 		288AE38013CEDE6E00453026 /* V8HorizontalPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = V8HorizontalPickerView.m; sourceTree = "<group>"; };
 		288AE38113CEDE6E00453026 /* V8HorizontalPickerViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = V8HorizontalPickerViewProtocol.h; sourceTree = "<group>"; };
-		288AE38313CEDE8B00453026 /* ViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewInfo.h; sourceTree = "<group>"; };
-		288AE38413CEDE8B00453026 /* ViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewInfo.m; sourceTree = "<group>"; };
-		288AE38513CEDE8B00453026 /* BookMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BookMark.h; sourceTree = "<group>"; };
-		288AE38613CEDE8B00453026 /* BookMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BookMark.m; sourceTree = "<group>"; };
 		288AE38913CEDEF200453026 /* MusicWaveAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicWaveAppDelegate.h; sourceTree = "<group>"; };
 		288AE38A13CEDEF200453026 /* MusicWaveAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicWaveAppDelegate.m; sourceTree = "<group>"; };
 		288AE38B13CEDEF200453026 /* MainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
@@ -119,8 +121,6 @@
 		288AE3A013CEDF2A00453026 /* MusicTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicTableViewController.h; sourceTree = "<group>"; };
 		288AE3A113CEDF2A00453026 /* MusicTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicTableViewController.m; sourceTree = "<group>"; };
 		288AE3A213CEDF2A00453026 /* MusicTableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MusicTableView.xib; sourceTree = "<group>"; };
-		288AE3A313CEDF2A00453026 /* Song.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Song.h; sourceTree = "<group>"; };
-		288AE3A413CEDF2A00453026 /* Song.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Song.m; sourceTree = "<group>"; };
 		288AE3A513CEDF2A00453026 /* iPodSongsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iPodSongsViewController.h; sourceTree = "<group>"; };
 		288AE3A613CEDF2A00453026 /* iPodSongsViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iPodSongsViewController.mm; sourceTree = "<group>"; };
 		288AE3A713CEDF2A00453026 /* iPodSongsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = iPodSongsViewController.xib; sourceTree = "<group>"; };
@@ -234,6 +234,12 @@
 				288AE38A13CEDEF200453026 /* MusicWaveAppDelegate.m */,
 				288AE38B13CEDEF200453026 /* MainWindow.xib */,
 				288AE38E13CEDF2900453026 /* MusicWave.xcdatamodel */,
+				2800938713D5AED8001E1F36 /* ViewInfo.h */,
+				2800938813D5AED8001E1F36 /* ViewInfo.m */,
+				2800938413D5AED8001E1F36 /* Song.h */,
+				2800938513D5AED8001E1F36 /* Song.m */,
+				2800938113D5AED8001E1F36 /* BookMark.h */,
+				2800938213D5AED8001E1F36 /* BookMark.m */,
 				288AE38F13CEDF2900453026 /* MyMediaPickerDelegate.h */,
 				288AE39013CEDF2900453026 /* MyMediaPickerDelegate.mm */,
 				288AE35B13CEDE2F00453026 /* Supporting Files */,
@@ -309,12 +315,6 @@
 		288AE41B13CEE6E600453026 /* DataHelper */ = {
 			isa = PBXGroup;
 			children = (
-				288AE38313CEDE8B00453026 /* ViewInfo.h */,
-				288AE38413CEDE8B00453026 /* ViewInfo.m */,
-				288AE38513CEDE8B00453026 /* BookMark.h */,
-				288AE38613CEDE8B00453026 /* BookMark.m */,
-				288AE3A313CEDF2A00453026 /* Song.h */,
-				288AE3A413CEDF2A00453026 /* Song.m */,
 			);
 			name = DataHelper;
 			sourceTree = "<group>";
@@ -459,8 +459,6 @@
 			files = (
 				288AE36213CEDE2F00453026 /* main.m in Sources */,
 				288AE38213CEDE6E00453026 /* V8HorizontalPickerView.m in Sources */,
-				288AE38713CEDE8B00453026 /* ViewInfo.m in Sources */,
-				288AE38813CEDE8B00453026 /* BookMark.m in Sources */,
 				288AE38C13CEDEF200453026 /* MusicWaveAppDelegate.m in Sources */,
 				288AE3A813CEDF2A00453026 /* MusicWave.xcdatamodel in Sources */,
 				288AE3A913CEDF2A00453026 /* MyMediaPickerDelegate.mm in Sources */,
@@ -472,8 +470,10 @@
 				288AE3AF13CEDF2A00453026 /* MyScrollView.m in Sources */,
 				288AE3B013CEDF2A00453026 /* BookMarkListViewController.m in Sources */,
 				288AE3B213CEDF2A00453026 /* MusicTableViewController.m in Sources */,
-				288AE3B413CEDF2A00453026 /* Song.m in Sources */,
 				288AE3B513CEDF2A00453026 /* iPodSongsViewController.mm in Sources */,
+				2800938313D5AED8001E1F36 /* BookMark.m in Sources */,
+				2800938613D5AED8001E1F36 /* Song.m in Sources */,
+				2800938913D5AED8001E1F36 /* ViewInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -541,7 +541,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -555,7 +555,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
