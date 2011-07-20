@@ -233,13 +233,6 @@
 				288AE38913CEDEF200453026 /* MusicWaveAppDelegate.h */,
 				288AE38A13CEDEF200453026 /* MusicWaveAppDelegate.m */,
 				288AE38B13CEDEF200453026 /* MainWindow.xib */,
-				288AE38E13CEDF2900453026 /* MusicWave.xcdatamodel */,
-				2800938713D5AED8001E1F36 /* ViewInfo.h */,
-				2800938813D5AED8001E1F36 /* ViewInfo.m */,
-				2800938413D5AED8001E1F36 /* Song.h */,
-				2800938513D5AED8001E1F36 /* Song.m */,
-				2800938113D5AED8001E1F36 /* BookMark.h */,
-				2800938213D5AED8001E1F36 /* BookMark.m */,
 				288AE38F13CEDF2900453026 /* MyMediaPickerDelegate.h */,
 				288AE39013CEDF2900453026 /* MyMediaPickerDelegate.mm */,
 				288AE35B13CEDE2F00453026 /* Supporting Files */,
@@ -315,6 +308,13 @@
 		288AE41B13CEE6E600453026 /* DataHelper */ = {
 			isa = PBXGroup;
 			children = (
+				288AE38E13CEDF2900453026 /* MusicWave.xcdatamodel */,
+				2800938713D5AED8001E1F36 /* ViewInfo.h */,
+				2800938813D5AED8001E1F36 /* ViewInfo.m */,
+				2800938413D5AED8001E1F36 /* Song.h */,
+				2800938513D5AED8001E1F36 /* Song.m */,
+				2800938113D5AED8001E1F36 /* BookMark.h */,
+				2800938213D5AED8001E1F36 /* BookMark.m */,
 			);
 			name = DataHelper;
 			sourceTree = "<group>";
