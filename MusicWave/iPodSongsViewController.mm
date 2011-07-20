@@ -381,8 +381,8 @@
         repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
     }
     else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
-    [scrollView setContentSize:CGSizeMake(320, graphView.bounds.size.height)];
-    [graphView setFrame:CGRectMake(0, 0, 320, graphView.bounds.size.height)];
+    [scrollView setContentSize:CGSizeMake(280, graphView.bounds.size.height)];
+    [graphView setFrame:CGRectMake(0, 0, 280, graphView.bounds.size.height)];
     [graphView setUpBookMarkLayer];
     scrollView.contentOffset = CGPointMake(0.0, 0.0);
     [graphView setNeedsDisplay];

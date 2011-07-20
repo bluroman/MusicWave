@@ -72,6 +72,14 @@
         soundLineView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"soundline.jpg"]];
         soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
         [self addSubview:soundLineView];
+        
+        startBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
+        startBarView.frame = CGRectMake(0, 86, 2, 9);
+        [self addSubview:startBarView];
+        
+        endBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
+        endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
+        [self addSubview:endBarView];
         //[soundLine release];
 	}
 	return self;
@@ -86,6 +94,8 @@
     if (context == nil) context = UIGraphicsGetCurrentContext();
     
     [self drawViewInfoArray];
+    
+    endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
     
     [bookMarkLayer setNeedsDisplay];
     
@@ -226,6 +236,8 @@
     [bookMarkLayerDelegate release];
     [currentSong release];
     [soundLineView release];
+    [startBarView release];
+    [endBarView release];
     [super dealloc];
 }
 
