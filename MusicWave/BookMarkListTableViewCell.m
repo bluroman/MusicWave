@@ -35,7 +35,7 @@
         
         timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         [timeLabel setBackgroundColor:[UIColor clearColor]];
-        [timeLabel setFont:[UIFont boldSystemFontOfSize:13.0]];
+        [timeLabel setFont:[UIFont boldSystemFontOfSize:15.0]];
         [timeLabel setTextColor:[UIColor whiteColor]];
         [timeLabel setHighlightedTextColor:[UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0]];
         [self.contentView addSubview:timeLabel];
@@ -95,10 +95,10 @@
 
 - (CGRect)_timeLabelFrame {
     if (self.editing) {
-        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 15.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 16.0);
+        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 24.0);
     }
 	else {
-        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 15.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_RIGHT_MARGIN * 2 - PREP_TIME_WIDTH, 16.0);
+        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_RIGHT_MARGIN * 2 - PREP_TIME_WIDTH, 24.0);
     }
 }
 

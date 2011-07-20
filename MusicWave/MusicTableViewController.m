@@ -49,10 +49,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 #import "MusicTableViewController.h"
 #import "iPodSongsViewController.h"
-//#import "ExampleAppDataObject.h"
-//#import "AppDelegateProtocol.h"
 #import "PlayListTableViewCell.h"
-//#import "MainViewController.h"
 
 @interface MusicTableViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -120,23 +117,17 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (void)configureCell:(PlayListTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-    //NSManagedObject *managedObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
     
     cell.song = song;
     if ([cell.song isEqual:((iPodSongsViewController *)mainViewController).currentSong]) {
-        //cell.nowPlaying = YES;
-        //cell.durationLabel.alpha = 0.0;
         cell.nowPlaying = YES;
         UIImageView *soundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_play.png"]];
         soundImageView.frame = CGRectMake(273, 21, 20, 16);
         cell.accessoryView = soundImageView;
         [soundImageView release];
-        //cell.accessoryType = UITableViewCellAccessoryCheckmark;
     }
     else {
-        //cell.durationLabel.alpha = 1.0;
         cell.nowPlaying = NO;
         cell.accessoryView = nil;
     }
@@ -145,14 +136,12 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (void)alertOKCancelAction
 {
 	// open a alert with an OK and cancel button
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Warning", @"My Music alert title") message:NSLocalizedString(@"Are you sure to delete now playing Item?", @"My Music alert message") delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"My Music delete cancel") otherButtonTitles:NSLocalizedString(@"OK", @"My Music delete ok"), nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Alert", @"My Music alert title") message:NSLocalizedString(@"Are you sure to delete now playing Item?", @"My Music alert message") delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"My Music delete cancel") otherButtonTitles:NSLocalizedString(@"OK", @"My Music delete ok"), nil];
 	[alert show];
 	[alert release];
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    //NSLog(@"clicked button index:%d", buttonIndex);
     if (buttonIndex == 1) {
-        //NSLog(@"delete indexPath.row:%d", self.deleteIndexPath.row);
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
         [context deleteObject:[self.fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
         
@@ -168,8 +157,6 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
-
-        //[self.mediaItemCollectionTable deleteRowsAtIndexPaths:[NSArray arrayWithObject:deleteIndexPath] withRowAnimation:UITableViewRowAnimationFade];
         [(iPodSongsViewController *)mainViewController deleteCurrentSong];
     }
 }
@@ -263,8 +250,6 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    //#warning Potentially incomplete method implementation.
-    // Return the number of sections.
     return 1;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -293,21 +278,18 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 //	 To conform to the Human Interface Guidelines, selections should not be persistent --
 //	 deselect the row after it has been selected.
-/*- (void) tableView: (UITableView *) tableView didSelectRowAtIndexPath: (NSIndexPath *) indexPath {
-
-	[tableView deselectRowAtIndexPath: indexPath animated: YES];
-}*/
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Navigation logic may go here. Create and push another view controller.
     
     //NSLog(@"play list table view did select:%d", indexPath.row);
+    NSLog(@"play list select");
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
     ((iPodSongsViewController *)mainViewController).currentSong = song;
-    //((iPodSongsViewController *)mainViewController).selectedCurrentSong = YES;
     [(iPodSongsViewController *)mainViewController updateCurrentSong];
     [tableView deselectRowAtIndexPath: indexPath animated: YES];
     [(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
+    NSLog(@"view disappear");
 }
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath

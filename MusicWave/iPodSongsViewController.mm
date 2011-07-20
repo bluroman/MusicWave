@@ -67,6 +67,8 @@
     [HUD hide:YES];
     [self.view setAlpha:1.0f];
     [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
+    [self.startPickerView scrollToElement:0 animated:NO];
+    [self.endPickerView scrollToElement:0 animated:NO];
 }
 - (void) addGraphViewArray {
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"x" ascending:YES];
@@ -208,9 +210,9 @@
     }
     if (reader.status == AVAssetReaderStatusCompleted) {
         //NSLog(@"completed reading");
-        progress = 1.0f;
+        //progress = 1.0f;
         //HUD.progress = 1.0f;
-        HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", progress *100];
+        HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", 100];
     }
     CGFloat min=0., max=0., sumsq = 0., rms = 0., d = 0.;
     int j = 0;
@@ -273,18 +275,6 @@
     [self addGraphViewArray];
     currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
 
-    //NSError *error = nil;
-    if (![context save:&error]) {
-			/*
-			 Replace this implementation with code to handle the error appropriately.
-			 
-			 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-			 */
-			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-			abort();
-    }
-
-    
     [reader release];
     
     id idVar = [NSNumber numberWithInt: pixel];
@@ -1164,7 +1154,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    //NSLog(@"main view will appear");
+    NSLog(@"main view will appear");
     [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
     [graphView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];
