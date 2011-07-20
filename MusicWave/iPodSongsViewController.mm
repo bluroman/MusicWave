@@ -1147,7 +1147,7 @@
     NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
     //[self updatePosition];
-    CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2 + 12.f;
+    CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2;
    
     if (scrollView.contentSize.width - [tempBookMark.position floatValue] < scrollView.bounds.size.width / 2) {
         moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 

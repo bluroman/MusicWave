@@ -85,12 +85,12 @@
         CGContextMoveToPoint(context, [tempBookMark.position floatValue], 0.0);
         CGContextAddLineToPoint(context, [tempBookMark.position floatValue], bounds.size.height);
         CGContextStrokePath(context);
-        CGContextSelectFont (context, "Helvetica", 15, kCGEncodingMacRoman);
+        CGContextSelectFont (context, "Helvetica", 11, kCGEncodingMacRoman);
         CGContextSetTextDrawingMode (context, kCGTextFillStroke);
         CGContextSetRGBFillColor (context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1);
         CGContextSetRGBStrokeColor (context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1);
         CGContextSetTextMatrix(context, CGAffineTransformMake(1, 0, 0, -1, 0, 0));
-        CGContextShowTextAtPoint (context, [tempBookMark.position floatValue], 15, numChar, strlen(numChar));
+        CGContextShowTextAtPoint (context, [tempBookMark.position floatValue], 11, numChar, strlen(numChar));
     }
     [sortDescriptor release];
 	[sortDescriptors release];

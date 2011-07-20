@@ -69,7 +69,7 @@
 							<object class="IBUIView" id="776333647">
 								<reference key="NSNextResponder" ref="521517020"/>
 								<int key="NSvFlags">274</int>
-								<string key="NSFrameSize">{296, 180}</string>
+								<string key="NSFrameSize">{280, 180}</string>
 								<reference key="NSSuperview" ref="521517020"/>
 								<reference key="NSWindow"/>
 								<object class="NSColor" key="IBUIBackgroundColor">
@@ -79,13 +79,13 @@
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{24, 25}, {296, 180}}</string>
+						<string key="NSFrame">{{20, 25}, {280, 180}}</string>
 						<reference key="NSSuperview" ref="774585933"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="776333647"/>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC4yMTE3NjQ3MDU5IDAuMjIzNTI5NDExOCAwLjI1NDkwMTk2MDgAA</bytes>
+							<bytes key="NSRGB">MC4xNjA3ODQzMTM3IDAuMTk2MDc4NDMxNCAwLjMxMzcyNTQ5MDIAA</bytes>
 						</object>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<bool key="IBUIMultipleTouchEnabled">YES</bool>
@@ -99,7 +99,7 @@
 				<reference key="NSNextKeyView" ref="521517020"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">1</int>
-					<bytes key="NSRGB">MC4yMTE3NjQ3MDU5IDAuMjIzNTI5NDExOCAwLjI1NDkwMTk2MDgAA</bytes>
+					<bytes key="NSRGB">MC4xNjA3ODQzMTM3IDAuMTk2MDc4NDMxNCAwLjMxMzcyNTQ5MDIAA</bytes>
 				</object>
 				<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
