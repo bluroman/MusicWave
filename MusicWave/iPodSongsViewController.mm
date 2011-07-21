@@ -60,6 +60,16 @@
         [scrollView setContentSize:CGSizeMake(pixelCount, graphView.bounds.size.height)];
         [graphView setFrame:CGRectMake(0, 0, pixelCount, graphView.bounds.size.height)];
     }
+    NSManagedObjectContext *context = [currentSong managedObjectContext];
+    NSError *error = nil;
+    
+    if ([context hasChanges] && ![context save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        NSLog(@"Saving graph error");
+        [self deleteCurrentSong];
+        return;
+    }
+
     [graphView setUpBookMarkLayer];
     scrollView.contentOffset = CGPointMake(0.0, 0.0);
     [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
