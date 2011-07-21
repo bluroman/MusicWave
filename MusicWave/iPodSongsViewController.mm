@@ -947,7 +947,7 @@
     [soundOffImage release];
     
     UIImageView *soundOnImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_on.png"]];
-    soundOnImage.frame = CGRectMake(285, 407-65, 14, 10);
+    soundOnImage.frame = CGRectMake(285, 407-65, 13, 10);
     [self.view addSubview:soundOnImage];
     [soundOnImage release];
     

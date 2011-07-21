@@ -16,6 +16,7 @@
 - (CGRect)_imageViewFrame;
 - (CGRect)_titleLabelFrame;
 - (CGRect)_artistLabelFrame;
+- (CGRect)_graphImageViewFrame;
 - (CGRect)_durationLabelFrame;
 @end
 
@@ -25,7 +26,8 @@
 
 @implementation PlayListTableViewCell
 
-@synthesize song, imageView, titleLabel, artistLabel, durationLabel, nowPlaying;
+@synthesize song, imageView, titleLabel, artistLabel, nowPlaying;
+@synthesize graphView;
 
 
 #pragma mark -
@@ -49,7 +51,7 @@
         [artistLabel setBackgroundColor:[UIColor clearColor]];
         [self.contentView addSubview:artistLabel];
         
-        durationLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        /*durationLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         durationLabel.textAlignment = UITextAlignmentLeft;
         //[durationLabel setFont:[UIFont fontWithName:@"Tahoma Bold" size:(11.0)]];
         [durationLabel setFont:[UIFont systemFontOfSize:11.0]];
@@ -58,7 +60,7 @@
         [durationLabel setBackgroundColor:[UIColor clearColor]];
 		//durationLabel.minimumFontSize = 7.0;
 		//durationLabel.lineBreakMode = UILineBreakModeTailTruncation;
-        [self.contentView addSubview:durationLabel];
+        [self.contentView addSubview:durationLabel];*/
         
         titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         titleLabel.textAlignment = UITextAlignmentLeft;
@@ -67,6 +69,10 @@
         [titleLabel setHighlightedTextColor:[UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0]];
         [titleLabel setBackgroundColor:[UIColor clearColor]];
         [self.contentView addSubview:titleLabel];
+        
+        graphView = [[UIImageView alloc] initWithFrame:CGRectZero];
+		graphView.contentMode = UIViewContentModeScaleAspectFit;
+        [self.contentView addSubview:graphView];
         
         self.nowPlaying = NO;
         
@@ -88,14 +94,14 @@
     [imageView setFrame:[self _imageViewFrame]];
     [titleLabel setFrame:[self _titleLabelFrame]];
     [artistLabel setFrame:[self _artistLabelFrame]];
-    //if (!self.nowPlaying) {
-        [durationLabel setFrame:[self _durationLabelFrame]];
-    //}
+    [graphView setFrame:[self _graphImageViewFrame]];
     
     if (self.editing || self.nowPlaying) {
-        durationLabel.alpha = 0.0;
+        //durationLabel.alpha = 0.0;
+        graphView.alpha = 0.0;
     } else {
-        durationLabel.alpha = 1.0;
+        //durationLabel.alpha = 1.0;
+        graphView.alpha = 1.0;
     }
 }
 
@@ -142,6 +148,11 @@
     return CGRectMake(contentViewBounds.size.width - PREP_TIME_WIDTH - TEXT_RIGHT_MARGIN, 25.0, PREP_TIME_WIDTH, 14.0);
 }
 
+- (CGRect)_graphImageViewFrame {
+    //CGRect contentViewBounds = self.contentView.bounds;
+    return CGRectMake(290/*contentViewBounds.size.width - PREP_TIME_WIDTH - TEXT_RIGHT_MARGIN*/, 21.0, 15, 19.0);
+}
+
 
 #pragma mark -
 #pragma mark Song set accessor
@@ -151,19 +162,16 @@
         [song release];
         song = [newSong retain];
 	}
-    //MPMediaItem *anItem = song.song;
-	
-	//if (anItem) {
-        //MPMediaItemArtwork *artwork = [anItem valueForProperty: MPMediaItemPropertyArtwork];
-    imageView.image = song.artworkImage;//[artwork imageWithSize:[imageView frame].size];
+    imageView.image = song.artworkImage;
     if (imageView.image == nil) {
         imageView.image = [UIImage imageNamed:@"artist_img.png"];
     }
     titleLabel.text = song.songTitle;
     artistLabel.text = song.songArtist;
-        //NSNumber *durationNumber = [anItem valueForProperty:MPMediaItemPropertyPlaybackDuration];
-    durationLabel.text = [NSString stringWithFormat: @"%02d:%02d",[song.songDuration intValue] / 60,[song.songDuration intValue] % 60];
-	//}
+    if ([song.doneGraphDrawing boolValue]) {
+        graphView.image = [UIImage imageNamed:@"graph_t2_on.png"];
+    }
+    else graphView.image = [UIImage imageNamed:@"graph_t2_off.png"];
 }
 
 
@@ -175,7 +183,7 @@
     [imageView release];
     [titleLabel release];
     [artistLabel release];
-    [durationLabel release];
+    [graphView release];
     [super dealloc];
 }
 

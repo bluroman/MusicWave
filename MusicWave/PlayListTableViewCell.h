@@ -16,14 +16,14 @@
     UIImageView *imageView;
     UILabel *titleLabel;
     UILabel *artistLabel;
-    UILabel *durationLabel;
+    UIImageView *graphView;
     BOOL nowPlaying;
 }
 @property (nonatomic, retain) Song *song;
 
 @property (nonatomic, retain) UIImageView *imageView;
+@property (nonatomic, retain) UIImageView *graphView;
 @property (nonatomic, retain) UILabel *titleLabel;
 @property (nonatomic, retain) UILabel *artistLabel;
-@property (nonatomic, retain) UILabel *durationLabel;
 @property (nonatomic, assign) BOOL nowPlaying;
 @end
