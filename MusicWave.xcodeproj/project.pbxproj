@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2800938313D5AED8001E1F36 /* BookMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938213D5AED8001E1F36 /* BookMark.m */; };
-		2800938613D5AED8001E1F36 /* Song.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938513D5AED8001E1F36 /* Song.m */; };
-		2800938913D5AED8001E1F36 /* ViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2800938813D5AED8001E1F36 /* ViewInfo.m */; };
+		28882E0C13D7AB3F0009EB9A /* Song.m in Sources */ = {isa = PBXBuildFile; fileRef = 28882E0B13D7AB3F0009EB9A /* Song.m */; };
+		28882E0F13D7AB590009EB9A /* BookMark.m in Sources */ = {isa = PBXBuildFile; fileRef = 28882E0E13D7AB590009EB9A /* BookMark.m */; };
+		28882E1213D7AB670009EB9A /* ViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 28882E1113D7AB670009EB9A /* ViewInfo.m */; };
 		288AE35313CEDE2F00453026 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35213CEDE2F00453026 /* UIKit.framework */; };
 		288AE35513CEDE2F00453026 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35413CEDE2F00453026 /* Foundation.framework */; };
 		288AE35713CEDE2F00453026 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288AE35613CEDE2F00453026 /* CoreGraphics.framework */; };
@@ -83,12 +83,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2800938113D5AED8001E1F36 /* BookMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BookMark.h; sourceTree = "<group>"; };
-		2800938213D5AED8001E1F36 /* BookMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BookMark.m; sourceTree = "<group>"; };
-		2800938413D5AED8001E1F36 /* Song.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Song.h; sourceTree = "<group>"; };
-		2800938513D5AED8001E1F36 /* Song.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Song.m; sourceTree = "<group>"; };
-		2800938713D5AED8001E1F36 /* ViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewInfo.h; sourceTree = "<group>"; };
-		2800938813D5AED8001E1F36 /* ViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewInfo.m; sourceTree = "<group>"; };
+		28882E0A13D7AB3F0009EB9A /* Song.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Song.h; sourceTree = "<group>"; };
+		28882E0B13D7AB3F0009EB9A /* Song.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Song.m; sourceTree = "<group>"; };
+		28882E0D13D7AB590009EB9A /* BookMark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BookMark.h; sourceTree = "<group>"; };
+		28882E0E13D7AB590009EB9A /* BookMark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BookMark.m; sourceTree = "<group>"; };
+		28882E1013D7AB670009EB9A /* ViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewInfo.h; sourceTree = "<group>"; };
+		28882E1113D7AB670009EB9A /* ViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewInfo.m; sourceTree = "<group>"; };
 		288AE34E13CEDE2F00453026 /* MusicWave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		288AE35213CEDE2F00453026 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288AE35413CEDE2F00453026 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -320,13 +320,13 @@
 		288AE41B13CEE6E600453026 /* DataHelper */ = {
 			isa = PBXGroup;
 			children = (
+				28882E0A13D7AB3F0009EB9A /* Song.h */,
+				28882E0B13D7AB3F0009EB9A /* Song.m */,
+				28882E1013D7AB670009EB9A /* ViewInfo.h */,
+				28882E1113D7AB670009EB9A /* ViewInfo.m */,
 				288AE38E13CEDF2900453026 /* MusicWave.xcdatamodel */,
-				2800938713D5AED8001E1F36 /* ViewInfo.h */,
-				2800938813D5AED8001E1F36 /* ViewInfo.m */,
-				2800938413D5AED8001E1F36 /* Song.h */,
-				2800938513D5AED8001E1F36 /* Song.m */,
-				2800938113D5AED8001E1F36 /* BookMark.h */,
-				2800938213D5AED8001E1F36 /* BookMark.m */,
+				28882E0D13D7AB590009EB9A /* BookMark.h */,
+				28882E0E13D7AB590009EB9A /* BookMark.m */,
 			);
 			name = DataHelper;
 			sourceTree = "<group>";
@@ -487,9 +487,9 @@
 				288AE3B013CEDF2A00453026 /* BookMarkListViewController.m in Sources */,
 				288AE3B213CEDF2A00453026 /* MusicTableViewController.m in Sources */,
 				288AE3B513CEDF2A00453026 /* iPodSongsViewController.mm in Sources */,
-				2800938313D5AED8001E1F36 /* BookMark.m in Sources */,
-				2800938613D5AED8001E1F36 /* Song.m in Sources */,
-				2800938913D5AED8001E1F36 /* ViewInfo.m in Sources */,
+				28882E0C13D7AB3F0009EB9A /* Song.m in Sources */,
+				28882E0F13D7AB590009EB9A /* BookMark.m in Sources */,
+				28882E1213D7AB670009EB9A /* ViewInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
