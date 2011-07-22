@@ -75,10 +75,10 @@
 		2891725113D3F4D10013E2CF /* picker_bg_right.png in Resources */ = {isa = PBXBuildFile; fileRef = 2891724F13D3F4CB0013E2CF /* picker_bg_right.png */; };
 		2891725413D51DA00013E2CF /* middle_bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 2891725313D51D9D0013E2CF /* middle_bar.png */; };
 		28A13AB713D7905300707EE1 /* sound_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13AB613D7905300707EE1 /* sound_on.png */; };
-		28A13ABA13D7917800707EE1 /* graph_t1_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13AB813D7917800707EE1 /* graph_t1_off.png */; };
-		28A13ABB13D7917800707EE1 /* graph_t1_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13AB913D7917800707EE1 /* graph_t1_on.png */; };
-		28A13ABE13D7918900707EE1 /* graph_t2_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13ABC13D7918900707EE1 /* graph_t2_off.png */; };
-		28A13ABF13D7918900707EE1 /* graph_t2_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13ABD13D7918900707EE1 /* graph_t2_on.png */; };
+		28DE36FE13D9225D00457AFB /* graph_t1_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE36FC13D9225D00457AFB /* graph_t1_off.png */; };
+		28DE36FF13D9225D00457AFB /* graph_t1_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE36FD13D9225D00457AFB /* graph_t1_on.png */; };
+		28DE370213D9226B00457AFB /* graph_t2_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE370013D9226B00457AFB /* graph_t2_off.png */; };
+		28DE370313D9226B00457AFB /* graph_t2_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE370113D9226B00457AFB /* graph_t2_on.png */; };
 		28F6316D13D00D72000172FF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28F6316B13D00D72000172FF /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
@@ -170,10 +170,10 @@
 		2891724F13D3F4CB0013E2CF /* picker_bg_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = picker_bg_right.png; sourceTree = "<group>"; };
 		2891725313D51D9D0013E2CF /* middle_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = middle_bar.png; sourceTree = "<group>"; };
 		28A13AB613D7905300707EE1 /* sound_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sound_on.png; sourceTree = "<group>"; };
-		28A13AB813D7917800707EE1 /* graph_t1_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_off.png; sourceTree = "<group>"; };
-		28A13AB913D7917800707EE1 /* graph_t1_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_on.png; sourceTree = "<group>"; };
-		28A13ABC13D7918900707EE1 /* graph_t2_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_off.png; sourceTree = "<group>"; };
-		28A13ABD13D7918900707EE1 /* graph_t2_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_on.png; sourceTree = "<group>"; };
+		28DE36FC13D9225D00457AFB /* graph_t1_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_off.png; sourceTree = "<group>"; };
+		28DE36FD13D9225D00457AFB /* graph_t1_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_on.png; sourceTree = "<group>"; };
+		28DE370013D9226B00457AFB /* graph_t2_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_off.png; sourceTree = "<group>"; };
+		28DE370113D9226B00457AFB /* graph_t2_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_on.png; sourceTree = "<group>"; };
 		28F6316C13D00D72000172FF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		28F6316E13D00D7D000172FF /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -251,10 +251,10 @@
 		288AE35B13CEDE2F00453026 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				28A13ABC13D7918900707EE1 /* graph_t2_off.png */,
-				28A13ABD13D7918900707EE1 /* graph_t2_on.png */,
-				28A13AB813D7917800707EE1 /* graph_t1_off.png */,
-				28A13AB913D7917800707EE1 /* graph_t1_on.png */,
+				28DE370013D9226B00457AFB /* graph_t2_off.png */,
+				28DE370113D9226B00457AFB /* graph_t2_on.png */,
+				28DE36FC13D9225D00457AFB /* graph_t1_off.png */,
+				28DE36FD13D9225D00457AFB /* graph_t1_on.png */,
 				2891725313D51D9D0013E2CF /* middle_bar.png */,
 				2891724E13D3F4C70013E2CF /* picker_bg_left.png */,
 				2891724F13D3F4CB0013E2CF /* picker_bg_right.png */,
@@ -459,10 +459,10 @@
 				2891725113D3F4D10013E2CF /* picker_bg_right.png in Resources */,
 				2891725413D51DA00013E2CF /* middle_bar.png in Resources */,
 				28A13AB713D7905300707EE1 /* sound_on.png in Resources */,
-				28A13ABA13D7917800707EE1 /* graph_t1_off.png in Resources */,
-				28A13ABB13D7917800707EE1 /* graph_t1_on.png in Resources */,
-				28A13ABE13D7918900707EE1 /* graph_t2_off.png in Resources */,
-				28A13ABF13D7918900707EE1 /* graph_t2_on.png in Resources */,
+				28DE36FE13D9225D00457AFB /* graph_t1_off.png in Resources */,
+				28DE36FF13D9225D00457AFB /* graph_t1_on.png in Resources */,
+				28DE370213D9226B00457AFB /* graph_t2_off.png in Resources */,
+				28DE370313D9226B00457AFB /* graph_t2_on.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,7 +520,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -529,6 +530,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				PROVISIONING_PROFILE = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -537,13 +540,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
