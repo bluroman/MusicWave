@@ -55,6 +55,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     NSManagedObjectContext *managedObjectContext;
     CGFloat startPickerPosition;
     CGFloat endPickerPosition;
+    BOOL movingOffset;
     //BOOL selectedCurrentSong;
 }
 @property (nonatomic, retain) MyMediaPickerDelegate *mediaControllerDelegate;

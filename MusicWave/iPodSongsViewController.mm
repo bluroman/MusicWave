@@ -39,7 +39,7 @@
 
 - (void)startDrawingCurrentGraphViewThread {
     [self.view setAlpha:0.7f];
-    HUD.mode = MBProgressHUDModeIndeterminate;
+    
     [NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
 }
 - (void)loadComplete:(id)total {
@@ -319,6 +319,7 @@
         [avPlayer removeTimeObserver:timeObserver];
         timeObserver = nil;
     }
+    movingOffset = NO;
     if (repeatMode) {
         repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
     }
@@ -342,6 +343,7 @@
 - (void)drawingCurrentGraphView {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     if (![currentSong.doneGraphDrawing boolValue]) {
+        HUD.mode = MBProgressHUDModeIndeterminate;
         HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
         
         HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
@@ -352,6 +354,7 @@
         [self extractDataFromAsset:songAsset];
     }
     else {
+        HUD.mode = MBProgressHUDModeIndeterminate;
         HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
         HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
         [HUD show:YES];
@@ -362,7 +365,7 @@
     [pool release];
 }
 - (void)deleteCurrentSong {
-    NSLog(@"delete currentSong in MainView");
+    //NSLog(@"delete currentSong in MainView");
     if (playState == playBackStatePlaying) {
         [self pause];
     }
@@ -371,6 +374,7 @@
         playbackTimer = nil;
     }
     self.currentSong = nil;
+    movingOffset = NO;
     graphView.currentSong = self.currentSong;
     [graphView.viewInfoArray removeAllObjects];
     [self.bookMarkArray removeAllObjects];
@@ -413,15 +417,18 @@
     if (repeatMode) {
         ViewInfo *startViewInfo = nil;
         ViewInfo *endViewInfo = nil;
+        CGFloat position = 0.;
         if (self.startPickerPosition != 0 && self.endPickerPosition != 0) {
             if (self.startPickerPosition  < self.endPickerPosition)
             {
                 startViewInfo = [graphView.viewInfoArray objectAtIndex:self.startPickerPosition];
                 endViewInfo = [graphView.viewInfoArray objectAtIndex:self.endPickerPosition];
+                position = self.startPickerPosition;
             }
             else if (self.endPickerPosition < self.startPickerPosition) {
                 startViewInfo = [graphView.viewInfoArray objectAtIndex:self.endPickerPosition];
                 endViewInfo = [graphView.viewInfoArray objectAtIndex:self.startPickerPosition];
+                position = self.endPickerPosition;
             }
             else {
                 //NSLog(@"This is very weird case");
@@ -444,6 +451,16 @@
                 //[avPlayer removeTimeObserver:timeObserver];
                 //timeObserver = nil;
                 [self setCurrentPostion:[startViewInfo.time floatValue]];
+                //[self updatePosition];
+                CGFloat moveOffset = position - scrollView.bounds.size.width / 2;
+                
+                if (scrollView.contentSize.width - position < scrollView.bounds.size.width / 2) {
+                    moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 
+                }
+                if (moveOffset < 0) {
+                    moveOffset = 0;
+                }
+                [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
             }];
             
         }
@@ -623,6 +640,27 @@
     //NSLog(@"update position %f", temp);
 	
     [graphView setCurrentPlaybackPosition:temp];
+    
+    if(movingOffset == NO && scrollView.contentOffset.x + scrollView.bounds.size.width - 20 < graphView.currentPixel && graphView.currentPixel < scrollView.contentOffset.x + scrollView.bounds.size.width)
+    {
+       //NSLog(@"Current PlayBack Position:%f, contentOffset:%f, width:%f", graphView.currentPixel, scrollView.contentOffset.x, scrollView.bounds.size.width);
+        movingOffset = YES;
+    }
+    if (movingOffset) {
+        if (scrollView.contentOffset.x + scrollView.bounds.size.width / 2 > graphView.currentPixel || graphView.currentPixel > scrollView.contentOffset.x + scrollView.bounds.size.width) {
+            movingOffset = NO;
+        }
+    }
+    if (movingOffset) {
+        
+        CGFloat moveOffset = scrollView.contentOffset.x + 1.0f;
+        [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+        if (graphView.currentPixel < scrollView.contentOffset.x + scrollView.bounds.size.width/2) {
+            movingOffset = NO;
+        }
+    }
+        
+        
 }
 - (void)setCurrentPostion:(CGFloat)value {
     [avPlayer seekToTime:CMTimeMake(value * 1000, 1000)];
@@ -1100,7 +1138,7 @@
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	//self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
-    NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
     if (index == 0) {
         if (picker.tag == 0) {
             self.startPickerPosition = 0.f;
@@ -1115,7 +1153,7 @@
     
     int bookMarkCount = [self.bookMarkArray count];
     if (bookMarkCount < index) {
-        NSLog(@"No book mark available in %d", index);
+        //NSLog(@"No book mark available in %d", index);
         return;
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:index - 1];
@@ -1125,9 +1163,9 @@
     else {
         self.endPickerPosition = [tempBookMark.position floatValue];
     }
-    NSLog(@"Self startPickerPosition:%f, endPickerPosition:%f", self.startPickerPosition, self.endPickerPosition);
+    //NSLog(@"Self startPickerPosition:%f, endPickerPosition:%f", self.startPickerPosition, self.endPickerPosition);
     ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
-    NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
+    //NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
     //[self updatePosition];
     CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2;
@@ -1173,6 +1211,8 @@
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [avPlayer seekToTime:kCMTimeZero];
     [graphView.layer setNeedsDisplay];
+    [scrollView setContentOffset:CGPointMake(0.0, 0.0)];
+    movingOffset = NO;
     [self pause];
     if (repeatMode) {
         [self play];
