@@ -91,7 +91,6 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 - (void) unregisterTimeObserver;
 - (void) extractDataFromAsset:(AVURLAsset *)songAsset;
 - (void) setCurrentPostion: (CGFloat)value;
-- (void) startGetDrawingInfoThread:(AVURLAsset *)currentAsset;
 - (void) loadComplete: (id)total;
 -(void) createPlaybackTimer;
 - (void) drawingCurrentGraphView;
@@ -100,4 +99,5 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller;
 - (void) deleteCurrentSong;
 - (int) restorePickerIndex:(NSNumber *)position;
+- (void)startDrawingCurrentGraphViewThread;
 @end

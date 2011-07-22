@@ -37,18 +37,10 @@
 @synthesize startPickerPosition, endPickerPosition;
 //@synthesize selectedCurrentSong;
 
-- (void)startGetDrawingInfoThread:(AVURLAsset *)currentAsset {
-    
+- (void)startDrawingCurrentGraphViewThread {
     [self.view setAlpha:0.7f];
-	HUD.mode = MBProgressHUDModeIndeterminate;
-    HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
-    
-    HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
-	
-    [HUD show:YES];
-    //NSLog(@"HUD retain count:%d", [HUD retainCount]);
-
-    [NSThread detachNewThreadSelector:@selector(extractDataFromAsset:) toTarget:self withObject:currentAsset];
+    HUD.mode = MBProgressHUDModeIndeterminate;
+    [NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
 }
 - (void)loadComplete:(id)total {
     int pixelCount = [total intValue];
@@ -74,11 +66,12 @@
     scrollView.contentOffset = CGPointMake(0.0, 0.0);
     [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
     [graphView setNeedsDisplay];
-    [HUD hide:YES];
-    [self.view setAlpha:1.0f];
     [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
     [self.startPickerView scrollToElement:0 animated:NO];
     [self.endPickerView scrollToElement:0 animated:NO];
+    
+    [HUD hide:YES];
+    [self.view setAlpha:1.0f];
 }
 - (void) addGraphViewArray {
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"x" ascending:YES];
@@ -97,7 +90,6 @@
     [tempViewInfoArray release];
 }
 - (void) extractDataFromAsset:(AVURLAsset *)songAsset {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     NSError * error = nil;
     UInt64 songSampleRate = 0;
     UInt64 channelsPerFrame = 0;
@@ -286,13 +278,6 @@
     currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
 
     [reader release];
-    
-    id idVar = [NSNumber numberWithInt: pixel];
-	[self performSelectorOnMainThread:@selector(loadComplete:) withObject:idVar waitUntilDone:NO];
-    
-	[pool release];
-   
- 
 }
 - (void)updateCurrentSong {
     if (playState == playBackStatePlaying) {
@@ -351,21 +336,33 @@
 	[sortDescriptors release];
 	[sortedBookMarks release];
 
-    [self drawingCurrentGraphView];
+    [self startDrawingCurrentGraphViewThread];
     
 }
 - (void)drawingCurrentGraphView {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     if (![currentSong.doneGraphDrawing boolValue]) {
+        HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
+        
+        HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
+        
+        [HUD show:YES];
+
         AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
-        [self startGetDrawingInfoThread:songAsset];
+        [self extractDataFromAsset:songAsset];
     }
     else {
+        HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
+        HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
+        [HUD show:YES];
         [self addGraphViewArray];
-        id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
-        [self loadComplete:idVar];
     }
+    id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
+	[self performSelectorOnMainThread:@selector(loadComplete:) withObject:idVar waitUntilDone:NO];
+    [pool release];
 }
 - (void)deleteCurrentSong {
+    NSLog(@"delete currentSong in MainView");
     if (playState == playBackStatePlaying) {
         [self pause];
     }
@@ -654,9 +651,6 @@
 }
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller {
 	[controller dismissModalViewControllerAnimated: YES];
-    //if (self.selectedCurrentSong) {
-        //[self updateCurrentSong];
-    //}
 }
 
 - (IBAction) selectSongs:(id)sender {
@@ -718,17 +712,6 @@
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }
-    
-    //NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
-	//NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-	
-	//NSMutableArray *sortedBookMarks = [[NSMutableArray alloc] initWithArray:[currentSong.bookmarks allObjects]];
-	//[sortedBookMarks sortUsingDescriptors:sortDescriptors];
-	//self.bookMarkArray = sortedBookMarks;
-    
-	//[sortDescriptor release];
-	//[sortDescriptors release];
-	//[sortedBookMarks release];
 }
 - (int) restorePickerIndex:(NSNumber *)position {
     int bookMarkCount = [self.bookMarkArray count];
@@ -1164,7 +1147,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"main view will appear");
+    //NSLog(@"main view will appear");
     [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
     [graphView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];

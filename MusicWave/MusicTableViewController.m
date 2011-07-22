@@ -91,7 +91,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (IBAction) showMediaPicker: (id) sender {
 
 	MPMediaPickerController *picker =
-		[[MPMediaPickerController alloc] initWithMediaTypes: MPMediaTypeAnyAudio];
+		[[MPMediaPickerController alloc] initWithMediaTypes: MPMediaTypeMusic];
 	
 	picker.delegate						= self;
 	picker.allowsPickingMultipleItems	= YES;
@@ -283,13 +283,14 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     // Navigation logic may go here. Create and push another view controller.
     
     //NSLog(@"play list table view did select:%d", indexPath.row);
-    NSLog(@"play list select");
+    //NSLog(@"play list select");
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
     ((iPodSongsViewController *)mainViewController).currentSong = song;
     [(iPodSongsViewController *)mainViewController updateCurrentSong];
+    //[(iPodSongsViewController *)mainViewController startUpdateCurrentSongThread];
     [tableView deselectRowAtIndexPath: indexPath animated: YES];
     [(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
-    NSLog(@"view disappear");
+    //NSLog(@"view disappear");
 }
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
