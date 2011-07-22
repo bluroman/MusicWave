@@ -52,16 +52,7 @@
         [scrollView setContentSize:CGSizeMake(pixelCount, graphView.bounds.size.height)];
         [graphView setFrame:CGRectMake(0, 0, pixelCount, graphView.bounds.size.height)];
     }
-    NSManagedObjectContext *context = [currentSong managedObjectContext];
-    NSError *error = nil;
     
-    if ([context hasChanges] && ![context save:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        NSLog(@"Saving graph error");
-        [self deleteCurrentSong];
-        return;
-    }
-
     [graphView setUpBookMarkLayer];
     scrollView.contentOffset = CGPointMake(0.0, 0.0);
     [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
@@ -276,6 +267,19 @@
     
     [self addGraphViewArray];
     currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
+    
+    //NSManagedObjectContext *context = [currentSong managedObjectContext];
+    //NSError *error = nil;
+    
+    if ([context hasChanges] && ![context save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        NSLog(@"Saving graph error");
+        [reader release];
+        [self deleteCurrentSong];
+        
+        return;
+    }
+
 
     [reader release];
 }
@@ -1133,7 +1137,7 @@
 	CGSize textSize = [text sizeWithFont:[UIFont boldSystemFontOfSize:16.0]
 					   constrainedToSize:constrainedSize
 						   lineBreakMode:UILineBreakModeWordWrap];
-	return textSize.width + 20.0f; // 20px padding on each side
+	return textSize.width + 22.0f; // 20px padding on each side
 }
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
