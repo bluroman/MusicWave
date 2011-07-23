@@ -74,6 +74,7 @@
 		2891725013D3F4D10013E2CF /* picker_bg_left.png in Resources */ = {isa = PBXBuildFile; fileRef = 2891724E13D3F4C70013E2CF /* picker_bg_left.png */; };
 		2891725113D3F4D10013E2CF /* picker_bg_right.png in Resources */ = {isa = PBXBuildFile; fileRef = 2891724F13D3F4CB0013E2CF /* picker_bg_right.png */; };
 		2891725413D51DA00013E2CF /* middle_bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 2891725313D51D9D0013E2CF /* middle_bar.png */; };
+		289E3A8613DA7D7C00B5F687 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 289E3A8513DA7D7C00B5F687 /* Entitlements.plist */; };
 		28A13AB713D7905300707EE1 /* sound_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A13AB613D7905300707EE1 /* sound_on.png */; };
 		28DE36FE13D9225D00457AFB /* graph_t1_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE36FC13D9225D00457AFB /* graph_t1_off.png */; };
 		28DE36FF13D9225D00457AFB /* graph_t1_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE36FD13D9225D00457AFB /* graph_t1_on.png */; };
@@ -169,6 +170,7 @@
 		2891724E13D3F4C70013E2CF /* picker_bg_left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = picker_bg_left.png; sourceTree = "<group>"; };
 		2891724F13D3F4CB0013E2CF /* picker_bg_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = picker_bg_right.png; sourceTree = "<group>"; };
 		2891725313D51D9D0013E2CF /* middle_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = middle_bar.png; sourceTree = "<group>"; };
+		289E3A8513DA7D7C00B5F687 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		28A13AB613D7905300707EE1 /* sound_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sound_on.png; sourceTree = "<group>"; };
 		28DE36FC13D9225D00457AFB /* graph_t1_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_off.png; sourceTree = "<group>"; };
 		28DE36FD13D9225D00457AFB /* graph_t1_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t1_on.png; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 		288AE34313CEDE2E00453026 = {
 			isa = PBXGroup;
 			children = (
+				289E3A8513DA7D7C00B5F687 /* Entitlements.plist */,
 				288AE3B713CEDF4300453026 /* Default.png */,
 				288AE35A13CEDE2F00453026 /* MusicWave */,
 				288AE35113CEDE2F00453026 /* Frameworks */,
@@ -463,6 +466,7 @@
 				28DE36FF13D9225D00457AFB /* graph_t1_on.png in Resources */,
 				28DE370213D9226B00457AFB /* graph_t2_off.png in Resources */,
 				28DE370313D9226B00457AFB /* graph_t2_on.png in Resources */,
+				289E3A8613DA7D7C00B5F687 /* Entitlements.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,7 +524,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -529,8 +533,8 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				PROVISIONING_PROFILE = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
 				SDKROOT = iphoneos;
 			};
@@ -540,15 +544,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
 				SDKROOT = iphoneos;
 			};
@@ -563,7 +567,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -577,12 +581,46 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
+		};
+		289E3A8313DA7B9700B5F687 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: hoon nam";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "940C6AF4-B2CE-4947-90AC-F046E3EA7E0F";
+				SDKROOT = iphoneos;
+			};
+			name = Distribution;
+		};
+		289E3A8413DA7B9700B5F687 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_ENTITLEMENTS[sdk=*]" = Entitlements.plist;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
+				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Distribution;
 		};
 /* End XCBuildConfiguration section */
 
@@ -592,6 +630,7 @@
 			buildConfigurations = (
 				288AE37213CEDE2F00453026 /* Debug */,
 				288AE37313CEDE2F00453026 /* Release */,
+				289E3A8313DA7B9700B5F687 /* Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -601,6 +640,7 @@
 			buildConfigurations = (
 				288AE37513CEDE2F00453026 /* Debug */,
 				288AE37613CEDE2F00453026 /* Release */,
+				289E3A8413DA7B9700B5F687 /* Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
