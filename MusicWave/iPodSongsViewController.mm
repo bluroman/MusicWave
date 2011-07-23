@@ -186,7 +186,7 @@
                     }
                     if (remaining < len) break;
                 }
-                float percent = 100.0 * (float)i/mMaxSamples;
+                //float percent = 100.0 * (float)i/mMaxSamples;
                 //NSLog(@"Progress:%f ,%i, %i, %f, %d", (float)i/mMaxSamples, i, mMaxSamples, percent, (int)percent);
                 progress = (float)i / mMaxSamples;
                 //HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", (int)percent];
@@ -644,6 +644,10 @@
     //NSLog(@"update position %f", temp);
 	
     [graphView setCurrentPlaybackPosition:temp];
+    if (scrollView.contentSize.width < scrollView.bounds.size.width) {
+        movingOffset = NO;
+        return;
+    }
     
     if(movingOffset == NO && scrollView.contentOffset.x + scrollView.bounds.size.width - 20 < graphView.currentPixel && graphView.currentPixel < scrollView.contentOffset.x + scrollView.bounds.size.width)
     {
