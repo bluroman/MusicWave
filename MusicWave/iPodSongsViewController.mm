@@ -38,7 +38,7 @@
 //@synthesize selectedCurrentSong;
 
 - (void)startDrawingCurrentGraphViewThread {
-    [self.view setAlpha:0.7f];
+    //[self.view setAlpha:0.7f];
     
     [NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
 }
@@ -62,7 +62,7 @@
     [self.endPickerView scrollToElement:0 animated:NO];
     
     [HUD hide:YES];
-    [self.view setAlpha:1.0f];
+    //[self.view setAlpha:1.0f];
 }
 - (void) addGraphViewArray {
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"x" ascending:YES];
@@ -189,7 +189,7 @@
                 float percent = 100.0 * (float)i/mMaxSamples;
                 //NSLog(@"Progress:%f ,%i, %i, %f, %d", (float)i/mMaxSamples, i, mMaxSamples, percent, (int)percent);
                 progress = (float)i / mMaxSamples;
-                HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", (int)percent];
+                //HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", (int)percent];
                 
             }
 
@@ -205,7 +205,7 @@
         //NSLog(@"completed reading");
         //progress = 1.0f;
         //HUD.progress = 1.0f;
-        HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", 100];
+        //HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", 100];
     }
     CGFloat min=0., max=0., sumsq = 0., rms = 0., d = 0.;
     int j = 0;
