@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>helpTitle</key>
+		<string>Main Control Overview</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>Thou art so fat-witted, with drinking of old sack, and unbuttoning thee after supper, and sleeping upon benches after noon, that thou hast forgotten to demand that truly which thou wouldst truly know.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+			<dict>
+				<key>description</key>
+				<string>By heaven, methinks, it were an easy leap,
+To pluck bright honour from the pale-fac&apos;d moon,
+Or dive into the bottom of the deep,
+Where fathom-line could never touch the ground,
+And pluck up drowned honour by the locks;
+So he, that doth redeem her thence, might wear
+Without corrival, all her dignities:
+But out upon this half-fac&apos;d fellowship!</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+			<dict>
+				<key>description</key>
+				<string>I have peppered two of them: two, I am sure I have paid, two rogues in buckram suits. I tell thee what, Hal, if I tell thee a lie, spit in my face; call me horse. Thou knowest my old ward: here I lay, and thus I bore my point. Four rogues in buckram let drive at me…</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+			<dict>
+				<key>description</key>
+				<string>Give you a reason on compulsion! If reasons were as plenty as blackberries, I would give no man a reason upon compulsion, I.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>Add song to music list</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>Four days will quickly steep themselves in nights;
+Four nights will quickly dream away the time;
+And then the moon, like to a silver bow
+New bent in heaven, shall behold the night
+Of our solemnities.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+			<dict>
+				<key>description</key>
+				<string>If we shadows have offended,
+Think but this, and all is mended,
+That you have but slumber&apos;d here
+While these visions did appear.
+And this weak and idle theme,
+No more yielding, but a dream,
+Gentles, do not reprehend;
+If you pardon, we will mend.
+And, as I am an honest Puck,
+If we have unearnéd luck,
+Now to &apos;scape the serpent&apos;s tongue,
+We will make amends ere long:
+Else the Puck a liar call.
+So good night unto you all.
+Give me your hands, if we be friends,
+And Robin shall restore amends.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>Select song to play</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>If music be the food of love, play on;
+Give me excess of it; that, surfeiting,
+The appetite may sicken, and so die. —
+That strain again; it had a dying fall:
+O, it came oer my ear, like the sweet sound
+That breathes upon a bank of violets,
+Stealing, and giving odour! Enough! No more.
+&apos;Tis not so sweet now as it was before.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>How to bookmark</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>If music be the food of love, play on;
+                    Give me excess of it; that, surfeiting,
+                    The appetite may sicken, and so die. —
+                    That strain again; it had a dying fall:
+                    O, it came oer my ear, like the sweet sound
+                    That breathes upon a bank of violets,
+                    Stealing, and giving odour! Enough! No more.
+                    &apos;Tis not so sweet now as it was before.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>How to select section</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>If music be the food of love, play on;
+                    Give me excess of it; that, surfeiting,
+                    The appetite may sicken, and so die. —
+                    That strain again; it had a dying fall:
+                    O, it came oer my ear, like the sweet sound
+                    That breathes upon a bank of violets,
+                    Stealing, and giving odour! Enough! No more.
+                    &apos;Tis not so sweet now as it was before.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>Remove music from list</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>If music be the food of love, play on;
+                    Give me excess of it; that, surfeiting,
+                    The appetite may sicken, and so die. —
+                    That strain again; it had a dying fall:
+                    O, it came oer my ear, like the sweet sound
+                    That breathes upon a bank of violets,
+                    Stealing, and giving odour! Enough! No more.
+                    &apos;Tis not so sweet now as it was before.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>helpTitle</key>
+		<string>Remove bookmark from list</string>
+		<key>tutorials</key>
+		<array>
+			<dict>
+				<key>description</key>
+				<string>If music be the food of love, play on;
+                    Give me excess of it; that, surfeiting,
+                    The appetite may sicken, and so die. —
+                    That strain again; it had a dying fall:
+                    O, it came oer my ear, like the sweet sound
+                    That breathes upon a bank of violets,
+                    Stealing, and giving odour! Enough! No more.
+                    &apos;Tis not so sweet now as it was before.</string>
+				<key>imageName</key>
+				<string>en_bookmark.PNG</string>
+			</dict>
+		</array>
+	</dict>
+</array>
+</plist>
