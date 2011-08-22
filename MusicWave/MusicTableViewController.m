@@ -55,6 +55,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
 
+#define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
+
 @implementation MusicTableViewController
 
 
@@ -64,7 +66,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 										//		programmatically supports localization.
 @synthesize mainViewController;
 @synthesize deleteIndexPath;
-@synthesize navigationItem;
+@synthesize navigationItem, navigationBar;
 
 @synthesize fetchedResultsController;
 
@@ -74,7 +76,72 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 {
     [super viewDidLoad];
     // Set the table view's row height
-    self.navigationItem.title = NSLocalizedString(@"My List", @"Music List Title");
+    self.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
+    UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
+    //btn.backgroundColor = [UIColor whiteColor];
+    NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
+    NSLog(@"current language:%@", language);
+    if([language isEqualToString:@"ko"])
+        NSLog(@"current string equal to ko");
+    else
+        NSLog(@"current string not equal to ko");
+    
+    //UILabel *label;
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, titleView.bounds.size.width, 44)];
+    titleLabel.tag = 1;
+    titleLabel.backgroundColor = [UIColor clearColor];
+    titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
+    titleLabel.textAlignment = UITextAlignmentCenter;
+    titleLabel.textColor = [UIColor blackColor];
+    titleLabel.text = NSLocalizedString(@"My List", @"Music List Title");
+    titleLabel.highlightedTextColor = [UIColor blackColor];
+    [titleView addSubview:titleLabel];
+    [titleLabel release];
+    //[label release];
+    
+    self.navigationItem.titleView = titleView;
+    [titleView release];
+    
+    UIButton *rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    //rightBarButton.buttonType = UIButtonTypeRoundedRect;
+    
+    //rightBarButton = [[UIButton alloc] buttonWithType:UIButtonTypeRoundedRect];
+	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 29.0f, 30.0f);
+    [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_plus_basic.png"] forState:UIControlStateNormal];
+    [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_plus_press.png"] forState:UIControlStateSelected];
+    [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_plus_press.png"] forState:UIControlStateHighlighted];
+   
+    [rightBarButton addTarget:self action:@selector(showMediaPicker:) forControlEvents: UIControlEventTouchUpInside];
+    //UIBarButtonItem *rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    //[rightBarButton release];
+    UIBarButtonItem *rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    //[rightBarButton release];
+    
+    self.navigationItem.rightBarButtonItem = rightBarItem;
+    [rightBarItem release];
+    
+    UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
+    if ([language isEqualToString:@"ko"]) {
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_basic.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateHighlighted];
+    } else {
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_basic.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateHighlighted];
+    }
+
+    
+    [leftBarButton addTarget:self action:@selector(doneShowingMusicList:) forControlEvents: UIControlEventTouchUpInside];
+    UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    //[leftBarButton release];
+    
+    self.navigationItem.leftBarButtonItem = leftBarItem;
+    [leftBarItem release];
+
+    //self.navigationItem.title = NSLocalizedString(@"My List", @"Music List Title");
     self.navigationItem.prompt = NSLocalizedString(@"Select song to play", @"Music table view prompt");
     self.mediaItemCollectionTable.rowHeight = 58.0;
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
@@ -354,6 +421,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [mainViewController release];
     [deleteIndexPath release];
     [navigationItem release];
+    [navigationBar release];
     [super dealloc];
 }
 #pragma mark - Fetched results controller
