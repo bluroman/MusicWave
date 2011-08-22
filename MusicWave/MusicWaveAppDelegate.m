@@ -10,6 +10,8 @@
 
 //#import "RootViewController.h"
 #import "iPodSongsViewController.h"
+#import "Help.h"
+#import "Tutorial.h"
 
 @implementation MusicWaveAppDelegate
 
@@ -26,11 +28,14 @@
 
 @synthesize mainViewController;
 
+@synthesize helps;
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     //self.window.rootViewController = self.navigationController;
+    [self setUpHelpListArray];
     mainViewController.managedObjectContext = self.managedObjectContext;
     [self.window addSubview:self.navigationController.view];
     //[self createEditableCopyOfDatabaseIfNeeded];
@@ -97,6 +102,38 @@
     //RootViewController *rootViewController = (RootViewController *)[self.navigationController topViewController];
     //rootViewController.managedObjectContext = self.managedObjectContext;
 }
+- (void)setUpHelpListArray {
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"HelpList" withExtension:@"plist"];
+    
+    NSArray *helpDictionariesArray = [[NSArray alloc] initWithContentsOfURL:url];
+    NSMutableArray *helpListArray = [NSMutableArray arrayWithCapacity:[helpDictionariesArray count]];
+    
+    for (NSDictionary *helpDictionary in helpDictionariesArray) {
+        
+        Help *help = [[Help alloc] init];
+        help.title = [helpDictionary objectForKey:@"helpTitle"];
+        
+        NSArray *tutorialDictionaries = [helpDictionary objectForKey:@"tutorials"];
+        NSMutableArray *tutorials = [NSMutableArray arrayWithCapacity:[tutorialDictionaries count]];
+        
+        for (NSDictionary *tutorialDictionary in tutorialDictionaries) {
+            
+            Tutorial *tutorial = [[Tutorial alloc] init];
+            [tutorial setValuesForKeysWithDictionary:tutorialDictionary];
+            
+            [tutorials addObject:tutorial];
+            [tutorial release];
+        }
+        help.tutorials = tutorials;
+        
+        [helpListArray addObject:help];
+        [help release];
+    }
+    
+    self.helps = helpListArray;
+    [helpDictionariesArray release];
+}
+
 
 - (void)saveContext
 {

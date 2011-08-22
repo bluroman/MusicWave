@@ -24,6 +24,9 @@
 - (NSString *)applicationDocumentDirectory;
 - (void) createEditableCopyOfDatabaseIfNeeded;
 
+@property (nonatomic, retain) NSArray *helps;
+- (void)setUpHelpListArray;
+
 @property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
 
 @end
