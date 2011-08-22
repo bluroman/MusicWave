@@ -17,7 +17,7 @@
 @synthesize bookMarkNavItem, bookMarkListTable;
 @synthesize currentSong, mainViewController;
 @synthesize bookMarkArray;
-@synthesize rightBarButton, rightBarItem;
+@synthesize rightBarButton, rightBarItem, menuBarItem;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -38,6 +38,7 @@
     [mainViewController release];
     //[rightBarButton release];
     [rightBarItem release];
+    [menuBarItem release];
     [super dealloc];
 }
 
@@ -47,18 +48,6 @@
     [super didReceiveMemoryWarning];
     
     // Release any cached data, images, etc that aren't in use.
-}
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [super setEditing:editing animated:animated];
-    NSLog(@"setEditing:%d", editing);
-    
-    if (editing) {
-        // Execute tasks for editing status
-        
-    } else {
-        //[rightBarButton setTitle:NSLocalizedString(@"Done", @"Title for done") forState:UIControlStateNormal];
-        // Execute tasks for non-editing status.
-    }
 }
 - (IBAction) tapEditButton: (id)sender {
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
@@ -141,9 +130,9 @@
     UIActionSheet *menu = [[UIActionSheet alloc]
                            initWithTitle: @""
                            delegate:self
-                           cancelButtonTitle:@"Cancel"
+                           cancelButtonTitle:NSLocalizedString(@"Cancel", @"delete cancel")
                            destructiveButtonTitle:nil
-                           otherButtonTitles:@"Help", @"Email Support", @"Rate MusicWave", nil];
+                           otherButtonTitles:NSLocalizedString(@"Help", @"Title for help list"), NSLocalizedString(@"Email Support", @"Title for menu email support"), NSLocalizedString(@"Rate MusicWave", @"Title for menu rate"), nil];
     [menu showInView:self.view];
 }
 - (IBAction) tapMenuButton:(id)sender {
@@ -263,13 +252,13 @@
 
 - (IBAction)gotoReviews:(id)sender
 {
-    NSString *str =@"http://itunes.com/apps/MusicWave";
-    //NSString *str = @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa";
-    //str = [NSString stringWithFormat:@"%@/wa/viewContentsUserReviews?", str]; 
-    //str = [NSString stringWithFormat:@"%@type=Purple+Software&id=", str];
+    //NSString *str =@"http://itunes.com/apps/MusicWave";
+    NSString *str = @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa";
+    str = [NSString stringWithFormat:@"%@/wa/viewContentsUserReviews?", str]; 
+    str = [NSString stringWithFormat:@"%@type=Purple+Software&id=", str];
     
     // Here is the app id from itunesconnect
-    //str = [NSString stringWithFormat:@"%@452506718", str]; 
+    str = [NSString stringWithFormat:@"%@452506718", str]; 
     
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
 }
@@ -351,6 +340,8 @@
     self.navigationItem.leftBarButtonItem = leftBarItem;
     [leftBarItem release];
     
+    self.menuBarItem.title = NSLocalizedString(@"Menu", @"Title for menu");
+    
     
     //self.editButtonItem.customView = rightBarButton;
     //[rightBarItem release];
@@ -388,6 +379,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+    menuBarItem = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

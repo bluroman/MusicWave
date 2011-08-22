@@ -15,6 +15,7 @@
 @interface BookMarkViewController : UIViewController <UITableViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate>{
     IBOutlet UITableView					*bookMarkListTable;
     IBOutlet UINavigationItem *bookMarkNavItem;
+    IBOutlet UIBarButtonItem *menuBarItem;
     //IBOutlet UIToolbar *bookMarkToolBar;
     Song *currentSong;
     UIViewController *mainViewController;
@@ -30,6 +31,7 @@
 @property (nonatomic, retain) NSMutableArray *bookMarkArray;
 @property (nonatomic, retain) UIButton *rightBarButton;
 @property (nonatomic, retain) UIBarButtonItem *rightBarItem;
+@property (nonatomic, retain) UIBarButtonItem *menuBarItem;
 
 -(IBAction)showPicker:(id)sender;
 -(void)displayComposerSheet;
