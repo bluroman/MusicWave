@@ -12,10 +12,11 @@
 #import "MusicWaveAppDelegate.h"
 #import "MyScrollView.h"
 //#import "PlayListViewController.h"
-#import "BookMarkListViewController.h"
+#import "BookMarkViewController.h"
 #import "MusicTableViewController.h"
 #import "BookMark.h"
 #define COOKBOOK_PURPLE_COLOR	[UIColor colorWithRed:208.0/255.0f green:208.0/255.0f blue:208.0/255.0f alpha:1.0f]
+#define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
 #define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
 #define BARBUTTON(TITLE, SELECTOR) 	[[[UIBarButtonItem alloc] initWithTitle:TITLE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
 #define IMGBARBUTTON(IMAGE, SELECTOR) [[[UIBarButtonItem alloc] initWithImage:IMAGE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
@@ -216,8 +217,8 @@
     }
     //NSLog(@"start graph");
     //HUD.mode = MBProgressHUDModeIndeterminate;
-    HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
-    HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
+    //HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
+    //HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
     NSManagedObjectContext *context = [currentSong managedObjectContext];
     while (j < mMaxSamples) {
         //ViewInfo *currentInfo = [ViewInfo alloc];
@@ -468,6 +469,14 @@
             }];
             
         }
+        else {
+            if (timeObserver != nil) {
+                //NSLog(@"remove time observer %d", __LINE__);
+                [avPlayer removeTimeObserver:timeObserver];
+                timeObserver = nil;
+            }
+        }
+            
     }
     else 
     {
@@ -720,7 +729,7 @@
     [controller release];
 }
 - (IBAction) goToBookMark:(id)sender {
-    BookMarkListViewController *bookMarkViewController = [[BookMarkListViewController alloc] initWithNibName:@"BookMarkListViewController" bundle:nil];
+    BookMarkViewController *bookMarkViewController = [[BookMarkViewController alloc] initWithNibName:@"BookMarkViewController" bundle:nil];
     bookMarkViewController.mainViewController = self;
     bookMarkViewController.currentSong = self.currentSong;
     bookMarkViewController.bookMarkArray = self.bookMarkArray;
@@ -840,8 +849,10 @@
 }
 #pragma mark - View lifecycle
 - (void)settingUpBackgroundView {
-    UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"time_bg.jpg"]];
-    timeBackGround.frame = CGRectMake(0, 0, 320, 25);
+    //UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"time_bg.jpg"]];
+    //timeBackGround.frame = CGRectMake(0, 0, 320, 25);
+    UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
+    timeBackGround.frame = CGRectMake(0, 0, 320, 206);
     UIImageView *pageBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"page_bg.jpg"]];
     pageBackGround.frame = CGRectMake(0, 205, 320, 25);
     UIImageView *pickerBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg.jpg"]];
@@ -1032,33 +1043,82 @@
 {
     self.startPickerPosition = 0.f;
     self.endPickerPosition = 0.f;
+    NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
+    NSLog(@"current language:%@", language);
+    if([language isEqualToString:@"ko"])
+        NSLog(@"current string equal to ko");
+    else
+        NSLog(@"current string not equal to ko");
+    
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(songsPicked:) name:@"SongsPicked" object:nil];
     [notificationCenter addObserver:self selector:@selector(applicationWillResign) name:UIApplicationWillResignActiveNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
-    self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+    //self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //self.navigationController.navigationBar.translucent = YES;
-    self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
-    self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music",@"Title for My List"), @selector(goToMyList:));
-    self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
-    self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
+    
+    UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
+    if ([language isEqualToString:@"ko"]) {
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_basic.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_press.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_press.png"] forState:UIControlStateHighlighted];
+    }
+    else {
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_basic.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_press.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_press.png"] forState:UIControlStateHighlighted];
+    }
+ 
+    [leftBarButton addTarget:self action:@selector(goToMyList:) forControlEvents: UIControlEventTouchUpInside];
+    UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    [leftBarButton release];
+
+    self.navigationItem.leftBarButtonItem = leftBarItem;
+    [leftBarItem release];
+
+    //self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
+    //self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music",@"Title for My List"), @selector(goToMyList:));
+    
+    UIButton *rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
+    if ([language isEqualToString:@"ko"]) {
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_basic.png"] forState:UIControlStateNormal];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_press.png"] forState:UIControlStateSelected];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_press.png"] forState:UIControlStateHighlighted];
+    } else {
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_basic.png"] forState:UIControlStateNormal];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_press.png"] forState:UIControlStateSelected];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_press.png"] forState:UIControlStateHighlighted];
+    }
+    [rightBarButton addTarget:self action:@selector(goToBookMark:) forControlEvents: UIControlEventTouchUpInside];
+    UIBarButtonItem *rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
+    [rightBarButton release];
+    
+    self.navigationItem.rightBarButtonItem = rightBarItem;
+    [rightBarItem release];
+
+    //self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
+    //self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
     self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
     avPlayer = nil;
+    self.navigationController.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
+    //self.navigationController.navigationBar.translucent = YES;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //NSLog(@"left bar button width:%f, right bar button width:%f, navigation bar width:%f", self.navigationItem.leftBarButtonItem.width, self.navigationItem.rightBarButtonItem.width, self.navigationController.navigationBar.bounds.size.width);
     
-    UIView *btn = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 180, 44)];
+    UIView *btn = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
     //btn.backgroundColor = [UIColor whiteColor];
     
     //UILabel *label;
     self.songTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, btn.bounds.size.width, 32)];
     self.songTitleLabel.tag = 1;
     self.songTitleLabel.backgroundColor = [UIColor clearColor];
-    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:16];
+    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:18];
     //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
-    self.songTitleLabel.textColor = [UIColor whiteColor];
+    self.songTitleLabel.textColor = [UIColor blackColor];
     self.songTitleLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
     self.songTitleLabel.highlightedTextColor = [UIColor blackColor];
     [btn addSubview:self.songTitleLabel];
@@ -1070,7 +1130,7 @@
     self.songArtistLabel.font = [UIFont boldSystemFontOfSize:12];
     self.songArtistLabel.adjustsFontSizeToFitWidth = NO;
     self.songArtistLabel.textAlignment = UITextAlignmentCenter;
-    self.songArtistLabel.textColor = [UIColor whiteColor];
+    self.songArtistLabel.textColor = [UIColor blackColor];
     self.songArtistLabel.text = @"";
     self.songArtistLabel.highlightedTextColor = [UIColor blackColor];
     [btn addSubview:self.songArtistLabel];
@@ -1108,7 +1168,6 @@
     }
     else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
     [self.view addSubview:repeatModeView];
-
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 	[self becomeFirstResponder];
@@ -1123,7 +1182,11 @@
 #pragma mark - HorizontalPickerView Delegate Methods
 - (NSString *)horizontalPickerView:(V8HorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
     //BookMark *mark = [currentSong.bookMarkArray objectAtIndex:index];
-    NSString *returnString = @"N";
+    NSString *returnString;
+    if (picker.tag == 0) {
+        returnString = @"L";
+    }
+    else returnString = @"R";
     if (index > 0) {
         returnString = [NSString stringWithFormat:@"%d", index];
     }
@@ -1146,7 +1209,7 @@
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	//self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
-    //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
     if (index == 0) {
         if (picker.tag == 0) {
             self.startPickerPosition = 0.f;
@@ -1156,6 +1219,7 @@
         }
         [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
         [graphView.bookMarkLayer setNeedsDisplay];
+        [self registerTimeObserver];
         return;
     }
     
