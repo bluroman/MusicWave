@@ -80,11 +80,11 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
     //btn.backgroundColor = [UIColor whiteColor];
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    NSLog(@"current language:%@", language);
-    if([language isEqualToString:@"ko"])
-        NSLog(@"current string equal to ko");
-    else
-        NSLog(@"current string not equal to ko");
+    //NSLog(@"current language:%@", language);
+    //if([language isEqualToString:@"ko"])
+        //NSLog(@"current string equal to ko");
+    //else
+        //NSLog(@"current string not equal to ko");
     
     //UILabel *label;
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, titleView.bounds.size.width, 44)];

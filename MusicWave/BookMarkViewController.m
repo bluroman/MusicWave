@@ -62,11 +62,11 @@
 }
 - (IBAction) tapEditButton: (id)sender {
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    NSLog(@"current language:%@", language);
-    if([language isEqualToString:@"ko"])
-        NSLog(@"current string equal to ko");
-    else
-        NSLog(@"current string not equal to ko");
+    //NSLog(@"current language:%@", language);
+    //if([language isEqualToString:@"ko"])
+        //NSLog(@"current string equal to ko");
+    //else
+        //NSLog(@"current string not equal to ko");
     if (self.bookMarkListTable.editing) {
         // Execute tasks for editing status
         [self.bookMarkListTable setEditing:NO animated:YES];
@@ -285,11 +285,11 @@
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    NSLog(@"current language:%@", language);
-    if([language isEqualToString:@"ko"])
-        NSLog(@"current string equal to ko");
-    else
-        NSLog(@"current string not equal to ko");
+    //NSLog(@"current language:%@", language);
+    //if([language isEqualToString:@"ko"])
+        //NSLog(@"current string equal to ko");
+    //else
+        //NSLog(@"current string not equal to ko");
     self.bookMarkListTable.rowHeight = 58.0;
     UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
     //btn.backgroundColor = [UIColor whiteColor];

@@ -78,11 +78,11 @@
     NSLog(@"help list view did load");
     
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    NSLog(@"current language:%@", language);
-    if([language isEqualToString:@"ko"])
-        NSLog(@"current string equal to ko");
-    else
-        NSLog(@"current string not equal to ko");
+    //NSLog(@"current language:%@", language);
+    //if([language isEqualToString:@"ko"])
+        //NSLog(@"current string equal to ko");
+    //else
+        //NSLog(@"current string not equal to ko");
     
     self.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
     UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];

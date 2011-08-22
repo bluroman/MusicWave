@@ -1044,11 +1044,11 @@
     self.startPickerPosition = 0.f;
     self.endPickerPosition = 0.f;
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    NSLog(@"current language:%@", language);
-    if([language isEqualToString:@"ko"])
-        NSLog(@"current string equal to ko");
-    else
-        NSLog(@"current string not equal to ko");
+    //NSLog(@"current language:%@", language);
+    //if([language isEqualToString:@"ko"])
+        //NSLog(@"current string equal to ko");
+    //else
+        //NSLog(@"current string not equal to ko");
     
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(songsPicked:) name:@"SongsPicked" object:nil];
