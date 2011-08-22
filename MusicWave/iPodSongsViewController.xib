@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1056</int>
-		<string key="IBDocument.SystemVersion">10K540</string>
+		<string key="IBDocument.SystemVersion">10K549</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
 		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
@@ -69,7 +69,7 @@
 							<object class="IBUIView" id="776333647">
 								<reference key="NSNextResponder" ref="521517020"/>
 								<int key="NSvFlags">274</int>
-								<string key="NSFrameSize">{280, 180}</string>
+								<string key="NSFrameSize">{286, 180}</string>
 								<reference key="NSSuperview" ref="521517020"/>
 								<reference key="NSWindow"/>
 								<object class="NSColor" key="IBUIBackgroundColor">
@@ -79,7 +79,7 @@
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{20, 25}, {280, 180}}</string>
+						<string key="NSFrame">{{17, 25}, {286, 180}}</string>
 						<reference key="NSSuperview" ref="774585933"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="776333647"/>
@@ -91,6 +91,7 @@
 						<bool key="IBUIMultipleTouchEnabled">YES</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<bool key="IBUIShowsVerticalScrollIndicator">NO</bool>
+						<int key="IBUIIndicatorStyle">2</int>
 					</object>
 				</object>
 				<string key="NSFrame">{{0, 64}, {320, 416}}</string>
@@ -199,6 +200,7 @@
 							<reference ref="776333647"/>
 						</object>
 						<reference key="parent" ref="774585933"/>
+						<string key="objectName">My Scroll View</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">52</int>
