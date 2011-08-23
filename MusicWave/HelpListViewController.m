@@ -14,7 +14,7 @@
 #import "Help.h"
 #import "Tutorial.h"
 
-#define DEFAULT_ROW_HEIGHT 322
+#define DEFAULT_ROW_HEIGHT 346
 #define HEADER_HEIGHT 56
 #define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
 
@@ -143,10 +143,10 @@
 		}
 		
 		self.sectionInfoArray = infoArray;
-        for (int i = 0; i < [sectionInfoArray count]; i++) {
-            SectionInfo *sectionInfo = [self.sectionInfoArray objectAtIndex:i];
-            NSLog(@"Title:%@", sectionInfo.help.title);
-        }
+        //for (int i = 0; i < [sectionInfoArray count]; i++) {
+            //SectionInfo *sectionInfo = [self.sectionInfoArray objectAtIndex:i];
+            //NSLog(@"Title:%@", sectionInfo.help.title);
+        //}
 		[infoArray release];
 	}
 
