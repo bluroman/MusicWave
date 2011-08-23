@@ -66,7 +66,7 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
-    NSLog(@"Selected:%d", selected);
+    //NSLog(@"Selected:%d", selected);
 
     // Configure the view for the selected state
     /*if (selected == YES)
