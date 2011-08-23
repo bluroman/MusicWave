@@ -47,7 +47,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
 	
-    [tutorialLabel setFrame:[self _tutorialLabelFrame]];
+    //[tutorialLabel setFrame:[self _tutorialLabelFrame]];
     [tutorialImageView setFrame:[self _tutorialImageViewFrame]];
 }
 #define IMAGE_SIZE          56.0
@@ -58,7 +58,7 @@
     return CGRectMake(0.0, 280.0, self.contentView.bounds.size.width, 42.0);
 }
 - (CGRect)_tutorialImageViewFrame {
-    return CGRectMake(20.0, 20.0, 200.0 , 280.0);
+    return CGRectMake(20.0, 0.0, 280.0 , 326.0);
 }
 
 
@@ -80,7 +80,7 @@
         [tutorial release];
         tutorial = [newTutorial retain];
         
-        NSLog(@"Description:%@, ImageName:%@", tutorial.description, tutorial.imageName);
+        //NSLog(@"Description:%@, ImageName:%@", tutorial.description, tutorial.imageName);
         
         tutorialLabel.text = tutorial.description;
         tutorialImageView.image = [UIImage imageNamed:tutorial.imageName];
