@@ -1209,7 +1209,7 @@
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	//self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
-    NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
+    //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
     if (index == 0) {
         if (picker.tag == 0) {
             self.startPickerPosition = 0.f;
