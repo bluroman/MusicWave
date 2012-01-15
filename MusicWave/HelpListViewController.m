@@ -56,7 +56,7 @@
 }
 - (IBAction) doneShowingHelpList: (id) sender
 {
-    [self.parentViewController dismissModalViewControllerAnimated:YES];
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark - View lifecycle
