@@ -26,9 +26,9 @@
     
     CALayer *bookMarkLayer;
     BookMarkLayerDelegate *bookMarkLayerDelegate;
-    UIImageView *soundLineView;
-    UIImageView *startBarView;
-    UIImageView *endBarView;
+    //UIImageView *soundLineView;
+    //UIImageView *startBarView;
+    //UIImageView *endBarView;
     NSMutableArray *viewInfoArray;
     
 }

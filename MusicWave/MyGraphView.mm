@@ -69,17 +69,17 @@
         [self setUpBookMarkLayer];
         [self.layer addSublayer:bookMarkLayer];
         
-        soundLineView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"soundline.jpg"]];
-        soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
-        [self addSubview:soundLineView];
+        //soundLineView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"soundline.jpg"]];
+        //soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
+        //[self addSubview:soundLineView];
         
-        startBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
-        startBarView.frame = CGRectMake(0, 86, 2, 9);
-        [self addSubview:startBarView];
+        //startBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
+        //startBarView.frame = CGRectMake(0, 86, 2, 9);
+        //[self addSubview:startBarView];
         
-        endBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
-        endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
-        [self addSubview:endBarView];
+        //endBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
+        //endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
+        //[self addSubview:endBarView];
         //[soundLine release];
 	}
 	return self;
@@ -95,7 +95,7 @@
     
     [self drawViewInfoArray];
     
-    endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
+    //endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
     
     [bookMarkLayer setNeedsDisplay];
     
@@ -108,7 +108,7 @@
     bookMarkLayer.backgroundColor = [UIColor clearColor].CGColor;
     bookMarkLayer.opacity = 1.0f;
     bookMarkLayerDelegate.currentSong = self.currentSong;
-    soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
+    //soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
     
         
 }
@@ -214,9 +214,36 @@
     CGPathAddPath( path, &xf, maxPath );
     //CGPathAddPath(path, NULL, minPath);
     CGPathCloseSubpath(path);
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:96.0/255.0f green:143.0/255.0f blue:199.0/255.0f alpha:1.0].CGColor);
+    //CGContextSetFillColorWithColor(context, [UIColor colorWithRed:96.0/255.0f green:143.0/255.0f blue:199.0/255.0f alpha:1.0].CGColor);
     CGContextAddPath(context, path);
-    CGContextFillPath(context);
+    CGContextClip(context);
+    //CGContextFillPath(context);
+    // Declare the gradient
+    CGGradientRef myGradient; 
+    
+    //	Define the color space
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    // Define the color components of the gradient
+    CGFloat components[8] = { 1.0, 1.0, 1.0, 1.0,  // Start color 
+        0.0, 0.0, 1.0, 1.0 }; // End color 
+    
+    // Define the location of each component
+    int num_locations = 2; 
+    CGFloat locations[2] = { 0.0, 1.0 };
+    
+    // Create the gradient
+    myGradient = CGGradientCreateWithColorComponents (colorSpace, components, 
+                                                      locations, num_locations); 
+    
+    // Draw the gradient
+    CGContextDrawLinearGradient (context, myGradient, CGPointMake(0, -90),
+                                 CGPointMake(0, 90), 0); 
+    
+	//	Clean up the color space & gradient
+	CGColorSpaceRelease(colorSpace);
+	CGGradientRelease(myGradient);
+
     //CGContextAddPath(context, path);
     //CGContextSetRGBStrokeColor(context, 96, 143, 199, 1.0);
     //[[UIColor colorWithRed:96.0/255.0f green:143.0/255.0f blue:199.0/255.0f alpha:1.0] setStroke];
@@ -235,9 +262,9 @@
     [viewInfoArray release];
     [bookMarkLayerDelegate release];
     [currentSong release];
-    [soundLineView release];
-    [startBarView release];
-    [endBarView release];
+    //[soundLineView release];
+    //[startBarView release];
+    //[endBarView release];
     [super dealloc];
 }
 
