@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		283AC64114C15A5E0079DA7C /* graph_bg_copy.png in Resources */ = {isa = PBXBuildFile; fileRef = 283AC64014C15A5E0079DA7C /* graph_bg_copy.png */; };
+		283AC64314C186220079DA7C /* bottombg.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 283AC64214C186220079DA7C /* bottombg.jpg */; };
 		2880EFA813FB588F00B2A64D /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2880EFA713FB588F00B2A64D /* MessageUI.framework */; };
 		2880EFCD13FB8CCB00B2A64D /* HelpListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2880EFCB13FB8CCB00B2A64D /* HelpListViewController.m */; };
 		2880EFCE13FB8CCB00B2A64D /* HelpListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2880EFCC13FB8CCB00B2A64D /* HelpListViewController.xib */; };
@@ -124,6 +126,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		283AC64014C15A5E0079DA7C /* graph_bg_copy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_bg_copy.png; sourceTree = "<group>"; };
+		283AC64214C186220079DA7C /* bottombg.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bottombg.jpg; sourceTree = "<group>"; };
 		2880EFA713FB588F00B2A64D /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		2880EFCA13FB8CCB00B2A64D /* HelpListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpListViewController.h; sourceTree = "<group>"; };
 		2880EFCB13FB8CCB00B2A64D /* HelpListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelpListViewController.m; sourceTree = "<group>"; };
@@ -391,6 +395,7 @@
 				288AE3C013CEDF9900453026 /* re.png */,
 				288AE3C113CEDF9900453026 /* picker_bg_basic.png */,
 				28A495691401EE11009BC586 /* graph_bg.png */,
+				283AC64014C15A5E0079DA7C /* graph_bg_copy.png */,
 				28A4956B1401EECD009BC586 /* page_bg1.jpg */,
 				288AE3C413CEDF9900453026 /* icon_play.png */,
 				288AE3C513CEDF9900453026 /* list_bg_off.jpg */,
@@ -404,6 +409,7 @@
 				288AE3CF13CEDF9900453026 /* bar_off.png */,
 				288AE3D013CEDF9900453026 /* bar_on.png */,
 				288AE3D113CEDF9900453026 /* sound_controll.png */,
+				283AC64214C186220079DA7C /* bottombg.jpg */,
 				288AE3D213CEDF9900453026 /* page_bg.jpg */,
 				288AE3D313CEDF9900453026 /* graph_bg.jpg */,
 				288AE3D413CEDF9900453026 /* soundline.jpg */,
@@ -528,6 +534,9 @@
 /* Begin PBXProject section */
 		288AE34513CEDE2E00453026 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 288AE34813CEDE2E00453026 /* Build configuration list for PBXProject "MusicWave" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -633,6 +642,8 @@
 				28A6127C14032AFE0053180C /* help_05.png in Resources */,
 				28A6127D14032AFE0053180C /* help_06.png in Resources */,
 				28A6127E14032AFE0053180C /* help_07.png in Resources */,
+				283AC64114C15A5E0079DA7C /* graph_bg_copy.png in Resources */,
+				283AC64314C186220079DA7C /* bottombg.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,7 +708,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -707,7 +718,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				"PROVISIONING_PROFILE[sdk=*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -717,7 +728,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hun nam (4FRA7FFTEM)";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -725,7 +736,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FBA9350B-D8FF-4374-AA1C-6E9C82AD04EA";
+				"PROVISIONING_PROFILE[sdk=*]" = "";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -738,6 +749,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -752,6 +764,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -764,7 +777,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: hoon nam";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -786,6 +799,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
