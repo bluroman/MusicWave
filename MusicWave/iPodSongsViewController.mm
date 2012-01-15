@@ -20,12 +20,14 @@
 #define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
 #define BARBUTTON(TITLE, SELECTOR) 	[[[UIBarButtonItem alloc] initWithTitle:TITLE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
 #define IMGBARBUTTON(IMAGE, SELECTOR) [[[UIBarButtonItem alloc] initWithImage:IMAGE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
+#define STATUSBAR_HEIGHT    20
 
 @implementation iPodSongsViewController
 @synthesize mediaControllerDelegate, graphView, scrollView;
 @synthesize currentSong;
 @synthesize playbackTimeLabel;
-@synthesize startTimeLabel, endTimeLabel, samplingRateLabel, totalTimeLabel;
+//@synthesize startTimeLabel, endTimeLabel;
+//@synthesize samplingRateLabel; //totalTimeLabel;
 @synthesize mainButton;
 @synthesize startPickerView, endPickerView;
 @synthesize playListViewController;
@@ -312,8 +314,8 @@
 	
 	UInt32 minutes = songDuration / 60;
 	UInt32 seconds = songDuration % 60;
-	totalTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
-    samplingRateLabel.text = [NSString stringWithFormat:@"%dHz", songSampleRate];
+	//totalTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
+    //samplingRateLabel.text = [NSString stringWithFormat:@"%dHz", songSampleRate];
     self.songTitleLabel.text = currentSong.songTitle;
     self.songArtistLabel.text = currentSong.songArtist;
     playState = playBackStateNone;
@@ -383,9 +385,10 @@
     graphView.currentSong = self.currentSong;
     [graphView.viewInfoArray removeAllObjects];
     [self.bookMarkArray removeAllObjects];
-    totalTimeLabel.text = @"00:00";
-    samplingRateLabel.text = @"";
+    //totalTimeLabel.text = @"00:00";
+    //samplingRateLabel.text = @"";
     playbackTimeLabel.text = @"00:00";
+    remainTimeLabel.text = @"00.00";
     self.songTitleLabel.text = @"MusicWave";
     self.songArtistLabel.text = @"";
     playState = playBackStateNone;
@@ -532,6 +535,7 @@
     updateTimer = nil;
     [avPlayer pause];
     playState = playBackStatePaused;
+    mainSlider.enabled = NO;
     //NSLog(@"state pause:%d", playState);
 }
 
@@ -556,6 +560,7 @@
     [avPlayer play];
     
     playState = playBackStatePlaying;
+    mainSlider.enabled = YES;
     //NSLog(@"state play:%d", playState);
 }
 
@@ -628,10 +633,11 @@
         updateTimer = nil;
     }
     [playbackTimeLabel release];
-    [startTimeLabel release];
-    [samplingRateLabel release];
-    [totalTimeLabel release];
-    [endTimeLabel release];
+    [remainTimeLabel release];
+    //[startTimeLabel release];
+    //[samplingRateLabel release];
+    //[totalTimeLabel release];
+    //[endTimeLabel release];
     [HUD release];
     [startPickerView release];
     [endPickerView release];
@@ -642,6 +648,7 @@
     [songArtistLabel release];
     [repeatModeView release];
     [managedObjectContext release];
+    [mainSlider release];
     //[startPickerPosition release];
     //[endPickerPosition release];
     [super dealloc];
@@ -696,12 +703,21 @@
 }
 -(void) playerTimerUpdate: (NSTimer*) timer {
 	// playback time label
-    CMTime currentTime = avPlayer.currentTime;
+    CMTime duration = avPlayer.currentItem.duration;
+    CMTime currentTime = avPlayer.currentItem.currentTime;
+    CMTime remainTime = CMTimeSubtract(duration,currentTime);
 	UInt64 currentTimeSec = currentTime.value / currentTime.timescale;
+    UInt64 remainTimeSec = remainTime.value / remainTime.timescale;
 		
 	UInt32 minutes = currentTimeSec / 60;
 	UInt32 seconds = currentTimeSec % 60;
 	playbackTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
+    
+    minutes = remainTimeSec / 60;
+	seconds = remainTimeSec % 60;
+	remainTimeLabel.text = [NSString stringWithFormat: @"-%02d:%02d", minutes, seconds];
+    
+    mainSlider.value = (currentTimeSec / [currentSong.songDuration floatValue]);
 	
 }
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller {
@@ -827,11 +843,11 @@
 	
 	UInt32 minutes = startTimeSec / 60;
 	UInt32 seconds = startTimeSec % 60;
-	startTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
+	//startTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
     
     minutes = endTimeSec / 60;
 	seconds = endTimeSec % 60;
-	endTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
+	//endTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
 }
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)aScrollView
 {
@@ -847,80 +863,125 @@
     
     // Release any cached data, images, etc that aren't in use.
 }
+- (void) scrubbingDone: (UISlider *) aSlider
+{
+	[self play];
+    
+    CGFloat moveOffset = graphView.currentPixel - scrollView.bounds.size.width / 2;
+    
+    if (scrollView.contentSize.width - graphView.currentPixel < scrollView.bounds.size.width / 2) {
+        moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 
+    }
+    if (moveOffset < 0) {
+        moveOffset = 0;
+    }
+    [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+}
+
+- (void) scrub: (UISlider *) aSlider
+{
+	// Pause the player
+	[self pause];
+	
+	// Calculate the new current time
+    [self setCurrentPostion:aSlider.value * [currentSong.songDuration floatValue]];
+    [graphView setCurrentPlaybackPosition:aSlider.value * [currentSong.songDuration floatValue]];
+    
+    
+	
+	// Update the title, nav bar
+	//self.title = [NSString stringWithFormat:@"%@ of %@", [self formatTime:self.player.currentTime], [self formatTime:self.player.duration]];
+	//self.navigationItem.rightBarButtonItem = SYSBARBUTTON(UIBarButtonSystemItemPlay, self, @selector(play:));
+}
+
 #pragma mark - View lifecycle
 - (void)settingUpBackgroundView {
     //UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"time_bg.jpg"]];
     //timeBackGround.frame = CGRectMake(0, 0, 320, 25);
     UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
-    timeBackGround.frame = CGRectMake(0, 0, 320, 206);
-    UIImageView *pageBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"page_bg.jpg"]];
-    pageBackGround.frame = CGRectMake(0, 205, 320, 25);
+    timeBackGround.frame = CGRectMake(0,  -23, 320, 206);
+    UIImageView *sliderBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg_copy.png"]];
+    sliderBackGround.frame = CGRectMake(0,  183, 320, 42);
+    UIImageView *pageBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bottombg.jpg"]];
+    pageBackGround.frame = CGRectMake(0, 205 + STATUSBAR_HEIGHT, 320, 25);
     UIImageView *pickerBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg.jpg"]];
-    pickerBackGround.frame = CGRectMake(0, 230, 320, 147);
+    pickerBackGround.frame = CGRectMake(0, 230 + STATUSBAR_HEIGHT, 320, 147);
     
     [self.view addSubview:timeBackGround];
+    [self.view addSubview:sliderBackGround];
     [self.view addSubview:pageBackGround];
     [self.view addSubview:pickerBackGround];
     
     [timeBackGround release];
+    [sliderBackGround release];
     [pageBackGround release];
     [pickerBackGround release];
     
 }
 - (void)settingUpLabel {
-    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(137.0f, 7.0f, 46.0f, 11.0f)];
+    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 230.0f, 46.0f, 11.0f)];
     [playbackTimeLabel setText:@"00:00"];
     [playbackTimeLabel setTextAlignment:UITextAlignmentCenter];
     playbackTimeLabel.adjustsFontSizeToFitWidth = NO;
     playbackTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
     playbackTimeLabel.backgroundColor = [UIColor clearColor];
-    //playbackTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
+    playbackTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
     playbackTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
     [self.view addSubview:playbackTimeLabel];
     
-    self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 7.0f, 46.0f, 11.0f)];
-    [startTimeLabel setText:@"00:00"];
-    [startTimeLabel setTextAlignment:UITextAlignmentLeft];
-    startTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
-    startTimeLabel.backgroundColor = [UIColor clearColor];
+    remainTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 230.0f, 46.0f, 11.0f)];
+    [remainTimeLabel setText:@"00:00"];
+    [remainTimeLabel setTextAlignment:UITextAlignmentCenter];
+    remainTimeLabel.adjustsFontSizeToFitWidth = NO;
+    remainTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
+    remainTimeLabel.backgroundColor = [UIColor clearColor];
+    remainTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
+    remainTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    [self.view addSubview:remainTimeLabel];
+    
+    //self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 7.0f, 46.0f, 11.0f)];
+    //[startTimeLabel setText:@"00:00"];
+    //[startTimeLabel setTextAlignment:UITextAlignmentLeft];
+    //startTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
+    //startTimeLabel.backgroundColor = [UIColor clearColor];
     //startTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    startTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    [self.view addSubview:startTimeLabel];
+    //startTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //[self.view addSubview:startTimeLabel];
     
-    self.endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 7.0f, 46.0f, 11.0f)];
-    [endTimeLabel setText:@"00:00"];
-    [endTimeLabel setTextAlignment:UITextAlignmentRight];
-    endTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
-    endTimeLabel.backgroundColor = [UIColor clearColor];
+    //self.endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 7.0f, 46.0f, 11.0f)];
+    //[endTimeLabel setText:@"00:00"];
+    //[endTimeLabel setTextAlignment:UITextAlignmentRight];
+    //endTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
+    //endTimeLabel.backgroundColor = [UIColor clearColor];
     //endTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    endTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    [self.view addSubview:endTimeLabel];
+    //endTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //[self.view addSubview:endTimeLabel];
     
-    self.samplingRateLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 230.0f, 89.0f, 11.0f)];
-    [samplingRateLabel setText:@""];
-    [samplingRateLabel setTextAlignment:UITextAlignmentLeft];
-    samplingRateLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
-    samplingRateLabel.backgroundColor = [UIColor clearColor];
-    samplingRateLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //self.samplingRateLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 230.0f, 89.0f, 11.0f)];
+    //[samplingRateLabel setText:@""];
+    //[samplingRateLabel setTextAlignment:UITextAlignmentLeft];
+    //samplingRateLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
+    //samplingRateLabel.backgroundColor = [UIColor clearColor];
+    //samplingRateLabel.font = [UIFont boldSystemFontOfSize:11.0f];
     //samplingRateLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    [self.view addSubview:samplingRateLabel];
+    //[self.view addSubview:samplingRateLabel];
     
-    self.totalTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 230.0f, 46.0f, 11.0f)];
-    [totalTimeLabel setText:@"00:00"];
-    [totalTimeLabel setTextAlignment:UITextAlignmentRight];
-    totalTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
-    totalTimeLabel.backgroundColor = [UIColor clearColor];
-    totalTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //self.totalTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 230.0f, 46.0f, 11.0f)];
+    //[totalTimeLabel setText:@"00:00"];
+    //[totalTimeLabel setTextAlignment:UITextAlignmentRight];
+    //totalTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
+    //totalTimeLabel.backgroundColor = [UIColor clearColor];
+    //totalTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
     //totalTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    [self.view addSubview:totalTimeLabel];
+    //[self.view addSubview:totalTimeLabel];
 }
 - (void)settingUpPicker {
     UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_basic.png"]];
-    leftBackGround.frame = CGRectMake(12, 246, 104, 66);
+    leftBackGround.frame = CGRectMake(12, 246 + STATUSBAR_HEIGHT, 104, 66);
     [self.view addSubview:leftBackGround];
     [leftBackGround release];
 
-    CGRect leftFrame = CGRectMake(12.0f, 246.0f, 104.0f, 66.0f);
+    CGRect leftFrame = CGRectMake(12.0f, 246.0f + STATUSBAR_HEIGHT, 104.0f, 66.0f);
 	startPickerView = [[V8HorizontalPickerView alloc] initWithFrame:leftFrame];
 	startPickerView.backgroundColor   = [UIColor clearColor];
 	startPickerView.selectedTextColor = [UIColor blackColor];
@@ -949,10 +1010,10 @@
     [self.view addSubview:startPickerView];
     
     UIImageView *rightBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_basic.png"]];
-    rightBackGround.frame = CGRectMake(204, 246, 104, 66);
+    rightBackGround.frame = CGRectMake(204, 246 + STATUSBAR_HEIGHT, 104, 66);
     [self.view addSubview:rightBackGround];
     [rightBackGround release];
-    CGRect rightFrame = CGRectMake(204.0f, 246.0f, 104.0f, 66.0f);
+    CGRect rightFrame = CGRectMake(204.0f, 246.0f + STATUSBAR_HEIGHT, 104.0f, 66.0f);
 	endPickerView = [[V8HorizontalPickerView alloc] initWithFrame:rightFrame];
 	endPickerView.backgroundColor   = [UIColor clearColor];
 	endPickerView.selectedTextColor = [UIColor blackColor];
@@ -982,7 +1043,7 @@
 }
 - (void)settingUpBookMarkButton {
     mainButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	mainButton.frame = CGRectMake(127.0f, 246.0f, 65.0f, 79.0f);
+	mainButton.frame = CGRectMake(127.0f, 246.0f + STATUSBAR_HEIGHT, 65.0f, 79.0f);
     
     [mainButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_off.png"] forState:UIControlStateNormal];
     [mainButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_on.png"] forState:UIControlStateSelected];
@@ -992,16 +1053,16 @@
 }
 - (void)settingUpVolumeSlider {
     UIImageView *soundOffImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_off.png"]];
-    soundOffImage.frame = CGRectMake(21, 407-65, 14, 10);
+    soundOffImage.frame = CGRectMake(21, 407-65 + STATUSBAR_HEIGHT, 14, 10);
     [self.view addSubview:soundOffImage];
     [soundOffImage release];
     
     UIImageView *soundOnImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_on.png"]];
-    soundOnImage.frame = CGRectMake(285, 407-65, 13, 10);
+    soundOnImage.frame = CGRectMake(285, 407-65 + STATUSBAR_HEIGHT, 13, 10);
     [self.view addSubview:soundOnImage];
     [soundOnImage release];
     
-    CGRect frame = CGRectMake(42, 407-64-5, 235, 9);
+    CGRect frame = CGRectMake(42, 407-64-5 + STATUSBAR_HEIGHT, 235, 9);
     UISlider *customSlider = [[UISlider alloc] initWithFrame:frame];
     MPVolumeView *volumeView = [[[MPVolumeView alloc] initWithFrame:[customSlider frame]] autorelease];
     UISlider *volumeViewSlider = nil;
@@ -1020,6 +1081,47 @@
     [self.view addSubview:volumeView];
     [customSlider release];
     //[volumeView release];
+}
+// Return a base thumb image without the bubble
+UIImage *createSimpleThumb()
+{
+	float INSET_AMT = 1.5f;
+	UIGraphicsBeginImageContext(CGSizeMake(40.0f, 100.0f));
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	
+	// Create a filled rect for the thumb
+	[[UIColor darkGrayColor] setFill];
+	CGContextAddRect(context, CGRectMake(INSET_AMT, 40.0f + INSET_AMT, 40.0f - 2.0f * INSET_AMT, 20.0f - 2.0f * INSET_AMT));
+	CGContextFillPath(context);
+	
+	// Outline the thumb
+	[[UIColor whiteColor] setStroke];
+	CGContextSetLineWidth(context, 2.0f);	
+	CGContextAddRect(context, CGRectMake(2.0f * INSET_AMT, 40.0f + 2.0f * INSET_AMT, 40.0f - 4.0f * INSET_AMT, 20.0f - 4.0f * INSET_AMT));
+	CGContextStrokePath(context);
+	
+	UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
+	return theImage;
+}
+
+- (void)settingUpMainSlider {
+    CGRect frame = CGRectMake(21, 190, 278, 14);
+    UIImage *simpleThumbImage = [createSimpleThumb() retain];
+    mainSlider = [[UISlider alloc] initWithFrame:frame];
+    //UIImage *stetchLeftTrack = [[UIImage imageNamed:@"bar_on.png"] stretchableImageWithLeftCapWidth:14.0 topCapHeight:0];
+    //UIImage *stetchRightTrack = [[UIImage imageNamed:@"bar_off.png"] stretchableImageWithLeftCapWidth:14.0 topCapHeight:0];
+    //[mainSlider setThumbImage: [UIImage imageNamed:@"sound_controll.png"] forState:UIControlStateNormal];
+    [mainSlider setThumbImage: simpleThumbImage forState:UIControlStateNormal];
+    //[mainSlider setMinimumTrackImage:stetchLeftTrack forState:UIControlStateNormal];
+    //[mainSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
+    
+    [mainSlider addTarget:self action:@selector(scrub:) forControlEvents:UIControlEventTouchDown];
+	[mainSlider addTarget:self action:@selector(scrub:) forControlEvents:UIControlEventValueChanged];
+	[mainSlider addTarget:self action:@selector(scrubbingDone:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+    [self.view addSubview:mainSlider];
+    //[mainSlider release];
+
 }
 - (void)applicationWillResign {
     //NSLog(@"application will resign");
@@ -1158,11 +1260,14 @@
     [self settingUpPicker];
     [self settingUpBookMarkButton];
     [self settingUpVolumeSlider];
+    [self settingUpMainSlider];
+    
+    mainSlider.enabled = NO;
     
     self.repeatModeView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.repeatModeView.contentMode = UIViewContentModeScaleAspectFit;
     
-    self.repeatModeView.frame = CGRectMake(150, 211, 21, 13);
+    self.repeatModeView.frame = CGRectMake(150, 211 + STATUSBAR_HEIGHT, 21, 13);
     if (repeatMode) {
         repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
     }
