@@ -339,6 +339,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [self configureCell:cell atIndexPath:indexPath];
     [tableView deselectRowAtIndexPath: indexPath animated: YES];
     
+    
     return cell;
 }
 
@@ -352,6 +353,22 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     //NSLog(@"play list table view did select:%d", indexPath.row);
     //NSLog(@"play list select");
     Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
+    
+    MPMediaPropertyPredicate *predicate = [MPMediaPropertyPredicate predicateWithValue:song.persistentId forProperty:MPMediaItemPropertyPersistentID]; 
+    MPMediaQuery *songQuery = [[MPMediaQuery alloc] init]; 
+    [songQuery addFilterPredicate: predicate]; 
+    if (songQuery.items.count > 0) {
+        //song exists  
+        NSLog(@"Existing song");
+        [songQuery release];
+        //return;
+    }
+    else {
+        NSLog(@"Not existing song");
+        [tableView deselectRowAtIndexPath: indexPath animated: YES];
+        [songQuery release];
+        return;
+    }
     ((iPodSongsViewController *)mainViewController).currentSong = song;
     [(iPodSongsViewController *)mainViewController updateCurrentSong];
     //[(iPodSongsViewController *)mainViewController startUpdateCurrentSongThread];
