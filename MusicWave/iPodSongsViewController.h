@@ -69,6 +69,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @property (nonatomic, retain) Song *currentSong;
 @property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, retain) IBOutlet UILabel *playbackTimeLabel;
+@property (nonatomic, retain) IBOutlet UILabel *remainTimeLabel;
 //@property (nonatomic, retain) IBOutlet UILabel *startTimeLabel;
 //@property (nonatomic, retain) IBOutlet UILabel *endTimeLabel;
 //@property (nonatomic, retain) IBOutlet UILabel *samplingRateLabel;
