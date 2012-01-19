@@ -26,6 +26,7 @@
 @synthesize mediaControllerDelegate, graphView, scrollView;
 @synthesize currentSong;
 @synthesize playbackTimeLabel;
+@synthesize remainTimeLabel;
 //@synthesize startTimeLabel, endTimeLabel;
 //@synthesize samplingRateLabel; //totalTimeLabel;
 @synthesize mainButton;
