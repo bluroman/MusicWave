@@ -359,12 +359,12 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [songQuery addFilterPredicate: predicate]; 
     if (songQuery.items.count > 0) {
         //song exists  
-        NSLog(@"Existing song");
+        //NSLog(@"Existing song");
         [songQuery release];
         //return;
     }
     else {
-        NSLog(@"Not existing song");
+        //NSLog(@"Not existing song");
         [tableView deselectRowAtIndexPath: indexPath animated: YES];
         [songQuery release];
         return;
