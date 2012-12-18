@@ -12,7 +12,6 @@
 #import "HelpListViewController.h"
 #import "MusicWaveAppDelegate.h"
 
-
 @implementation BookMarkViewController
 @synthesize bookMarkNavItem, bookMarkListTable;
 @synthesize currentSong, mainViewController;
@@ -280,25 +279,19 @@
     //else
         //NSLog(@"current string not equal to ko");
     self.bookMarkListTable.rowHeight = 58.0;
-    UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
-    //btn.backgroundColor = [UIColor whiteColor];
-    
-    //UILabel *label;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, titleView.bounds.size.width, 44)];
+   
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(73, 5, 174, 30)];
     titleLabel.tag = 1;
     titleLabel.backgroundColor = [UIColor clearColor];
-    titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    titleLabel.font = [UIFont boldSystemFontOfSize:22];
     //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
+    titleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
     titleLabel.textAlignment = UITextAlignmentCenter;
-    titleLabel.textColor = [UIColor blackColor];
+    titleLabel.textColor = [UIColor whiteColor];
     titleLabel.text = NSLocalizedString(@"BookMarks", @"Title for BookMark List");
-    titleLabel.highlightedTextColor = [UIColor blackColor];
-    [titleView addSubview:titleLabel];
-    [titleLabel release];
-    //[label release];
+    titleLabel.highlightedTextColor = [UIColor whiteColor];
     
-    self.navigationItem.titleView = titleView;
-    [titleView release];
+    self.navigationItem.titleView = titleLabel;
     rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
     //rightBarButton.buttonType = UIButtonTypeRoundedRect;
     

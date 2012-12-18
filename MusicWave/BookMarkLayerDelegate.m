@@ -48,13 +48,13 @@
     else if (self.startPosition > 0 && self.endPosition > 0) {
         if (self.endPosition > self.startPosition) {
             //layer.opacity = 0.2f;
-            CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:231.0/255.0f blue:0.0/255.0f alpha:0.2f].CGColor);
+            CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:255.0/255.0f blue:255.0/255.0f alpha:0.5f].CGColor);
             CGContextAddRect(context, CGRectMake(self.startPosition, 0.0, self.endPosition - self.startPosition, bounds.size.height));
             CGContextFillPath(context);
         }
         else {
             //layer.opacity = 0.2f;
-            CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:231.0/255.0f blue:0.0/255.0f alpha:0.2f].CGColor);
+            CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:255.0/255.0f blue:255.0/255.0f alpha:0.5f].CGColor);
             CGContextAddRect(context, CGRectMake(self.endPosition, 0.0, self.startPosition - self.endPosition, bounds.size.height));
             CGContextFillPath(context);
         }
@@ -81,7 +81,7 @@
         BookMark *tempBookMark = [sortedBookMarks objectAtIndex:i];
         char numChar[20] ;
         snprintf(numChar,sizeof(numChar),"%d",i + 1) ;
-        CGContextSetRGBStrokeColor(context, 255.0/255.0f, 249.0/255.0f, 190.0/255.0f, 1.0);
+        CGContextSetRGBStrokeColor(context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1.0);
         CGContextMoveToPoint(context, [tempBookMark.position floatValue], 0.0);
         CGContextAddLineToPoint(context, [tempBookMark.position floatValue], bounds.size.height);
         CGContextStrokePath(context);

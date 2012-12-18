@@ -68,40 +68,72 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 @synthesize deleteIndexPath;
 @synthesize navigationItem, navigationBar;
 
-@synthesize fetchedResultsController;
+@synthesize fetchedResultsController=_fetchedResultsController;
 
 @synthesize managedObjectContext;
+- (void)checkIpodLibrary
+{
+    NSError *error;
+    NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+    
+    for (Song *item in _fetchedResultsController.fetchedObjects)
+    {
+        MPMediaPropertyPredicate *predicate = [MPMediaPropertyPredicate predicateWithValue:item.persistentId forProperty:MPMediaItemPropertyPersistentID];
+        MPMediaQuery *songQuery = [[MPMediaQuery alloc] init];
+        [songQuery addFilterPredicate: predicate];
+        if (songQuery.items.count > 0) {
+            //song exists
+            //NSLog(@"Existing song");
+        }
+        else
+        {
+            NSLog(@"Not existing song");
+            [context deleteObject:item];
+        }
+        [songQuery release];
+    }
+    // Save the context.
+    if (![context save:&error])
+    {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+
+    
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Set the table view's row height
-    self.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
-    UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
-    //btn.backgroundColor = [UIColor whiteColor];
+    NSError *error;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+		// Update to handle the error appropriately.
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		abort();  // Fail
+	}
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
     //NSLog(@"current language:%@", language);
     //if([language isEqualToString:@"ko"])
-        //NSLog(@"current string equal to ko");
+    //NSLog(@"current string equal to ko");
     //else
-        //NSLog(@"current string not equal to ko");
+    //NSLog(@"current string not equal to ko");
     
-    //UILabel *label;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, titleView.bounds.size.width, 44)];
+    // Set the table view's row height
+    //self.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
+    [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar.png"] forBarMetrics:UIBarMetricsDefault];
+    
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(73, 5, 174, 30)];
     titleLabel.tag = 1;
     titleLabel.backgroundColor = [UIColor clearColor];
-    titleLabel.font = [UIFont boldSystemFontOfSize:18];
+    titleLabel.font = [UIFont boldSystemFontOfSize:22];
     //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
+    titleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
     titleLabel.textAlignment = UITextAlignmentCenter;
-    titleLabel.textColor = [UIColor blackColor];
+    titleLabel.textColor = [UIColor whiteColor];
     titleLabel.text = NSLocalizedString(@"My List", @"Music List Title");
-    titleLabel.highlightedTextColor = [UIColor blackColor];
-    [titleView addSubview:titleLabel];
-    [titleLabel release];
-    //[label release];
+    titleLabel.highlightedTextColor = [UIColor whiteColor];
     
-    self.navigationItem.titleView = titleView;
-    [titleView release];
+    self.navigationItem.titleView = titleLabel;
     
     UIButton *rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
     //rightBarButton.buttonType = UIButtonTypeRoundedRect;
@@ -142,10 +174,15 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [leftBarItem release];
 
     //self.navigationItem.title = NSLocalizedString(@"My List", @"Music List Title");
-    self.navigationItem.prompt = NSLocalizedString(@"Select song to play", @"Music table view prompt");
+    //self.navigationItem.prompt = NSLocalizedString(@"Select song to play", @"Music table view prompt");
     self.mediaItemCollectionTable.rowHeight = 58.0;
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
     self.mediaItemCollectionTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
+}
+- (IBAction) tapCheckLibraryButton: (id)sender
+{
+    [self checkIpodLibrary];
+    [self.mediaItemCollectionTable reloadData];
 }
 
 // When the user taps Done, invokes the delegate's method that dismisses the table view.
@@ -184,7 +221,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (void)configureCell:(PlayListTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
-    Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
+    Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
     
     cell.song = song;
     if ([cell.song isEqual:((iPodSongsViewController *)mainViewController).currentSong]) {
@@ -209,8 +246,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 }
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
-        NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
+        NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+        [context deleteObject:[_fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
         
         // Save the context.
         NSError *error = nil;
@@ -238,8 +275,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (void)insertNewSong:(MPMediaItem *)mediaItem {
     
     // Create a new instance of the entity managed by the fetched results controller.
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
+    NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+    NSEntityDescription *entity = [[_fetchedResultsController fetchRequest] entity];
     Song *newSong = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     
     // If appropriate, configure the new managed object.
@@ -268,7 +305,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (void) updateUserSongListWithMediaCollection: (MPMediaItemCollection *) mediaItemCollection {
 
-    NSMutableArray *previousUserSongList = [[self.fetchedResultsController fetchedObjects] mutableCopy];
+    NSMutableArray *previousUserSongList = [[_fetchedResultsController fetchedObjects] mutableCopy];
     
     if (previousUserSongList == nil) {
         //NSLog(@"previousUserSongList nil");
@@ -321,7 +358,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[[self.fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
+    return [[[_fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -352,7 +389,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     
     //NSLog(@"play list table view did select:%d", indexPath.row);
     //NSLog(@"play list select");
-    Song *song = (Song *)[self.fetchedResultsController objectAtIndexPath:indexPath];
+    Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
     
     MPMediaPropertyPredicate *predicate = [MPMediaPropertyPredicate predicateWithValue:song.persistentId forProperty:MPMediaItemPropertyPersistentID]; 
     MPMediaQuery *songQuery = [[MPMediaQuery alloc] init]; 
@@ -381,7 +418,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        Song *deleteSong = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        Song *deleteSong = [_fetchedResultsController objectAtIndexPath:indexPath];
         if ([deleteSong isEqual:((iPodSongsViewController *)mainViewController).currentSong])
         {
             //NSLog(@"current song is deleted warning");
@@ -392,8 +429,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
             return;
         }
         //[theDataObject.userSongList removeObjectAtIndex:indexPath.row];
-        NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+        NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+        [context deleteObject:[_fetchedResultsController objectAtIndexPath:indexPath]];
         
         // Save the context.
         NSError *error = nil;
@@ -429,11 +466,12 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
+    self.fetchedResultsController = nil;
 }
 
 
 - (void)dealloc {
-    [fetchedResultsController release];
+    [_fetchedResultsController release];
     [managedObjectContext release];
     [mainViewController release];
     [deleteIndexPath release];
@@ -445,9 +483,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (NSFetchedResultsController *)fetchedResultsController
 {
-    if (fetchedResultsController != nil)
+    if (_fetchedResultsController != nil)
     {
-        return fetchedResultsController;
+        return _fetchedResultsController;
     }
     
     /*
@@ -479,19 +517,14 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [sortDescriptor release];
     [sortDescriptors release];
     
-	NSError *error = nil;
+	/*NSError *error = nil;
 	if (![self.fetchedResultsController performFetch:&error])
     {
-	    /*
-	     Replace this implementation with code to handle the error appropriately.
-         
-	     abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-	     */
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 	    abort();
-	}
+	}*/
     
-    return fetchedResultsController;
+    return _fetchedResultsController;
 }    
 
 #pragma mark - Fetched results controller delegate

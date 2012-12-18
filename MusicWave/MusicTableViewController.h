@@ -60,7 +60,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     UIViewController *mainViewController;
     NSIndexPath *deleteIndexPath;
     IBOutlet UINavigationItem *navigationItem;
-    NSFetchedResultsController *fetchedResultsController;
+    //NSFetchedResultsController *fetchedResultsController;
     NSManagedObjectContext *managedObjectContext;
 }
 
@@ -77,6 +77,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (IBAction) showMediaPicker: (id) sender;
 - (IBAction) doneShowingMusicList: (id) sender;
+- (IBAction) tapCheckLibraryButton: (id)sender;
 
 @end
 

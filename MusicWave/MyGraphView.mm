@@ -28,8 +28,9 @@
 	if(self != nil)
 	{
         layer = [CALayer layer];
-        layer.frame = CGRectMake(0, 0, 2, 180);
-        layer.contents = (id) [UIImage imageNamed:@"bar.jpg"].CGImage;
+        layer.frame = CGRectMake(0, 0, 1, frame.size.height);
+        layer.backgroundColor = [UIColor whiteColor].CGColor;
+        //layer.contents = (id) [UIImage imageNamed:@"bar.jpg"].CGImage;
         layer.masksToBounds = YES;
 	}
 	return self;
@@ -54,13 +55,12 @@
 
 
 // Designated initializer
-
--(id)initWithCoder:(NSCoder*)decoder
+-(id)initWithFrame:(CGRect)frame
 {
-	self = [super initWithCoder:decoder];
+	self = [super initWithFrame:frame];
 	if(self != nil)
 	{
-		context = nil;
+        context = nil;
         current = [[GraphViewSegment alloc] initWithFrame:self.bounds];
         [self.layer addSublayer:current.layer];
         bookMarkLayerDelegate = [[BookMarkLayerDelegate alloc] init];
@@ -68,22 +68,11 @@
         bookMarkLayer.delegate = bookMarkLayerDelegate;
         [self setUpBookMarkLayer];
         [self.layer addSublayer:bookMarkLayer];
-        
-        //soundLineView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"soundline.jpg"]];
-        //soundLineView.frame = CGRectMake(0, 89, self.bounds.size.width, 2);
-        //[self addSubview:soundLineView];
-        
-        //startBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
-        //startBarView.frame = CGRectMake(0, 86, 2, 9);
-        //[self addSubview:startBarView];
-        
-        //endBarView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"middle_bar.png"]];
-        //endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
-        //[self addSubview:endBarView];
-        //[soundLine release];
 	}
 	return self;
 }
+
+
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.*/
@@ -134,7 +123,7 @@
     
     
     if ([self.viewInfoArray count] < pointInView.x) {
-        //NSLog(@"something wrong with view info array");
+        NSLog(@"something wrong with view info array");
         return;
     }
     self.currentPixel = pointInView.x;
@@ -186,10 +175,10 @@
         }
         len += 5;
     }
-    CGContextSetRGBStrokeColor(context, 123.0/255.0f, 218.0/255.0f, 245.0/255.0f, 1.0);
-    CGContextMoveToPoint(context, 0.0, graphHeight / 2);
-    CGContextAddLineToPoint(context, viewRect.size.width, graphHeight / 2);
-    CGContextStrokePath(context);//center line
+    //CGContextSetRGBStrokeColor(context, 123.0/255.0f, 218.0/255.0f, 245.0/255.0f, 1.0);
+    //CGContextMoveToPoint(context, 0.0, graphHeight / 2);
+    //CGContextAddLineToPoint(context, viewRect.size.width, graphHeight / 2);
+    //CGContextStrokePath(context);//center line
     
     if (count < 1) {
         //NSLog(@"something wrong with draw view info");
@@ -225,8 +214,8 @@
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     
     // Define the color components of the gradient
-    CGFloat components[8] = { 1.0, 1.0, 1.0, 1.0,  // Start color 
-        0.0, 0.0, 1.0, 1.0 }; // End color 
+    CGFloat components[8] = { 1.0, 1.0, 1.0, 0.1,  // Start color
+        1.0, 1.0, 1.0, 0.9 }; // End color
     
     // Define the location of each component
     int num_locations = 2; 

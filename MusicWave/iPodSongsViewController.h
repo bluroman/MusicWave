@@ -43,7 +43,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     UIView *titleView;
     UILabel *songTitleLabel;
     UILabel *songArtistLabel;
-    UISlider *mainSlider;
+    //UISlider *mainSlider;
     IBOutlet UIButton *mainButton;
     V8HorizontalPickerView *startPickerView;
     V8HorizontalPickerView *endPickerView;
@@ -60,6 +60,8 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     BOOL movingOffset;
     //BOOL selectedCurrentSong;
 }
+@property (nonatomic, strong) MyScrollView *myScrollView;
+@property (nonatomic, strong) MyGraphView *myGraphView;
 @property (nonatomic, retain) MyMediaPickerDelegate *mediaControllerDelegate;
 @property (nonatomic, retain) IBOutlet UIView *graphView;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;

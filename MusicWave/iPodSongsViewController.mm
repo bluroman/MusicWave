@@ -15,6 +15,36 @@
 #import "BookMarkViewController.h"
 #import "MusicTableViewController.h"
 #import "BookMark.h"
+@interface UINavigationBar (CustomHeight)
+
+@end
+
+@implementation UINavigationBar (CustomHeight)
+
+- (CGSize)sizeThatFits:(CGSize)size {
+    // Change navigation bar height. The height must be even, otherwise there will be a white line above the navigation bar.
+    CGSize newSize = CGSizeMake(self.frame.size.width, 62);
+    return newSize;
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    
+
+    // Make items on navigation bar vertically centered.
+    int i = 0;
+    for (UIView *view in self.subviews) {
+        //NSLog(@"%i. %@", i++, [view description]);
+        i++;
+        if (i == 0)
+            continue;
+        float centerY = self.bounds.size.height / 2.0f;
+        CGPoint center = view.center;
+        center.y = centerY;
+        view.center = center;
+    }
+}
+@end
 #define COOKBOOK_PURPLE_COLOR	[UIColor colorWithRed:208.0/255.0f green:208.0/255.0f blue:208.0/255.0f alpha:1.0f]
 #define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
 #define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
@@ -49,18 +79,18 @@
 - (void)loadComplete:(id)total {
     int pixelCount = [total intValue];
     if (pixelCount > 320) {
-        [scrollView setContentSize:CGSizeMake(pixelCount, graphView.bounds.size.height)];
-        [graphView setFrame:CGRectMake(0, 0, pixelCount, graphView.bounds.size.height)];
+        [self.myScrollView setContentSize:CGSizeMake(pixelCount, self.myGraphView.bounds.size.height)];
+        [self.myGraphView setFrame:CGRectMake(0, 0, pixelCount, self.myGraphView.bounds.size.height)];
     }
     else {
-        [scrollView setContentSize:CGSizeMake(pixelCount, graphView.bounds.size.height)];
-        [graphView setFrame:CGRectMake(0, 0, pixelCount, graphView.bounds.size.height)];
+        [self.myScrollView setContentSize:CGSizeMake(pixelCount, self.myGraphView.bounds.size.height)];
+        [self.myGraphView setFrame:CGRectMake(0, 0, pixelCount, self.myGraphView.bounds.size.height)];
     }
     
-    [graphView setUpBookMarkLayer];
-    scrollView.contentOffset = CGPointMake(0.0, 0.0);
-    [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
-    [graphView setNeedsDisplay];
+    [self.myGraphView setUpBookMarkLayer];
+    self.myScrollView.contentOffset = CGPointMake(0.0, 0.0);
+    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+    [self.myGraphView setNeedsDisplay];
     [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
     [self.startPickerView scrollToElement:0 animated:NO];
     [self.endPickerView scrollToElement:0 animated:NO];
@@ -75,9 +105,9 @@
     NSMutableArray *tempViewInfoArray = [[NSMutableArray alloc] initWithArray:[currentSong.viewinfos allObjects]];
     [tempViewInfoArray sortUsingDescriptors:sortDescriptors];
     
-    graphView.viewInfoArray = tempViewInfoArray;
-    /*for (int i=0; i < [graphView.viewInfoArray count]; i++) {
-     ViewInfo *printInfo = [graphView.viewInfoArray objectAtIndex:i];
+    self.myGraphView.viewInfoArray = tempViewInfoArray;
+    /*for (int i=0; i < [self.myGraphView.viewInfoArray count]; i++) {
+     ViewInfo *printInfo = [self.myGraphView.viewInfoArray objectAtIndex:i];
      NSLog(@"max:%f, x:%f, d:%f", [printInfo.max floatValue], [printInfo.x floatValue], [printInfo.time floatValue]);
      }*/
     [sortDescriptor release];
@@ -259,7 +289,7 @@
         currentInfo.x = [NSNumber numberWithFloat:pixel];
         
         //[currentInfo print];
-        //[graphView addViewInfo:currentInfo];
+        //[self.myGraphView addViewInfo:currentInfo];
         [currentSong addViewinfosObject:currentInfo];
         //[currentInfo release];
 
@@ -267,7 +297,7 @@
     }
     delete[] temp;
     //NSLog(@"ending graph");
-    //graphView.currentSong = currentSong;
+    //self.myGraphView.currentSong = currentSong;
     
     [self addGraphViewArray];
     currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
@@ -291,7 +321,7 @@
     if (playState == playBackStatePlaying) {
         [self pause];
     }
-    graphView.currentSong = currentSong;
+    self.myGraphView.currentSong = currentSong;
     UInt64 songSampleRate = 0;
     UInt64 channelsPerFrame = 0;
     AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
@@ -329,9 +359,9 @@
     }
     movingOffset = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
 	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
@@ -383,8 +413,8 @@
     }
     self.currentSong = nil;
     movingOffset = NO;
-    graphView.currentSong = self.currentSong;
-    [graphView.viewInfoArray removeAllObjects];
+    self.myGraphView.currentSong = self.currentSong;
+    [self.myGraphView.viewInfoArray removeAllObjects];
     [self.bookMarkArray removeAllObjects];
     //totalTimeLabel.text = @"00:00";
     //samplingRateLabel.text = @"";
@@ -398,14 +428,14 @@
     //NSLog(@"state none:%d line:%d", playState, __LINE__);
     repeatMode = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
-    [scrollView setContentSize:CGSizeMake(280, graphView.bounds.size.height)];
-    [graphView setFrame:CGRectMake(0, 0, 280, graphView.bounds.size.height)];
-    [graphView setUpBookMarkLayer];
-    scrollView.contentOffset = CGPointMake(0.0, 0.0);
-    [graphView setNeedsDisplay];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
+    [self.myScrollView setContentSize:CGSizeMake(280, self.myGraphView.bounds.size.height)];
+    [self.myGraphView setFrame:CGRectMake(0, 0, 280, self.myGraphView.bounds.size.height)];
+    [self.myGraphView setUpBookMarkLayer];
+    self.myScrollView.contentOffset = CGPointMake(0.0, 0.0);
+    [self.myGraphView setNeedsDisplay];
     if (timeObserver != nil) {
         [avPlayer removeTimeObserver:timeObserver];
         timeObserver = nil;
@@ -430,13 +460,13 @@
         if (self.startPickerPosition != 0 && self.endPickerPosition != 0) {
             if (self.startPickerPosition  < self.endPickerPosition)
             {
-                startViewInfo = [graphView.viewInfoArray objectAtIndex:self.startPickerPosition];
-                endViewInfo = [graphView.viewInfoArray objectAtIndex:self.endPickerPosition];
+                startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.startPickerPosition];
+                endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.endPickerPosition];
                 position = self.startPickerPosition;
             }
             else if (self.endPickerPosition < self.startPickerPosition) {
-                startViewInfo = [graphView.viewInfoArray objectAtIndex:self.endPickerPosition];
-                endViewInfo = [graphView.viewInfoArray objectAtIndex:self.startPickerPosition];
+                startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.endPickerPosition];
+                endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.startPickerPosition];
                 position = self.endPickerPosition;
             }
             else {
@@ -461,15 +491,15 @@
                 //timeObserver = nil;
                 [self setCurrentPostion:[startViewInfo.time floatValue]];
                 //[self updatePosition];
-                CGFloat moveOffset = position - scrollView.bounds.size.width / 2;
+                CGFloat moveOffset = position - self.myScrollView.bounds.size.width / 2;
                 
-                if (scrollView.contentSize.width - position < scrollView.bounds.size.width / 2) {
-                    moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 
+                if (self.myScrollView.contentSize.width - position < self.myScrollView.bounds.size.width / 2) {
+                    moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width; 
                 }
                 if (moveOffset < 0) {
                     moveOffset = 0;
                 }
-                [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+                [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
             }];
             
         }
@@ -536,7 +566,7 @@
     updateTimer = nil;
     [avPlayer pause];
     playState = playBackStatePaused;
-    mainSlider.enabled = NO;
+    //mainSlider.enabled = NO;
     //NSLog(@"state pause:%d", playState);
 }
 
@@ -561,7 +591,7 @@
     [avPlayer play];
     
     playState = playBackStatePlaying;
-    mainSlider.enabled = YES;
+    //mainSlider.enabled = YES;
     //NSLog(@"state play:%d", playState);
 }
 
@@ -582,11 +612,11 @@
         repeatMode = YES;
     }
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
     }
     else 
     {
-        repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
     }
     [self registerTimeObserver];
     
@@ -627,7 +657,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [mediaControllerDelegate release];
     [mpVolumeView release];
-    [graphView release];
+    [self.myGraphView release];
     [bookMarkArray release];
     if (updateTimer) {
         [updateTimer invalidate];
@@ -649,7 +679,7 @@
     [songArtistLabel release];
     [repeatModeView release];
     [managedObjectContext release];
-    [mainSlider release];
+    //[mainSlider release];
     //[startPickerPosition release];
     //[endPickerPosition release];
     [super dealloc];
@@ -660,27 +690,27 @@
     Float32 temp = CMTimeGetSeconds(avPlayer.currentTime);
     //NSLog(@"update position %f", temp);
 	
-    [graphView setCurrentPlaybackPosition:temp];
-    if (scrollView.contentSize.width < scrollView.bounds.size.width) {
+    [self.myGraphView setCurrentPlaybackPosition:temp];
+    if (self.myScrollView.contentSize.width < self.myScrollView.bounds.size.width) {
         movingOffset = NO;
         return;
     }
     
-    if(movingOffset == NO && scrollView.contentOffset.x + scrollView.bounds.size.width - 20 < graphView.currentPixel && graphView.currentPixel < scrollView.contentOffset.x + scrollView.bounds.size.width)
+    if(movingOffset == NO && self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width - 20 < self.myGraphView.currentPixel && self.myGraphView.currentPixel < self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width)
     {
-       //NSLog(@"Current PlayBack Position:%f, contentOffset:%f, width:%f", graphView.currentPixel, scrollView.contentOffset.x, scrollView.bounds.size.width);
+       //NSLog(@"Current PlayBack Position:%f, contentOffset:%f, width:%f", self.myGraphView.currentPixel, self.myScrollView.contentOffset.x, self.myScrollView.bounds.size.width);
         movingOffset = YES;
     }
     if (movingOffset) {
-        if (scrollView.contentOffset.x + scrollView.bounds.size.width / 2 > graphView.currentPixel || graphView.currentPixel > scrollView.contentOffset.x + scrollView.bounds.size.width) {
+        if (self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width / 2 > self.myGraphView.currentPixel || self.myGraphView.currentPixel > self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width) {
             movingOffset = NO;
         }
     }
     if (movingOffset) {
         
-        CGFloat moveOffset = scrollView.contentOffset.x + 1.0f;
-        [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
-        if (graphView.currentPixel < scrollView.contentOffset.x + scrollView.bounds.size.width/2) {
+        CGFloat moveOffset = self.myScrollView.contentOffset.x + 1.0f;
+        [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+        if (self.myGraphView.currentPixel < self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width/2) {
             movingOffset = NO;
         }
     }
@@ -712,13 +742,13 @@
 		
 	UInt32 minutes = currentTimeSec / 60;
 	UInt32 seconds = currentTimeSec % 60;
-	playbackTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
+	playbackTimeLabel.text = [NSString stringWithFormat: @"%02d:%02ld", minutes, seconds];
     
     minutes = remainTimeSec / 60;
 	seconds = remainTimeSec % 60;
-	remainTimeLabel.text = [NSString stringWithFormat: @"-%02d:%02d", minutes, seconds];
+	remainTimeLabel.text = [NSString stringWithFormat: @"-%02d:%02ld", minutes, seconds];
     
-    mainSlider.value = (currentTimeSec / [currentSong.songDuration floatValue]);
+    //mainSlider.value = (currentTimeSec / [currentSong.songDuration floatValue]);
 	
 }
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller {
@@ -764,7 +794,7 @@
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:(tag - 1)];
     
-    ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
+    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
 }
 -(void)addBookMarkOnPixel:(CGFloat)pixel {
@@ -773,7 +803,7 @@
     
     BookMark *bookMark = [NSEntityDescription insertNewObjectForEntityForName:@"BookMark" inManagedObjectContext:context];
    
-    ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:pixel - 1];
+    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:pixel - 1];
     bookMark.duration = tempViewInfo.time;
     bookMark.position = [NSNumber numberWithFloat:pixel];
     bookMark.keepDate = [NSDate date];
@@ -806,8 +836,8 @@
 	
 	//if (playState == playBackStatePaused || playState == playBackStatePlaying) {
     if ([currentSong.doneGraphDrawing boolValue]) {
-        [self addBookMarkOnPixel:[graphView currentPixel]];
-        [graphView.bookMarkLayer setNeedsDisplay];
+        [self addBookMarkOnPixel:[self.myGraphView currentPixel]];
+        [self.myGraphView.bookMarkLayer setNeedsDisplay];
         [startPickerView reloadData];
         [endPickerView reloadData];
     }
@@ -827,18 +857,18 @@
     //NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
     CGFloat start = offset.x;
     CGFloat end = offset.x + 320;
-    if ([graphView.viewInfoArray count] == 0) {
+    if ([self.myGraphView.viewInfoArray count] == 0) {
         //NSLog(@"viewInfoArray delete");
         return;
     }
     if (start < 0) {
         start = 0;
     }
-    if (end > [graphView.viewInfoArray count] - 1) {
-        end = [graphView.viewInfoArray count] - 1;
+    if (end > [self.myGraphView.viewInfoArray count] - 1) {
+        end = [self.myGraphView.viewInfoArray count] - 1;
     }
-    ViewInfo *startViewInfo = [graphView.viewInfoArray objectAtIndex:start];
-    ViewInfo *endViewInfo = [graphView.viewInfoArray objectAtIndex:end];
+    ViewInfo *startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:start];
+    ViewInfo *endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:end];
     UInt64 startTimeSec = [startViewInfo.time floatValue];
     UInt64 endTimeSec = [endViewInfo.time floatValue];
 	
@@ -868,15 +898,15 @@
 {
 	[self play];
     
-    CGFloat moveOffset = graphView.currentPixel - scrollView.bounds.size.width / 2;
+    CGFloat moveOffset = self.myGraphView.currentPixel - self.myScrollView.bounds.size.width / 2;
     
-    if (scrollView.contentSize.width - graphView.currentPixel < scrollView.bounds.size.width / 2) {
-        moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 
+    if (self.myScrollView.contentSize.width - self.myGraphView.currentPixel < self.myScrollView.bounds.size.width / 2) {
+        moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width; 
     }
     if (moveOffset < 0) {
         moveOffset = 0;
     }
-    [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+    [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
 }
 
 - (void) scrub: (UISlider *) aSlider
@@ -886,7 +916,7 @@
 	
 	// Calculate the new current time
     [self setCurrentPostion:aSlider.value * [currentSong.songDuration floatValue]];
-    [graphView setCurrentPlaybackPosition:aSlider.value * [currentSong.songDuration floatValue]];
+    [self.myGraphView setCurrentPlaybackPosition:aSlider.value * [currentSong.songDuration floatValue]];
     
     
 	
@@ -897,9 +927,15 @@
 
 #pragma mark - View lifecycle
 - (void)settingUpBackgroundView {
+    UIImageView *backGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"mainview_bg.png"]];
+    backGround.frame = CGRectMake(0,  0, 320, 374);
+    [self.view addSubview:backGround];
+    [backGround release];
+    
+    //[[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]]];
     //UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"time_bg.jpg"]];
     //timeBackGround.frame = CGRectMake(0, 0, 320, 25);
-    UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
+    /*UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
     timeBackGround.frame = CGRectMake(0,  -23, 320, 206);
     UIImageView *sliderBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg_copy.png"]];
     sliderBackGround.frame = CGRectMake(0,  183, 320, 42);
@@ -916,28 +952,28 @@
     [timeBackGround release];
     [sliderBackGround release];
     [pageBackGround release];
-    [pickerBackGround release];
+    [pickerBackGround release];*/
     
 }
 - (void)settingUpLabel {
-    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 230.0f, 46.0f, 11.0f)];
+    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(18.0f, 197.0f, 60.0f, 20.0f)];
     [playbackTimeLabel setText:@"00:00"];
     [playbackTimeLabel setTextAlignment:UITextAlignmentCenter];
     playbackTimeLabel.adjustsFontSizeToFitWidth = NO;
-    playbackTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
+    playbackTimeLabel.textColor = [UIColor whiteColor];
     playbackTimeLabel.backgroundColor = [UIColor clearColor];
-    playbackTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    playbackTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //playbackTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(12.0)];
+    playbackTimeLabel.font = [UIFont boldSystemFontOfSize:13.0f];
     [self.view addSubview:playbackTimeLabel];
     
-    remainTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 230.0f, 46.0f, 11.0f)];
+    remainTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(242.0f, 197.0f, 60.0f, 20.0f)];
     [remainTimeLabel setText:@"00:00"];
     [remainTimeLabel setTextAlignment:UITextAlignmentCenter];
     remainTimeLabel.adjustsFontSizeToFitWidth = NO;
-    remainTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
+    remainTimeLabel.textColor = [UIColor whiteColor];//[UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
     remainTimeLabel.backgroundColor = [UIColor clearColor];
-    remainTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    remainTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
+    //remainTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(12.0)];
+    remainTimeLabel.font = [UIFont boldSystemFontOfSize:13.0f];
     [self.view addSubview:remainTimeLabel];
     
     //self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 7.0f, 46.0f, 11.0f)];
@@ -977,12 +1013,12 @@
     //[self.view addSubview:totalTimeLabel];
 }
 - (void)settingUpPicker {
-    UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_basic.png"]];
-    leftBackGround.frame = CGRectMake(12, 246 + STATUSBAR_HEIGHT, 104, 66);
+    UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
+    leftBackGround.frame = CGRectMake(18, 249, 82, 69);
     [self.view addSubview:leftBackGround];
     [leftBackGround release];
 
-    CGRect leftFrame = CGRectMake(12.0f, 246.0f + STATUSBAR_HEIGHT, 104.0f, 66.0f);
+    CGRect leftFrame = CGRectMake(18, 250, 82, 45);
 	startPickerView = [[V8HorizontalPickerView alloc] initWithFrame:leftFrame];
 	startPickerView.backgroundColor   = [UIColor clearColor];
 	startPickerView.selectedTextColor = [UIColor blackColor];
@@ -994,27 +1030,28 @@
 	//startPickerView.selectionPoint = CGPointMake(60, 0);
     
 	// add carat or other view to indicate selected element
-	UIImageView *startIndicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_cell.png"]];
-    startIndicator.layer.opacity = 0.56f;
-	startPickerView.selectionIndicatorView = startIndicator;
-	startPickerView.indicatorPosition = V8HorizontalPickerIndicatorTop; // specify indicator's location
-	[startIndicator release];
+	//UIImageView *startIndicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_cell.png"]];
+    //startIndicator.layer.opacity = 0.56f;
+	//startPickerView.selectionIndicatorView = startIndicator;
+	//startPickerView.indicatorPosition = V8HorizontalPickerIndicatorTop; // specify indicator's location
+	//[startIndicator release];
     
 	// add gradient images to left and right of view if desired
-    UIImageView *startLeftFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_left.png"]];
+    UIImageView *startLeftFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"scroll_up.png"]];
+    startLeftFade.layer.opacity = 0.8f;
     startPickerView.leftEdgeView = startLeftFade;
     [startLeftFade release];
     //
-    UIImageView *startRightFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_right.png"]];
-    startPickerView.rightEdgeView = startRightFade;
-    [startRightFade release];
+    //UIImageView *startRightFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_right.png"]];
+    //startPickerView.rightEdgeView = startRightFade;
+    //[startRightFade release];
     [self.view addSubview:startPickerView];
     
-    UIImageView *rightBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_basic.png"]];
-    rightBackGround.frame = CGRectMake(204, 246 + STATUSBAR_HEIGHT, 104, 66);
+    UIImageView *rightBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
+    rightBackGround.frame = CGRectMake(224, 249, 82, 69);
     [self.view addSubview:rightBackGround];
     [rightBackGround release];
-    CGRect rightFrame = CGRectMake(204.0f, 246.0f + STATUSBAR_HEIGHT, 104.0f, 66.0f);
+    CGRect rightFrame = CGRectMake(224, 250, 82, 45);
 	endPickerView = [[V8HorizontalPickerView alloc] initWithFrame:rightFrame];
 	endPickerView.backgroundColor   = [UIColor clearColor];
 	endPickerView.selectedTextColor = [UIColor blackColor];
@@ -1026,44 +1063,45 @@
 	//startPickerView.selectionPoint = CGPointMake(60, 0);
     
 	// add carat or other view to indicate selected element
-	UIImageView *endIndicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_cell.png"]];
-    endIndicator.layer.opacity = 0.56f;
-	endPickerView.selectionIndicatorView = endIndicator;
-	endPickerView.indicatorPosition = V8HorizontalPickerIndicatorTop; // specify indicator's location
-	[endIndicator release];
+	//UIImageView *endIndicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_cell.png"]];
+    //endIndicator.layer.opacity = 0.56f;
+	//endPickerView.selectionIndicatorView = endIndicator;
+	//endPickerView.indicatorPosition = V8HorizontalPickerIndicatorTop; // specify indicator's location
+	//[endIndicator release];
     
 	// add gradient images to left and right of view if desired
-    UIImageView *endLeftFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_left.png"]];
+    UIImageView *endLeftFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"scroll_up.png"]];
+    endLeftFade.layer.opacity = 0.8f;
     endPickerView.leftEdgeView = endLeftFade;
     [endLeftFade release];
     //
-    UIImageView *endRightFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_right.png"]];
-    endPickerView.rightEdgeView = endRightFade;
-    [endRightFade release];
+    //UIImageView *endRightFade = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg_right.png"]];
+    //endPickerView.rightEdgeView = endRightFade;
+    //[endRightFade release];
     [self.view addSubview:endPickerView];
 }
 - (void)settingUpBookMarkButton {
     mainButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	mainButton.frame = CGRectMake(127.0f, 246.0f + STATUSBAR_HEIGHT, 65.0f, 79.0f);
+	mainButton.frame = CGRectMake(112.0f, 238.0f, 92.0f, 92.0f);
     
-    [mainButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_off.png"] forState:UIControlStateNormal];
-    [mainButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_on.png"] forState:UIControlStateSelected];
-    [mainButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_on.png"] forState:UIControlStateHighlighted];
+    [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_off.png"] forState:UIControlStateNormal];
+    [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_on.png"] forState:UIControlStateSelected];
+    [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_on.png"] forState:UIControlStateHighlighted];
     [mainButton addTarget:self action:@selector(tapMainButton:) forControlEvents: UIControlEventTouchUpInside];
     [self.view addSubview:mainButton];
 }
 - (void)settingUpVolumeSlider {
-    UIImageView *soundOffImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_off.png"]];
-    soundOffImage.frame = CGRectMake(21, 407-65 + STATUSBAR_HEIGHT, 14, 10);
-    [self.view addSubview:soundOffImage];
-    [soundOffImage release];
+    //UIImageView *soundOffImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_off.png"]];
+    //soundOffImage.frame = CGRectMake(21, 407-65 + STATUSBAR_HEIGHT, 14, 10);
+    //[self.view addSubview:soundOffImage];
+    //[soundOffImage release];
     
-    UIImageView *soundOnImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_on.png"]];
-    soundOnImage.frame = CGRectMake(285, 407-65 + STATUSBAR_HEIGHT, 13, 10);
-    [self.view addSubview:soundOnImage];
-    [soundOnImage release];
+    //UIImageView *soundOnImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_on.png"]];
+    //soundOnImage.frame = CGRectMake(285, 407-65 + STATUSBAR_HEIGHT, 13, 10);
+    //[self.view addSubview:soundOnImage];
+    //[soundOnImage release];
     
-    CGRect frame = CGRectMake(42, 407-64-5 + STATUSBAR_HEIGHT, 235, 9);
+    CGRect frame = CGRectMake(52, 349, 210, 6);
     UISlider *customSlider = [[UISlider alloc] initWithFrame:frame];
     MPVolumeView *volumeView = [[[MPVolumeView alloc] initWithFrame:[customSlider frame]] autorelease];
     UISlider *volumeViewSlider = nil;
@@ -1073,11 +1111,11 @@
 		}
 	}
     volumeViewSlider.backgroundColor = [UIColor clearColor];	
-    UIImage *stetchLeftTrack = [[UIImage imageNamed:@"bar_on.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
-    UIImage *stetchRightTrack = [[UIImage imageNamed:@"bar_off.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
-    [volumeViewSlider setThumbImage: [UIImage imageNamed:@"sound_controll.png"] forState:UIControlStateNormal];
-    [volumeViewSlider setMinimumTrackImage:stetchLeftTrack forState:UIControlStateNormal];
-    [volumeViewSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
+    //UIImage *stetchLeftTrack = [[UIImage imageNamed:@"bar_on.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
+    //UIImage *stetchRightTrack = [[UIImage imageNamed:@"bar_off.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
+    [volumeViewSlider setThumbImage: [UIImage imageNamed:@"volume_pos.png"] forState:UIControlStateNormal];
+    [volumeViewSlider setMinimumTrackImage:[UIImage imageNamed:@"volume_left.png"] forState:UIControlStateNormal];
+    //[volumeViewSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
     [customSlider removeFromSuperview];
     [self.view addSubview:volumeView];
     [customSlider release];
@@ -1106,7 +1144,7 @@ UIImage *createSimpleThumb()
 	return theImage;
 }
 
-- (void)settingUpMainSlider {
+/*- (void)settingUpMainSlider {
     CGRect frame = CGRectMake(21, 190, 278, 14);
     UIImage *simpleThumbImage = [createSimpleThumb() retain];
     mainSlider = [[UISlider alloc] initWithFrame:frame];
@@ -1123,7 +1161,7 @@ UIImage *createSimpleThumb()
     [self.view addSubview:mainSlider];
     //[mainSlider release];
 
-}
+}*/
 - (void)applicationWillResign {
     //NSLog(@"application will resign");
 }
@@ -1138,6 +1176,17 @@ UIImage *createSimpleThumb()
     {
         //NSLog(@"avPlayer rate is %f", avPlayer.rate);
         //NSLog(@"self playstate:%d", playState);
+    }
+}
+-(void)checkLibrary
+{
+    MPMediaQuery *everything = [[MPMediaQuery alloc] init];
+    NSArray *itemsFromGenericQuery = [everything items];
+    for (MPMediaItem *song in itemsFromGenericQuery) {
+        NSString *songTitle = [song valueForProperty: MPMediaItemPropertyTitle];
+        NSLog(@"Title:%@", songTitle);
+        NSString *songID = [song valueForProperty: MPMediaItemPropertyPersistentID];
+        NSLog(@"ID:%@", songID);
     }
 }
 
@@ -1162,16 +1211,16 @@ UIImage *createSimpleThumb()
     //self.navigationController.navigationBar.translucent = YES;
     
     UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 60.0f, 36.0f);
     if ([language isEqualToString:@"ko"]) {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_kor_press.png"] forState:UIControlStateHighlighted];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_off_kor.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_on_kor.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_on_kor.png"] forState:UIControlStateHighlighted];
     }
     else {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_music_eng_press.png"] forState:UIControlStateHighlighted];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_off_eng.png"] forState:UIControlStateNormal];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_on_eng.png"] forState:UIControlStateSelected];
+        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_on_eng.png"] forState:UIControlStateHighlighted];
     }
  
     [leftBarButton addTarget:self action:@selector(goToMyList:) forControlEvents: UIControlEventTouchUpInside];
@@ -1185,15 +1234,15 @@ UIImage *createSimpleThumb()
     //self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music",@"Title for My List"), @selector(goToMyList:));
     
     UIButton *rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
+	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 60.0f, 36.0f);
     if ([language isEqualToString:@"ko"]) {
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_basic.png"] forState:UIControlStateNormal];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_press.png"] forState:UIControlStateSelected];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_kor_press.png"] forState:UIControlStateHighlighted];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_off_kor.png"] forState:UIControlStateNormal];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_on_kor.png"] forState:UIControlStateSelected];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_on_kor.png"] forState:UIControlStateHighlighted];
     } else {
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_basic.png"] forState:UIControlStateNormal];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_press.png"] forState:UIControlStateSelected];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_bookmark_eng_press.png"] forState:UIControlStateHighlighted];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_off_eng.png"] forState:UIControlStateNormal];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_on_eng.png"] forState:UIControlStateSelected];
+        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_on_eng.png"] forState:UIControlStateHighlighted];
     }
     [rightBarButton addTarget:self action:@selector(goToBookMark:) forControlEvents: UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
@@ -1204,45 +1253,65 @@ UIImage *createSimpleThumb()
 
     //self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
     //self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
-    self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
+    //self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
     avPlayer = nil;
-    self.navigationController.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
+    //self.navigationController.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
+    //self.navigationController.navigationBar.translucent = YES;
+    
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar.png"] forBarMetrics:UIBarMetricsDefault];
     //self.navigationController.navigationBar.translucent = YES;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //NSLog(@"left bar button width:%f, right bar button width:%f, navigation bar width:%f", self.navigationItem.leftBarButtonItem.width, self.navigationItem.rightBarButtonItem.width, self.navigationController.navigationBar.bounds.size.width);
+    /*UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 62)];
+    label.backgroundColor = [UIColor clearColor];
+    label.numberOfLines = 3;
+    label.font = [UIFont boldSystemFontOfSize: 12.0f];
+    label.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
+    label.textAlignment = UITextAlignmentCenter;
+    label.textColor = [UIColor whiteColor];
+    NSString *songData;
+    songData = NSLocalizedString(@"MusicWave MusicWave MusicWave MusicWave", @"Default title for song label");//[[songList objectAtIndex:currentIndex] artistName];
+    songData = [songData stringByAppendingString:@"\n"];
+    songData = [songData stringByAppendingString:NSLocalizedString(@"MusicWave", @"Default title for song label")];//[songData stringByAppendingString: [[songList objectAtIndex:currentIndex] songName]];
+    songData = [songData stringByAppendingString:@"\n"];
+    songData = [songData stringByAppendingString:NSLocalizedString(@"MusicWave", @"Default title for song label")];//[songData stringByAppendingString: [[songList objectAtIndex:currentIndex] albumName]];
+    label.text = songData;
+    self.navigationItem.titleView = label;*/
     
-    UIView *btn = [[UIView alloc] initWithFrame:CGRectMake(0, 60, 160, 44)];
-    //btn.backgroundColor = [UIColor whiteColor];
+    UILabel *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 62)];
+    songDataView.backgroundColor = [UIColor clearColor];
     
     //UILabel *label;
-    self.songTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, btn.bounds.size.width, 32)];
+    self.songTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 5, songDataView.bounds.size.width, 30)];
     self.songTitleLabel.tag = 1;
     self.songTitleLabel.backgroundColor = [UIColor clearColor];
-    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:18];
+    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:22];
+    self.songTitleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
     //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
-    self.songTitleLabel.textColor = [UIColor blackColor];
+    self.songTitleLabel.textColor = [UIColor whiteColor];
     self.songTitleLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
-    self.songTitleLabel.highlightedTextColor = [UIColor blackColor];
-    [btn addSubview:self.songTitleLabel];
+    self.songTitleLabel.highlightedTextColor = [UIColor whiteColor];
+    [songDataView addSubview:self.songTitleLabel];
     //[label release];
     
-    self.songArtistLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 32, btn.bounds.size.width, 12)];
+    self.songArtistLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 33, songDataView.bounds.size.width, 22)];
     self.songArtistLabel.tag = 2;
     self.songArtistLabel.backgroundColor = [UIColor clearColor];
-    self.songArtistLabel.font = [UIFont boldSystemFontOfSize:12];
-    self.songArtistLabel.adjustsFontSizeToFitWidth = NO;
+    self.songArtistLabel.font = [UIFont systemFontOfSize:14];
+    self.songArtistLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
+    //self.songArtistLabel.adjustsFontSizeToFitWidth = NO;
     self.songArtistLabel.textAlignment = UITextAlignmentCenter;
-    self.songArtistLabel.textColor = [UIColor blackColor];
-    self.songArtistLabel.text = @"";
-    self.songArtistLabel.highlightedTextColor = [UIColor blackColor];
-    [btn addSubview:self.songArtistLabel];
+    self.songArtistLabel.textColor = [UIColor whiteColor];
+    self.songArtistLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");;
+    self.songArtistLabel.highlightedTextColor = [UIColor whiteColor];
+    [songDataView addSubview:self.songArtistLabel];
     //[label release];
     
-    self.navigationItem.titleView = btn;
+    self.navigationItem.titleView = songDataView;
     
     //self.currentSong = nil;
-    //scrollView.delegate = self;
+    //self.myScrollView.delegate = self;
     HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
     [self.navigationController.view addSubview:HUD];
     HUD.delegate = self;
@@ -1253,7 +1322,7 @@ UIImage *createSimpleThumb()
     //self.navigationItem.leftBarButtonItem = BARBUTTON(@"My List", @selector(selectSongs:));
     
     	
-    [graphView setParent:self];
+    [self.myGraphView setParent:self];
     //playState = playBackStateNone;
     //[self imageViewTest];
     [self settingUpBackgroundView];
@@ -1261,19 +1330,38 @@ UIImage *createSimpleThumb()
     [self settingUpPicker];
     [self settingUpBookMarkButton];
     [self settingUpVolumeSlider];
-    [self settingUpMainSlider];
+    //[self settingUpMainSlider];
     
-    mainSlider.enabled = NO;
+    [toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
+             forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    
+    //mainSlider.enabled = NO;
     
     self.repeatModeView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.repeatModeView.contentMode = UIViewContentModeScaleAspectFit;
+    //self.repeatModeView.contentMode = UIViewContentModeScaleAspectFit;
     
-    self.repeatModeView.frame = CGRectMake(150, 211 + STATUSBAR_HEIGHT, 21, 13);
+    self.repeatModeView.frame = CGRectMake(122, 198, 76, 21);
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"re_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"re_off.png"];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
     [self.view addSubview:repeatModeView];
+    
+    CGRect scrollViewRect = CGRectMake(10, 33, 300, 157);
+    
+    self.myScrollView = [[MyScrollView alloc] initWithFrame:scrollViewRect];
+    self.myScrollView.scrollEnabled = YES;
+    self.myScrollView.backgroundColor = [UIColor clearColor];
+    self.myScrollView.contentSize = CGSizeMake(scrollViewRect.size.width,
+                                               scrollViewRect.size.height);
+    [self.view addSubview:self.myScrollView];
+    
+    CGRect graphViewRect = self.myScrollView.bounds;
+    self.myGraphView = [[MyGraphView alloc] initWithFrame:graphViewRect];
+    self.myGraphView.backgroundColor = [UIColor clearColor];
+    self.myGraphView.parent = self;
+    [self.myScrollView addSubview:self.myGraphView];
+
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 	[self becomeFirstResponder];
@@ -1323,8 +1411,8 @@ UIImage *createSimpleThumb()
         else {
             self.endPickerPosition = 0.f;
         }
-        [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
-        [graphView.bookMarkLayer setNeedsDisplay];
+        [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+        [self.myGraphView.bookMarkLayer setNeedsDisplay];
         [self registerTimeObserver];
         return;
     }
@@ -1342,30 +1430,30 @@ UIImage *createSimpleThumb()
         self.endPickerPosition = [tempBookMark.position floatValue];
     }
     //NSLog(@"Self startPickerPosition:%f, endPickerPosition:%f", self.startPickerPosition, self.endPickerPosition);
-    ViewInfo *tempViewInfo = [graphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
+    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
     //NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
     [self setCurrentPostion:[tempViewInfo.time floatValue]];
     //[self updatePosition];
-    CGFloat moveOffset = [tempBookMark.position floatValue] - scrollView.bounds.size.width / 2;
+    CGFloat moveOffset = [tempBookMark.position floatValue] - self.myScrollView.bounds.size.width / 2;
    
-    if (scrollView.contentSize.width - [tempBookMark.position floatValue] < scrollView.bounds.size.width / 2) {
-        moveOffset = scrollView.contentSize.width - scrollView.bounds.size.width; 
+    if (self.myScrollView.contentSize.width - [tempBookMark.position floatValue] < self.myScrollView.bounds.size.width / 2) {
+        moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width; 
     }
     if (moveOffset < 0) {
         moveOffset = 0;
     }
-    [scrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
-    [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
-    [graphView.bookMarkLayer setNeedsDisplay];
-    [graphView setCurrentPlaybackPosition:[tempViewInfo.time floatValue]];
+    [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+    [self.myGraphView.bookMarkLayer setNeedsDisplay];
+    [self.myGraphView setCurrentPlaybackPosition:[tempViewInfo.time floatValue]];
     [self registerTimeObserver];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     //NSLog(@"main view will appear");
-    [graphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
-    [graphView.bookMarkLayer setNeedsDisplay];
+    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+    [self.myGraphView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];
     [endPickerView reloadData];
 }
@@ -1388,8 +1476,8 @@ UIImage *createSimpleThumb()
 }
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [avPlayer seekToTime:kCMTimeZero];
-    [graphView.layer setNeedsDisplay];
-    [scrollView setContentOffset:CGPointMake(0.0, 0.0)];
+    [self.myGraphView.layer setNeedsDisplay];
+    [self.myScrollView setContentOffset:CGPointMake(0.0, 0.0)];
     movingOffset = NO;
     [self pause];
     if (repeatMode) {
