@@ -359,9 +359,9 @@
     }
     movingOffset = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
 	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
@@ -428,9 +428,9 @@
     //NSLog(@"state none:%d line:%d", playState, __LINE__);
     repeatMode = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     [self.myScrollView setContentSize:CGSizeMake(280, self.myGraphView.bounds.size.height)];
     [self.myGraphView setFrame:CGRectMake(0, 0, 280, self.myGraphView.bounds.size.height)];
     [self.myGraphView setUpBookMarkLayer];
@@ -612,11 +612,11 @@
         repeatMode = YES;
     }
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
     else 
     {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     }
     [self registerTimeObserver];
     
@@ -931,32 +931,9 @@
     backGround.frame = CGRectMake(0,  0, 320, 374);
     [self.view addSubview:backGround];
     [backGround release];
-    
-    //[[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]]];
-    //UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"time_bg.jpg"]];
-    //timeBackGround.frame = CGRectMake(0, 0, 320, 25);
-    /*UIImageView *timeBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
-    timeBackGround.frame = CGRectMake(0,  -23, 320, 206);
-    UIImageView *sliderBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg_copy.png"]];
-    sliderBackGround.frame = CGRectMake(0,  183, 320, 42);
-    UIImageView *pageBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bottombg.jpg"]];
-    pageBackGround.frame = CGRectMake(0, 205 + STATUSBAR_HEIGHT, 320, 25);
-    UIImageView *pickerBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_bg.jpg"]];
-    pickerBackGround.frame = CGRectMake(0, 230 + STATUSBAR_HEIGHT, 320, 147);
-    
-    [self.view addSubview:timeBackGround];
-    [self.view addSubview:sliderBackGround];
-    [self.view addSubview:pageBackGround];
-    [self.view addSubview:pickerBackGround];
-    
-    [timeBackGround release];
-    [sliderBackGround release];
-    [pageBackGround release];
-    [pickerBackGround release];*/
-    
 }
 - (void)settingUpLabel {
-    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(18.0f, 197.0f, 60.0f, 20.0f)];
+    self.playbackTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(18.0f, 194.0f, 60.0f, 20.0f)];
     [playbackTimeLabel setText:@"00:00"];
     [playbackTimeLabel setTextAlignment:UITextAlignmentCenter];
     playbackTimeLabel.adjustsFontSizeToFitWidth = NO;
@@ -966,7 +943,7 @@
     playbackTimeLabel.font = [UIFont boldSystemFontOfSize:13.0f];
     [self.view addSubview:playbackTimeLabel];
     
-    remainTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(242.0f, 197.0f, 60.0f, 20.0f)];
+    remainTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(242.0f, 194.0f, 60.0f, 20.0f)];
     [remainTimeLabel setText:@"00:00"];
     [remainTimeLabel setTextAlignment:UITextAlignmentCenter];
     remainTimeLabel.adjustsFontSizeToFitWidth = NO;
@@ -1014,11 +991,11 @@
 }
 - (void)settingUpPicker {
     UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
-    leftBackGround.frame = CGRectMake(18, 249, 82, 69);
+    leftBackGround.frame = CGRectMake(57 - 41, 249, 82, 69);
     [self.view addSubview:leftBackGround];
     [leftBackGround release];
 
-    CGRect leftFrame = CGRectMake(18, 250, 82, 45);
+    CGRect leftFrame = CGRectMake(57 - 41, 250, 82, 45);
 	startPickerView = [[V8HorizontalPickerView alloc] initWithFrame:leftFrame];
 	startPickerView.backgroundColor   = [UIColor clearColor];
 	startPickerView.selectedTextColor = [UIColor blackColor];
@@ -1048,10 +1025,10 @@
     [self.view addSubview:startPickerView];
     
     UIImageView *rightBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
-    rightBackGround.frame = CGRectMake(224, 249, 82, 69);
+    rightBackGround.frame = CGRectMake(206 + 57 - 41, 249, 82, 69);
     [self.view addSubview:rightBackGround];
     [rightBackGround release];
-    CGRect rightFrame = CGRectMake(224, 250, 82, 45);
+    CGRect rightFrame = CGRectMake(206 + 57 - 41, 250, 82, 45);
 	endPickerView = [[V8HorizontalPickerView alloc] initWithFrame:rightFrame];
 	endPickerView.backgroundColor   = [UIColor clearColor];
 	endPickerView.selectedTextColor = [UIColor blackColor];
@@ -1082,7 +1059,7 @@
 }
 - (void)settingUpBookMarkButton {
     mainButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	mainButton.frame = CGRectMake(112.0f, 238.0f, 92.0f, 92.0f);
+	mainButton.frame = CGRectMake(160 - 46, 238.0f, 92.0f, 92.0f);
     
     [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_off.png"] forState:UIControlStateNormal];
     [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_on.png"] forState:UIControlStateSelected];
@@ -1121,47 +1098,6 @@
     [customSlider release];
     //[volumeView release];
 }
-// Return a base thumb image without the bubble
-UIImage *createSimpleThumb()
-{
-	float INSET_AMT = 1.5f;
-	UIGraphicsBeginImageContext(CGSizeMake(40.0f, 100.0f));
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	
-	// Create a filled rect for the thumb
-	[[UIColor darkGrayColor] setFill];
-	CGContextAddRect(context, CGRectMake(INSET_AMT, 40.0f + INSET_AMT, 40.0f - 2.0f * INSET_AMT, 20.0f - 2.0f * INSET_AMT));
-	CGContextFillPath(context);
-	
-	// Outline the thumb
-	[[UIColor whiteColor] setStroke];
-	CGContextSetLineWidth(context, 2.0f);	
-	CGContextAddRect(context, CGRectMake(2.0f * INSET_AMT, 40.0f + 2.0f * INSET_AMT, 40.0f - 4.0f * INSET_AMT, 20.0f - 4.0f * INSET_AMT));
-	CGContextStrokePath(context);
-	
-	UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
-	return theImage;
-}
-
-/*- (void)settingUpMainSlider {
-    CGRect frame = CGRectMake(21, 190, 278, 14);
-    UIImage *simpleThumbImage = [createSimpleThumb() retain];
-    mainSlider = [[UISlider alloc] initWithFrame:frame];
-    //UIImage *stetchLeftTrack = [[UIImage imageNamed:@"bar_on.png"] stretchableImageWithLeftCapWidth:14.0 topCapHeight:0];
-    //UIImage *stetchRightTrack = [[UIImage imageNamed:@"bar_off.png"] stretchableImageWithLeftCapWidth:14.0 topCapHeight:0];
-    //[mainSlider setThumbImage: [UIImage imageNamed:@"sound_controll.png"] forState:UIControlStateNormal];
-    [mainSlider setThumbImage: simpleThumbImage forState:UIControlStateNormal];
-    //[mainSlider setMinimumTrackImage:stetchLeftTrack forState:UIControlStateNormal];
-    //[mainSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
-    
-    [mainSlider addTarget:self action:@selector(scrub:) forControlEvents:UIControlEventTouchDown];
-	[mainSlider addTarget:self action:@selector(scrub:) forControlEvents:UIControlEventValueChanged];
-	[mainSlider addTarget:self action:@selector(scrubbingDone:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
-    [self.view addSubview:mainSlider];
-    //[mainSlider release];
-
-}*/
 - (void)applicationWillResign {
     //NSLog(@"application will resign");
 }
@@ -1340,11 +1276,11 @@ UIImage *createSimpleThumb()
     self.repeatModeView = [[UIImageView alloc] initWithFrame:CGRectZero];
     //self.repeatModeView.contentMode = UIViewContentModeScaleAspectFit;
     
-    self.repeatModeView.frame = CGRectMake(122, 198, 76, 21);
+    self.repeatModeView.frame = CGRectMake(160 - 38, 195, 76, 21);
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on.png"];
+        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off.png"];
+    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     [self.view addSubview:repeatModeView];
     
     CGRect scrollViewRect = CGRectMake(10, 33, 300, 157);

@@ -16,6 +16,7 @@
     IBOutlet UITableView					*bookMarkListTable;
     IBOutlet UINavigationItem *bookMarkNavItem;
     IBOutlet UIBarButtonItem *menuBarItem;
+    IBOutlet UIToolbar *bookMarkToolBar;
     //IBOutlet UIToolbar *bookMarkToolBar;
     Song *currentSong;
     UIViewController *mainViewController;

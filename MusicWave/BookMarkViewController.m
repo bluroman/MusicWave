@@ -38,6 +38,7 @@
     //[rightBarButton release];
     [rightBarItem release];
     [menuBarItem release];
+    [bookMarkToolBar release];
     [super dealloc];
 }
 
@@ -345,6 +346,9 @@
     //self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.bookMarkListTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
     self.bookMarkListTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
+    [bookMarkToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
+             forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    
     
     /*UIToolbar *tb = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 44.0f)];
 	tb.center = CGPointMake(160.0f, 400.0f);
@@ -369,6 +373,8 @@
 
 - (void)viewDidUnload
 {
+    [bookMarkToolBar release];
+    bookMarkToolBar = nil;
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;

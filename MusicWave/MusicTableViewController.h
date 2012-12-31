@@ -55,6 +55,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 	//id <MusicTableViewControllerDelegate>	delegate;
 	IBOutlet UITableView					*mediaItemCollectionTable;
+    IBOutlet UIToolbar *musicTableToolBar;
 	IBOutlet UIBarButtonItem				*addMusicButton;
     IBOutlet UINavigationBar *navigationBar;
     UIViewController *mainViewController;

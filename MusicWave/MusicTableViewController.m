@@ -178,6 +178,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     self.mediaItemCollectionTable.rowHeight = 58.0;
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
     self.mediaItemCollectionTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
+    
+    [musicTableToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
+             forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
 }
 - (IBAction) tapCheckLibraryButton: (id)sender
 {
@@ -463,6 +466,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 }
 
 - (void)viewDidUnload {
+    [musicTableToolBar release];
+    musicTableToolBar = nil;
 
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
@@ -477,6 +482,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [deleteIndexPath release];
     [navigationItem release];
     [navigationBar release];
+    [musicTableToolBar release];
     [super dealloc];
 }
 #pragma mark - Fetched results controller

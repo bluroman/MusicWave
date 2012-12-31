@@ -142,6 +142,8 @@
 		28A6127C14032AFE0053180C /* help_05.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A6127514032AFE0053180C /* help_05.png */; };
 		28A6127D14032AFE0053180C /* help_06.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A6127614032AFE0053180C /* help_06.png */; };
 		28A6127E14032AFE0053180C /* help_07.png in Resources */ = {isa = PBXBuildFile; fileRef = 28A6127714032AFE0053180C /* help_07.png */; };
+		28D202FF169122880052FC27 /* repeat_off_test.png in Resources */ = {isa = PBXBuildFile; fileRef = 28D202FD169122870052FC27 /* repeat_off_test.png */; };
+		28D20300169122880052FC27 /* repeat_on_test.png in Resources */ = {isa = PBXBuildFile; fileRef = 28D202FE169122880052FC27 /* repeat_on_test.png */; };
 		28DE370213D9226B00457AFB /* graph_t2_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE370013D9226B00457AFB /* graph_t2_off.png */; };
 		28DE370313D9226B00457AFB /* graph_t2_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 28DE370113D9226B00457AFB /* graph_t2_on.png */; };
 		28F6316D13D00D72000172FF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28F6316B13D00D72000172FF /* Localizable.strings */; };
@@ -308,6 +310,8 @@
 		28A6127514032AFE0053180C /* help_05.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help_05.png; sourceTree = "<group>"; };
 		28A6127614032AFE0053180C /* help_06.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help_06.png; sourceTree = "<group>"; };
 		28A6127714032AFE0053180C /* help_07.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help_07.png; sourceTree = "<group>"; };
+		28D202FD169122870052FC27 /* repeat_off_test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_off_test.png; sourceTree = "<group>"; };
+		28D202FE169122880052FC27 /* repeat_on_test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_on_test.png; sourceTree = "<group>"; };
 		28DE370013D9226B00457AFB /* graph_t2_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_off.png; sourceTree = "<group>"; };
 		28DE370113D9226B00457AFB /* graph_t2_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = graph_t2_on.png; sourceTree = "<group>"; };
 		28F6316C13D00D72000172FF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -394,6 +398,8 @@
 		288AE35B13CEDE2F00453026 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				28D202FD169122870052FC27 /* repeat_off_test.png */,
+				28D202FE169122880052FC27 /* repeat_on_test.png */,
 				287D325D167F7F6400102DE8 /* mainview_bg.png */,
 				287D325B167F7C1900102DE8 /* nav_bar.png */,
 				2878DDEC167DACED007A35EC /* toolbar_back.png */,
@@ -732,6 +738,8 @@
 				2878DDED167DACED007A35EC /* toolbar_back.png in Resources */,
 				287D325C167F7C1900102DE8 /* nav_bar.png in Resources */,
 				287D325E167F7F6400102DE8 /* mainview_bg.png in Resources */,
+				28D202FF169122880052FC27 /* repeat_off_test.png in Resources */,
+				28D20300169122880052FC27 /* repeat_on_test.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -835,20 +843,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
-				VALID_ARCHS = "armv6 armv7 armv7s";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -857,20 +862,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = "armv6 armv7 armv7s";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -898,10 +900,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_ENTITLEMENTS[sdk=*]" = Entitlements.plist;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
@@ -909,12 +908,12 @@
 				GCC_PREFIX_HEADER = "MusicWave/MusicWave-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "MusicWave/MusicWave-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = "armv6 armv7 armv7s";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Distribution;
