@@ -44,6 +44,7 @@
 @dynamic songArtist;
 @dynamic bookmarks;
 @dynamic viewinfos;
+@dynamic songAlbum;
 
 - (void)addBookmarksObject:(BookMark *)value {    
     NSSet *changedObjects = [[NSSet alloc] initWithObjects:&value count:1];

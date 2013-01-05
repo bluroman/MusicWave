@@ -74,10 +74,13 @@
 - (void)startDrawingCurrentGraphViewThread {
     //[self.view setAlpha:0.7f];
     
-    [NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
+    [self drawingCurrentGraphViewDispatchQueue];
+    
+    //[NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
 }
 - (void)loadComplete:(id)total {
     int pixelCount = [total intValue];
+    NSLog(@"Graph pixel count:%d", pixelCount);
     if (pixelCount > 320) {
         [self.myScrollView setContentSize:CGSizeMake(pixelCount, self.myGraphView.bounds.size.height)];
         [self.myGraphView setFrame:CGRectMake(0, 0, pixelCount, self.myGraphView.bounds.size.height)];
@@ -95,7 +98,7 @@
     [self.startPickerView scrollToElement:0 animated:NO];
     [self.endPickerView scrollToElement:0 animated:NO];
     
-    [HUD hide:YES];
+    //[HUD hide:YES];
     //[self.view setAlpha:1.0f];
 }
 - (void) addGraphViewArray {
@@ -143,10 +146,17 @@
     AVAssetReader * reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
     
     AVAssetTrack * songTrack = [songAsset.tracks objectAtIndex:0];
-    NSMutableDictionary* audioReadSettings = [NSMutableDictionary dictionary];
-    [audioReadSettings setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM] forKey:AVFormatIDKey];
+    NSDictionary* outputSettingsDict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        [NSNumber numberWithInt:kAudioFormatLinearPCM],AVFormatIDKey,
+                                        //     [NSNumber numberWithInt:44100.0],AVSampleRateKey, /*Not Supported*/
+                                        //     [NSNumber numberWithInt: 2],AVNumberOfChannelsKey,    /*Not Supported*/
+                                        [NSNumber numberWithInt:16],AVLinearPCMBitDepthKey,
+                                        [NSNumber numberWithBool:NO],AVLinearPCMIsBigEndianKey,
+                                        [NSNumber numberWithBool:NO],AVLinearPCMIsFloatKey,
+                                        [NSNumber numberWithBool:NO],AVLinearPCMIsNonInterleaved,
+                                        nil];
    
-    AVAssetReaderTrackOutput * output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:audioReadSettings];
+    AVAssetReaderTrackOutput * output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:outputSettingsDict];
     [reader addOutput:output];
     [output release];
     
@@ -182,7 +192,7 @@
                 
                 SInt16 *frame = (SInt16 *)audioBuffer.mData;
                 int position = 0, flag = 0, start = 0;
-                //NSLog(@"buffersize:%d", bufferSize);
+                NSLog(@"buffersize:%d, databytesize:%ld", bufferSize, audioBuffer.mDataByteSize);
                 totalSize += bufferSize;
                 if (remaining > 0) {
                     
@@ -233,7 +243,13 @@
             
             //HUD.progress = (float)(i / mMaxSamples);
         }
-        //NSLog(@"reader status:%d total:%d, sample count:%d, remaining_lost:%d", reader.status, totalSize, count, remaining_count);
+        NSLog(@"reader status:%d total:%d, sample count:%d, remaining_lost:%d", reader.status, totalSize, count, remaining_count);
+    }
+    if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown){
+        // Something went wrong. return nil
+        NSLog(@"Something went wrong");
+        
+        return;
     }
     if (reader.status == AVAssetReaderStatusCompleted) {
         //NSLog(@"completed reading");
@@ -378,24 +394,60 @@
     [self startDrawingCurrentGraphViewThread];
     
 }
+- (void)drawingCurrentGraphViewDispatchQueue {
+    dispatch_queue_t concurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    BOOL isGraphDrawing = [currentSong.doneGraphDrawing boolValue];
+    MBProgressHUD *HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    HUD.mode = MBProgressHUDModeIndeterminate;
+    if (!isGraphDrawing) {
+        HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
+        HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
+    }
+    else {
+        HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
+        HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
+    }
+    //[HUD show:YES];
+    
+    dispatch_async(concurrentQueue, ^{
+        //__block UIImage *image = nil;
+        dispatch_sync(concurrentQueue, ^{
+            //Download image
+            if (!isGraphDrawing) {
+                AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
+                [self extractDataFromAsset:songAsset];
+            }
+            else {
+                [self addGraphViewArray];
+            }
+        });
+        
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            //Show image to user
+            id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
+            [self loadComplete:idVar];
+            [MBProgressHUD hideHUDForView:self.view animated:YES];
+        });
+    });
+}
 - (void)drawingCurrentGraphView {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     if (![currentSong.doneGraphDrawing boolValue]) {
-        HUD.mode = MBProgressHUDModeIndeterminate;
-        HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
+        //HUD.mode = MBProgressHUDModeIndeterminate;
+        //HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
         
-        HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
+        //HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
         
-        [HUD show:YES];
+        //[HUD show:YES];
 
         AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
         [self extractDataFromAsset:songAsset];
     }
     else {
-        HUD.mode = MBProgressHUDModeIndeterminate;
-        HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
-        HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
-        [HUD show:YES];
+        //HUD.mode = MBProgressHUDModeIndeterminate;
+        //HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
+        //HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
+        //[HUD show:YES];
         [self addGraphViewArray];
     }
     id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
@@ -669,7 +721,7 @@
     //[samplingRateLabel release];
     //[totalTimeLabel release];
     //[endTimeLabel release];
-    [HUD release];
+    //[HUD release];
     [startPickerView release];
     [endPickerView release];
     [playListViewController release];
@@ -1123,6 +1175,8 @@
         NSLog(@"Title:%@", songTitle);
         NSString *songID = [song valueForProperty: MPMediaItemPropertyPersistentID];
         NSLog(@"ID:%@", songID);
+        NSString *albumTitle = [song valueForProperty: MPMediaItemPropertyAlbumTitle];
+        NSLog(@"Album Titel:%@", albumTitle);
     }
 }
 
@@ -1248,9 +1302,9 @@
     
     //self.currentSong = nil;
     //self.myScrollView.delegate = self;
-    HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-    [self.navigationController.view addSubview:HUD];
-    HUD.delegate = self;
+    //HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+    //[self.navigationController.view addSubview:HUD];
+    //HUD.delegate = self;
     
     
     

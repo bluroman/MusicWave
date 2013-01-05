@@ -287,6 +287,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     newSong.songArtist = [mediaItem valueForProperty:MPMediaItemPropertyArtist];
     newSong.songDuration = [mediaItem valueForProperty:MPMediaItemPropertyPlaybackDuration];
     newSong.persistentId = [mediaItem valueForProperty:MPMediaItemPropertyPersistentID];
+    newSong.songAlbum = [mediaItem valueForProperty:MPMediaItemPropertyAlbumTitle];
     NSURL *tempURL = [mediaItem valueForProperty:MPMediaItemPropertyAssetURL];
     newSong.songURL = [tempURL absoluteString];
     MPMediaItemArtwork *artwork = [mediaItem valueForProperty: MPMediaItemPropertyArtwork];
@@ -322,6 +323,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
             id myObject;
             while ((myObject = [enumer nextObject]) != nil) {
                 MPMediaItem *tempMediaItem = (MPMediaItem *) myObject;
+                NSLog(@"AlbumTitle:%@", [tempMediaItem valueForProperty:MPMediaItemPropertyAlbumTitle]);
                 //NSLog(@"Title: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyTitle]);
                 //NSLog(@"Artist: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyArtist]);
                 //NSLog(@"Persistent Id: %llu", [[tempMediaItem valueForProperty:MPMediaItemPropertyPersistentID] unsignedLongLongValue]);

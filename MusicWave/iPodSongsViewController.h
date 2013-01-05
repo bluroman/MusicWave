@@ -32,7 +32,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     //NSMutableArray *viewInfoArray;
     NSMutableArray *bookMarkArray;
     Song *currentSong;
-    MBProgressHUD *HUD;
+    //MBProgressHUD *HUD;
     IBOutlet UIToolbar *toolBar;
     UILabel *playbackTimeLabel;
     UILabel *remainTimeLabel;
