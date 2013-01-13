@@ -45,15 +45,16 @@
     }
 }
 @end
-#define COOKBOOK_PURPLE_COLOR	[UIColor colorWithRed:208.0/255.0f green:208.0/255.0f blue:208.0/255.0f alpha:1.0f]
-#define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
 #define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
 #define BARBUTTON(TITLE, SELECTOR) 	[[[UIBarButtonItem alloc] initWithTitle:TITLE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
 #define IMGBARBUTTON(IMAGE, SELECTOR) [[[UIBarButtonItem alloc] initWithImage:IMAGE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
-#define STATUSBAR_HEIGHT    20
+#define TMP NSTemporaryDirectory()
+#define imgExt @"png"
+#define imageToData(x) UIImagePNGRepresentation(x)
+#define ZOOM_STEP 2.0f
 
 @implementation iPodSongsViewController
-@synthesize mediaControllerDelegate, graphView, scrollView;
+@synthesize graphView, scrollView, graphImage;
 @synthesize currentSong;
 @synthesize playbackTimeLabel;
 @synthesize remainTimeLabel;
@@ -65,86 +66,189 @@
 @synthesize avPlayer;
 @synthesize playState;
 @synthesize bookMarkArray;
-@synthesize repeatModeView;
+//@synthesize repeatModeView;
 @synthesize songTitleLabel, songArtistLabel;
 @synthesize managedObjectContext;
-@synthesize startPickerPosition, endPickerPosition;
+@synthesize startPickerTime, endPickerTime;
+@synthesize delta;
 //@synthesize selectedCurrentSong;
++ (NSString *) assetCacheFolder  {
+    NSArray  *assetFolderRoot = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    return [NSString stringWithFormat:@"%@/audio", [assetFolderRoot objectAtIndex:0]];
+}
++ (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    //UIGraphicsBeginImageContext(newSize);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
 
-- (void)startDrawingCurrentGraphViewThread {
-    //[self.view setAlpha:0.7f];
+
+- (NSString *) cachedAudioPictogramPathForCurrentSong{
+    NSString *assetFolder = [[self class] assetCacheFolder];
+    NSNumber * libraryId = currentSong.persistentId;
+    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
+    return [NSString stringWithFormat:@"%@/%@", assetFolder, assetPictogramFilename];
     
-    [self drawingCurrentGraphViewDispatchQueue];
-    
-    //[NSThread detachNewThreadSelector:@selector(drawingCurrentGraphView) toTarget:self withObject:nil];
 }
-- (void)loadComplete:(id)total {
-    int pixelCount = [total intValue];
-    NSLog(@"Graph pixel count:%d", pixelCount);
-    if (pixelCount > 320) {
-        [self.myScrollView setContentSize:CGSizeMake(pixelCount, self.myGraphView.bounds.size.height)];
-        [self.myGraphView setFrame:CGRectMake(0, 0, pixelCount, self.myGraphView.bounds.size.height)];
+
+- (UIImage *) getCachedImage
+{
+    NSNumber * libraryId = currentSong.persistentId;
+    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
+    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
+    
+    UIImage *image = nil;
+    
+    // Check for a cached version
+    if([[NSFileManager defaultManager] fileExistsAtPath: uniquePath])
+    {
+        NSLog(@"File exists on cache:%@", uniquePath);
+        image = [UIImage imageWithContentsOfFile: uniquePath]; // this is the cached image
     }
-    else {
-        [self.myScrollView setContentSize:CGSizeMake(pixelCount, self.myGraphView.bounds.size.height)];
-        [self.myGraphView setFrame:CGRectMake(0, 0, pixelCount, self.myGraphView.bounds.size.height)];
+    else
+    {
+        NSLog(@"No File exists on cache:%@", uniquePath);
     }
     
-    [self.myGraphView setUpBookMarkLayer];
-    self.myScrollView.contentOffset = CGPointMake(0.0, 0.0);
-    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
-    [self.myGraphView setNeedsDisplay];
-    [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
-    [self.startPickerView scrollToElement:0 animated:NO];
-    [self.endPickerView scrollToElement:0 animated:NO];
-    
-    //[HUD hide:YES];
-    //[self.view setAlpha:1.0f];
+    return image;
 }
-- (void) addGraphViewArray {
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"x" ascending:YES];
-	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
-	
-    NSMutableArray *tempViewInfoArray = [[NSMutableArray alloc] initWithArray:[currentSong.viewinfos allObjects]];
-    [tempViewInfoArray sortUsingDescriptors:sortDescriptors];
+- (void) cacheImage
+{
     
-    self.myGraphView.viewInfoArray = tempViewInfoArray;
-    /*for (int i=0; i < [self.myGraphView.viewInfoArray count]; i++) {
-     ViewInfo *printInfo = [self.myGraphView.viewInfoArray objectAtIndex:i];
-     NSLog(@"max:%f, x:%f, d:%f", [printInfo.max floatValue], [printInfo.x floatValue], [printInfo.time floatValue]);
-     }*/
-    [sortDescriptor release];
-	[sortDescriptors release];
-    [tempViewInfoArray release];
+    // Generate a unique path to a resource representing the image you want
+    NSNumber * libraryId = currentSong.persistentId;
+    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
+    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
+    
+    // Check for file existence
+    if(![[NSFileManager defaultManager] fileExistsAtPath: uniquePath] && self.graphImage != nil)
+    {
+        // The file doesn't exist, we should get a copy of it
+        NSLog(@"File does not exist so write file to:%@", uniquePath);
+        
+        [imageToData(self.graphImage) writeToFile: uniquePath atomically: YES];
+        currentSong.graphPath = uniquePath;
+    }
 }
-- (void) extractDataFromAsset:(AVURLAsset *)songAsset {
-    NSError * error = nil;
-    UInt64 songSampleRate = 0;
-    UInt64 channelsPerFrame = 0;
-    UInt64 divisor = 100;
-    int mod = 1;
+-(UIImage *) audioImageGraph:(SInt16 *) samples
+                normalizeMax:(SInt16) normalizeMax
+                 sampleCount:(NSInteger) sampleCount
+                channelCount:(NSInteger) channelCount
+                 imageHeight:(float) imageHeight {
     
-    for (AVAssetTrack* track in songAsset.tracks) {
-        CMFormatDescriptionRef fmt = (CMFormatDescriptionRef)[track.formatDescriptions objectAtIndex:0];
-        AudioStreamBasicDescription* desc = (AudioStreamBasicDescription *)CMAudioFormatDescriptionGetStreamBasicDescription(fmt);
-        //NSLog(@"track samplerate:%f", desc->mSampleRate);
-        //NSLog(@"track formatID:%lu", desc->mFormatID);
-        //NSLog(@"track formatFlags:%lu", desc->mFormatFlags);
-        //NSLog(@"track BytesPerPacket:%lu", desc->mBytesPerPacket);
-        //NSLog(@"track BytesPerFrame:%lu", desc->mBytesPerFrame);
-        //NSLog(@"track BitsPerChannel:%lu", desc->mBitsPerChannel);
-        //NSLog(@"track FramesPerPacket:%lu", desc->mFramesPerPacket);
-        //NSLog(@"track ChannelsPerFrame:%lu", desc->mChannelsPerFrame);
-        //NSLog(@"track.enabled: %d", track.enabled);
-        //NSLog(@"track.selfContained: %d", track.selfContained);
-        songSampleRate = desc->mSampleRate;
-        channelsPerFrame = desc->mChannelsPerFrame;
-        if (channelsPerFrame == 1) {
-            mod = 2;
+    CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
+    UIGraphicsBeginImageContext(imageSize);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetFillColorWithColor(context, [UIColor clearColor].CGColor);
+    CGContextSetAlpha(context,1.0);
+    CGRect rect;
+    rect.size = imageSize;
+    rect.origin.x = 0;
+    rect.origin.y = 0;
+    
+    //CGColorRef leftcolor = [[UIColor whiteColor] CGColor];
+    //CGColorRef rightcolor = [[UIColor redColor] CGColor];
+    
+    CGContextFillRect(context, rect);
+    
+    CGContextSetLineWidth(context, 1.0);
+    
+    float halfGraphHeight = (imageHeight / 2) / (float) channelCount ;
+    float centerLeft = halfGraphHeight;
+    //float centerRight = (halfGraphHeight*3) ;
+    float sampleAdjustmentFactor = (imageHeight/ (float) channelCount) / (float) normalizeMax;
+    
+    /*for (NSInteger intSample = 1 ; intSample < sampleCount + 1 ; intSample ++ ) {
+        SInt16 left = *samples++;
+        float pixels = (float) left;
+        pixels *= sampleAdjustmentFactor;
+        CGContextMoveToPoint(context, intSample, centerLeft-pixels);
+        CGContextAddLineToPoint(context, intSample, centerLeft+pixels);
+        CGContextSetStrokeColorWithColor(context, leftcolor);
+        CGContextStrokePath(context);
+        
+        if (channelCount==2) {
+            SInt16 right = *samples++;
+            float pixels = (float) right;
+            pixels *= sampleAdjustmentFactor;
+            CGContextMoveToPoint(context, intSample, centerRight - pixels);
+            CGContextAddLineToPoint(context, intSample, centerRight + pixels);
+            CGContextSetStrokeColorWithColor(context, rightcolor);
+            CGContextStrokePath(context);
+        }
+    }*/
+    centerLeft = imageHeight / 2;
+    sampleAdjustmentFactor = imageHeight/ (float) normalizeMax;
+    CGMutablePathRef maxPath = CGPathCreateMutable();
+    CGContextTranslateCTM(context, 0.0, imageHeight / 2);
+    CGPathMoveToPoint(maxPath, NULL, 0, 0);
+    for (NSInteger i = 1; i < sampleCount + 1; i++) {
+        SInt16 left = *samples++;
+        float pixels = (float) left;
+        pixels *= sampleAdjustmentFactor;
+        CGPathAddLineToPoint(maxPath, NULL, i, pixels);
+        if (channelCount==2) {
+            SInt16 right = *samples++;
+            float pixels = (float) right;
+            pixels *= sampleAdjustmentFactor;
         }
     }
-    AVAssetReader * reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathAddPath( path, NULL, maxPath );
     
+    
+    CGAffineTransform xf = CGAffineTransformIdentity;
+    xf = CGAffineTransformScale(xf, 1.0, -1.0);
+    
+    CGPathAddPath( path, &xf, maxPath );
+    CGPathCloseSubpath(path);
+    CGContextAddPath(context, path);
+    CGContextClip(context);
+    // Declare the gradient
+    CGGradientRef myGradient;
+    
+    //	Define the color space
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    // Define the color components of the gradient
+    CGFloat components[8] = { 1.0, 1.0, 1.0, 0.1,  // Start color
+        1.0, 1.0, 1.0, 0.9 }; // End color
+    
+    // Define the location of each component
+    int num_locations = 2;
+    CGFloat locations[2] = { 0.0, 1.0 };
+    
+    // Create the gradient
+    myGradient = CGGradientCreateWithColorComponents (colorSpace, components,
+                                                      locations, num_locations);
+    
+    // Draw the gradient
+    CGContextDrawLinearGradient (context, myGradient, CGPointMake(0, -90),
+                                 CGPointMake(0, 90), 0);
+    
+	//	Clean up the color space & gradient
+	CGColorSpaceRelease(colorSpace);
+	CGGradientRelease(myGradient);
+    
+    CGPathRelease(maxPath);
+    CGPathRelease(path);
+
+    
+    // Create new image
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    // Tidy up
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+- (void) renderPNGAudioPictogramForAsset:(AVURLAsset *)songAsset {
+    NSError * error = nil;
+    AVAssetReader * reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
     AVAssetTrack * songTrack = [songAsset.tracks objectAtIndex:0];
     NSDictionary* outputSettingsDict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         [NSNumber numberWithInt:kAudioFormatLinearPCM],AVFormatIDKey,
@@ -155,189 +259,219 @@
                                         [NSNumber numberWithBool:NO],AVLinearPCMIsFloatKey,
                                         [NSNumber numberWithBool:NO],AVLinearPCMIsNonInterleaved,
                                         nil];
-   
-    AVAssetReaderTrackOutput * output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:outputSettingsDict];
+    AVAssetReaderTrackOutput* output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:outputSettingsDict];
     [reader addOutput:output];
     [output release];
     
-    CMTime duration = CMTimeMakeWithSeconds(CMTimeGetSeconds(songAsset.duration), 1.0);
+    UInt32 sampleRate,channelCount;
+    NSArray* formatDesc = songTrack.formatDescriptions;
+    for(unsigned int i = 0; i < [formatDesc count]; ++i) {
+        CMAudioFormatDescriptionRef item = ( CMAudioFormatDescriptionRef)[formatDesc objectAtIndex:i];
+        const AudioStreamBasicDescription* fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription (item);
+        if(fmtDesc ) {
+            sampleRate = fmtDesc->mSampleRate;
+            channelCount = fmtDesc->mChannelsPerFrame;
+            NSLog(@"channels:%lu, bytes/packet: %lu, sampleRate %f",fmtDesc->mChannelsPerFrame, fmtDesc->mBytesPerPacket,fmtDesc->mSampleRate);
+        }
+    }
     
+    UInt32 bytesPerSample = 2 * channelCount;
+    SInt16 normalizeMax = 0;
+    NSMutableData * fullSongData = [[NSMutableData alloc] init];
+    NSLog(@"Duration:%f, %f", CMTimeGetSeconds(songAsset.duration), [currentSong.songDuration doubleValue]);
+    CMTime duration = CMTimeMakeWithSeconds([currentSong.songDuration doubleValue], 1.0);
     CMTime start = CMTimeMakeWithSeconds(0.0, 1.0);
     CMTimeRange range = CMTimeRangeMake(start, duration);
     reader.timeRange = range;
-    int remaining = -1, count = 0, remaining_count = 0, totalSize = 0, first = 1;
-    int len = songSampleRate / divisor;
-    int mMaxSamples = (songSampleRate / len) * (CMTimeGetSeconds(songAsset.duration) / mod);
-    
-    CGFloat *temp = new CGFloat[mMaxSamples];
-    for (int i = 0; i < mMaxSamples; i++) {
-        temp[i] = 0.;
-    }
-    int i = 0;
-    float progress = 0.;
     
     [reader startReading];
-    //NSLog(@"start reading reader status:%d", reader.status);
+    
+    UInt64 totalBytes = 0;
+    SInt64 totalLeft = 0;
+    SInt64 totalRight = 0;
+    NSInteger sampleTally = 0;
+    NSInteger samplesPerPixel = sampleRate / 50;
+    
     while (reader.status == AVAssetReaderStatusReading){
+        
         AVAssetReaderTrackOutput * trackOutput = (AVAssetReaderTrackOutput *)[reader.outputs objectAtIndex:0];
         CMSampleBufferRef sampleBufferRef = [trackOutput copyNextSampleBuffer];
+        
         if (sampleBufferRef){
-            AudioBufferList audioBufferList;
-            CMBlockBufferRef blockBufferRef;
+            CMBlockBufferRef blockBufferRef = CMSampleBufferGetDataBuffer(sampleBufferRef);
             
-            CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(sampleBufferRef, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBufferRef);
-            if (audioBufferList.mNumberBuffers == 1) {
-                AudioBuffer audioBuffer = audioBufferList.mBuffers[0];
-                int bufferSize = audioBuffer.mDataByteSize / sizeof(Float32);
+            size_t length = CMBlockBufferGetDataLength(blockBufferRef);
+            totalBytes += length;
+            //NSLog(@"Total:%lld, Length:%zd", totalBytes, length);
+            NSMutableData * data = [NSMutableData dataWithLength:length];
+            CMBlockBufferCopyDataBytes(blockBufferRef, 0, length, data.mutableBytes);
                 
-                SInt16 *frame = (SInt16 *)audioBuffer.mData;
-                int position = 0, flag = 0, start = 0;
-                NSLog(@"buffersize:%d, databytesize:%ld", bufferSize, audioBuffer.mDataByteSize);
-                totalSize += bufferSize;
-                if (remaining > 0) {
-                    
-                    start = len - remaining - 1; 
-                    flag = 1;
-                    //NSLog(@"start remaining:%d, start position:%d", remaining, start);
+            SInt16 * samples = (SInt16 *) data.mutableBytes;
+            int sampleCount = length / bytesPerSample;
+            for (int i = 0; i < sampleCount ; i ++) {
+                SInt16 left = *samples++;
+                totalLeft  += left;
+                SInt16 right;
+                if (channelCount==2) {
+                    right = *samples++;
+                    totalRight += right;
                 }
-                while (position < bufferSize) {
-                    if (flag == 1) {
-                        count++;
-                        flag = 0;
-                        position += start;
-                        
-                        //NSLog(@"4410th frame:%f at position:%d", frame[position] / 32768.0f, position);
-                        temp[i] = frame[position] / 32768.0f;
-                        i++;
+                sampleTally++;
+                if (sampleTally > samplesPerPixel) {
+                    left  = totalLeft / sampleTally;
+                    SInt16 fix = abs(left);
+                    if (fix > normalizeMax) {
+                        normalizeMax = fix;
                     }
-                    if (first == 1) {
-                        position += len - 1;
-                        first = 0;
+                    //NSLog(@"appendleft:%d", left);
+                    [fullSongData appendBytes:&left length:sizeof(left)];
+                    if (channelCount==2) {
+                        right = totalRight / sampleTally;
+                        SInt16 fix = abs(right);
+                        if (fix > normalizeMax) {
+                            normalizeMax = fix;
+                        }
+                        [fullSongData appendBytes:&right length:sizeof(right)];
                     }
-                    else position += len ;
-                    if (position < bufferSize) {
-                        count++;
-                        //NSLog(@"4410th frame:%f at position:%d", frame[position] / 32768.0f, position);
-                        temp[i] = frame[position] / 32768.0f;
-                        i++;
-                    }
-                    remaining = bufferSize - position - 1;
-                    
-                    //NSLog(@"Remaining:%d", remaining);
-                    if (remaining == len || remaining == 0) {
-                        remaining_count++;
-                        //NSLog(@"remaing lost:%d", remaining_count);
-                    }
-                    if (remaining < len) break;
+                    totalLeft   = 0;
+                    totalRight  = 0;
+                    sampleTally = 0;
                 }
-                //float percent = 100.0 * (float)i/mMaxSamples;
-                //NSLog(@"Progress:%f ,%i, %i, %f, %d", (float)i/mMaxSamples, i, mMaxSamples, percent, (int)percent);
-                progress = (float)i / mMaxSamples;
-                //HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", (int)percent];
-                
             }
-
             CMSampleBufferInvalidate(sampleBufferRef);
             CFRelease(sampleBufferRef);
-            CFRelease(blockBufferRef);
-            
-            //HUD.progress = (float)(i / mMaxSamples);
         }
-        NSLog(@"reader status:%d total:%d, sample count:%d, remaining_lost:%d", reader.status, totalSize, count, remaining_count);
     }
+    //NSData * finalData = nil;
     if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown){
         // Something went wrong. return nil
-        NSLog(@"Something went wrong");
-        
         return;
     }
-    if (reader.status == AVAssetReaderStatusCompleted) {
-        //NSLog(@"completed reading");
-        //progress = 1.0f;
-        //HUD.progress = 1.0f;
-        //HUD.detailsLabelText = [NSString stringWithFormat:@"%d%%", 100];
-    }
-    CGFloat min=0., max=0., sumsq = 0., rms = 0., d = 0.;
-    int j = 0;
-    CGFloat pixel = 0.;
-    int sampling = 10;
-    if (mod == 2) {
-        sampling = 10 / mod;
-    }
-    //NSLog(@"start graph");
-    //HUD.mode = MBProgressHUDModeIndeterminate;
-    //HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
-    //HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
-    NSManagedObjectContext *context = [currentSong managedObjectContext];
-    while (j < mMaxSamples) {
-        //ViewInfo *currentInfo = [ViewInfo alloc];
-        ViewInfo *currentInfo = [NSEntityDescription insertNewObjectForEntityForName:@"ViewInfo" inManagedObjectContext:context];
-        int i = 0;
-        min = temp[j];
-        max = temp[j];
-        sumsq = temp[j] * temp[j];
-        for ( i = j + 1; i < j + sampling; i++) {
-            CGFloat current = temp[i];
-            if (current < min) {
-                min = current;
-            }
-            if (current > max) {
-                max = current;
-            }
-            sumsq += current * current;
-        }
-        rms = sqrt(sumsq / sampling);
-        d += 10.0 / (songSampleRate/len) ;
-        pixel++;
-        if (min < -1.0f or min > 1.0f) {
-            min = 0.f;
-        }
-        if (max < -1.0f or max > 1.0f) {
-            max = 0.f;
-        }
-        if (rms < -1.0f or rms > 1.0f) {
-            rms = 0.f;
-        }
-        currentInfo.min = [NSNumber numberWithFloat:min];
-        currentInfo.max = [NSNumber numberWithFloat:max];
-        currentInfo.rms = [NSNumber numberWithFloat:rms];
-        currentInfo.time = [NSNumber numberWithFloat:d];
-        currentInfo.x = [NSNumber numberWithFloat:pixel];
+    
+    if (reader.status == AVAssetReaderStatusCompleted){
         
-        //[currentInfo print];
-        //[self.myGraphView addViewInfo:currentInfo];
-        [currentSong addViewinfosObject:currentInfo];
-        //[currentInfo release];
-
-        j += sampling;
-    }
-    delete[] temp;
-    //NSLog(@"ending graph");
-    //self.myGraphView.currentSong = currentSong;
-    
-    [self addGraphViewArray];
-    currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
-    
-    //NSManagedObjectContext *context = [currentSong managedObjectContext];
-    //NSError *error = nil;
-    
-    if ([context hasChanges] && ![context save:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        NSLog(@"Saving graph error");
-        [reader release];
-        [self deleteCurrentSong];
+        NSLog(@"rendering output graphics using normalizeMax %d, %d, %lld",normalizeMax,fullSongData.length/4, totalBytes);
         
-        return;
+        self.graphImage = [self audioImageGraph:(SInt16 *)
+                         fullSongData.bytes
+                                 normalizeMax:normalizeMax
+                                  sampleCount:fullSongData.length / (2*channelCount)
+                                 channelCount:channelCount
+                                  imageHeight:self.myGraphView.frame.size.height];
+        //NSLog(@"Image width:%f, height:%f", test.size.width, test.size.height);
+        NSLog(@"Maximum scale factor:%f", self.graphImage.size.width / self.myScrollView.frame.size.width);
+        //delta = [currentSong.songDuration floatValue]/self.graphImage.size.width;
+        
+        [self cacheImage];
+        currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
+        
+        
+        
+        //finalData = imageToData(graphImage);
+        //NSLog(@"Image Data Length:%d", [finalData length]);
+        NSManagedObjectContext *context = [currentSong managedObjectContext];
+        NSError *error = nil;
+        
+        if ([context hasChanges] && ![context save:&error]) {
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            NSLog(@"Saving graph error");
+        }
+
     }
-
-
+    
+    
+    
+    
+    [fullSongData release];
     [reader release];
+    
+    //return finalData;
 }
+- (void)redrawWithSize:(float)scalefactor {
+    BOOL isPlaying = NO;
+
+    CGFloat newWidth = scalefactor * self.myGraphView.frame.size.width;
+    if (newWidth < self.myScrollView.frame.size.width) {
+        if (self.myGraphView.frame.size.width == self.myScrollView.frame.size.width)
+            return;
+        NSLog(@"Too small so setting to default");
+        newWidth = self.myScrollView.frame.size.width;
+    }
+    else if (newWidth > maximumWidth)
+    {
+        if (self.myGraphView.frame.size.width == maximumWidth)
+            return;
+        NSLog(@"Too large so setting to original");
+        newWidth = maximumWidth;
+    }
+    CGSize newSize = CGSizeMake(newWidth, self.myScrollView.frame.size.height);
+    //NSLog(@"Current Image width:%f, height:%f", resizeImage.size.width, resizeImage.size.height);
+    [self.myScrollView setContentSize:newSize];
+    [self.myGraphView setFrame:CGRectMake(0, 0, newSize.width, newSize.height)];
+    [self.myGraphView.graphImageView setFrame:CGRectMake(0,0,newSize.width,newSize.height)];
+    //[self.myGraphView addSubview:imageView];
+    delta = [currentSong.songDuration doubleValue]/newSize.width;
+    [self.myGraphView setDelta:delta];
+    [self.myGraphView settingStartEndTime:startPickerTime endPosition:endPickerTime];
+    [self.myGraphView.bookMarkLayer setNeedsDisplay];
+    
+    if (playState == playBackStatePlaying) {
+        isPlaying = YES;
+        [self pause];
+    }
+    Float32 temp = CMTimeGetSeconds(avPlayer.currentTime);
+    
+    CGFloat moveOffset = temp/self.delta - self.myScrollView.bounds.size.width / 2;
+    
+    if (self.myScrollView.contentSize.width - temp / self.delta < self.myScrollView.bounds.size.width / 2) {
+        moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width;
+    }
+    if (moveOffset < 0) {
+        moveOffset = 0;
+    }
+    [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+    //NSLog(@"update position %f", temp);
+	
+    [self.myGraphView setCurrentPlaybackPosition:temp/delta];
+    if (isPlaying) {
+        [self play];
+    }
+}
+- (void)loadCompleteImage {
+    //int pixelCount = [total intValue];
+    //self.graphImage = [[self class] imageWithImage:graphImage scaledToSize:CGSizeMake(300, 157)];
+    NSLog(@"Load Image width:%f, height:%f", graphImage.size.width, graphImage.size.height);
+    delta = [currentSong.songDuration floatValue]/self.graphImage.size.width;
+    [self.myGraphView setDelta:delta];
+    maximumWidth = graphImage.size.width;
+    [self.myScrollView setContentSize:graphImage.size];
+    [self.myGraphView setFrame:CGRectMake(0, 0, graphImage.size.width, graphImage.size.height)];
+    //UIImageView *imageView = [[UIImageView alloc] initWithImage:graphImage];
+    self.myGraphView.graphImageView.image = graphImage;
+    [self.myGraphView.graphImageView setFrame:CGRectMake(0,0,graphImage.size.width,graphImage.size.height)];
+    //[self.myGraphView addSubview:imageView];
+    
+    [self.myGraphView setUpBookMarkLayer];
+    self.myScrollView.contentOffset = CGPointMake(0.0, 0.0);
+    [self.myGraphView settingStartEndTime:startPickerTime endPosition:endPickerTime];
+    [self.myGraphView setNeedsDisplay];
+    [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
+    [self.startPickerView scrollToElement:0 animated:NO];
+    [self.endPickerView scrollToElement:0 animated:NO];
+    
+    [self playerTimerUpdate:nil];
+    
+    //[HUD hide:YES];
+    //[self.view setAlpha:1.0f];
+}
+
 - (void)updateCurrentSong {
     if (playState == playBackStatePlaying) {
         [self pause];
     }
     self.myGraphView.currentSong = currentSong;
+    self.graphImage = [self getCachedImage];
+    //self.graphImage = currentSong.graphImage;
     UInt64 songSampleRate = 0;
     UInt64 channelsPerFrame = 0;
     AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
@@ -357,27 +491,32 @@
         songSampleRate = desc->mSampleRate;
         channelsPerFrame = desc->mChannelsPerFrame;
     }
-    UInt64 songDuration = CMTimeGetSeconds(songAsset.duration);
+    //UInt64 songDuration = CMTimeGetSeconds(songAsset.duration);
+    
+    delta = [currentSong.songDuration doubleValue]/self.graphImage.size.width;
+    [self.myGraphView setDelta:delta];
+
 	
-	UInt32 minutes = songDuration / 60;
-	UInt32 seconds = songDuration % 60;
+	//UInt32 minutes = songDuration / 60;
+	//UInt32 seconds = songDuration % 60;
 	//totalTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
     //samplingRateLabel.text = [NSString stringWithFormat:@"%dHz", songSampleRate];
     self.songTitleLabel.text = currentSong.songTitle;
     self.songArtistLabel.text = currentSong.songArtist;
     playState = playBackStateNone;
     repeatMode = NO;
-    self.startPickerPosition = 0.f;
-    self.endPickerPosition = 0.f;
+    self.startPickerTime = 0.f;
+    self.endPickerTime = 0.f;
     if (timeObserver != nil) {
         [avPlayer removeTimeObserver:timeObserver];
         timeObserver = nil;
     }
     movingOffset = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
+        [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_on_test.png"] forState:UIControlStateNormal];
+        //repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
+    else [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_off_test.png"] forState:UIControlStateNormal];//repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"keepDate" ascending:YES];
 	NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:&sortDescriptor count:1];
@@ -391,7 +530,7 @@
 	[sortDescriptors release];
 	[sortedBookMarks release];
 
-    [self startDrawingCurrentGraphViewThread];
+    [self drawingCurrentGraphViewDispatchQueue];
     
 }
 - (void)drawingCurrentGraphViewDispatchQueue {
@@ -407,53 +546,28 @@
         HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
         HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
     }
-    //[HUD show:YES];
-    
     dispatch_async(concurrentQueue, ^{
-        //__block UIImage *image = nil;
         dispatch_sync(concurrentQueue, ^{
             //Download image
             if (!isGraphDrawing) {
                 AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
-                [self extractDataFromAsset:songAsset];
-            }
-            else {
-                [self addGraphViewArray];
+                //[self extractDataFromAsset:songAsset];
+                [self renderPNGAudioPictogramForAsset:songAsset];
             }
         });
         
         dispatch_sync(dispatch_get_main_queue(), ^{
             //Show image to user
-            id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
-            [self loadComplete:idVar];
+            //id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
+            //[self loadComplete:idVar];
+            [self loadCompleteImage];
+            
             [MBProgressHUD hideHUDForView:self.view animated:YES];
+            
         });
     });
 }
-- (void)drawingCurrentGraphView {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    if (![currentSong.doneGraphDrawing boolValue]) {
-        //HUD.mode = MBProgressHUDModeIndeterminate;
-        //HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
-        
-        //HUD.detailsLabelText = NSLocalizedString(@"Information", @"Main View Hud loading hud detail label");
-        
-        //[HUD show:YES];
 
-        AVURLAsset *songAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:currentSong.songURL] options:nil];
-        [self extractDataFromAsset:songAsset];
-    }
-    else {
-        //HUD.mode = MBProgressHUDModeIndeterminate;
-        //HUD.labelText = NSLocalizedString(@"Drawing", @"Main View Hud drawing label");
-        //HUD.detailsLabelText = NSLocalizedString(@"Graph", @"Main View Hud drawing detail label");
-        //[HUD show:YES];
-        [self addGraphViewArray];
-    }
-    id idVar = [NSNumber numberWithInt: [currentSong.viewinfos count]];
-	[self performSelectorOnMainThread:@selector(loadComplete:) withObject:idVar waitUntilDone:NO];
-    [pool release];
-}
 - (void)deleteCurrentSong {
     //NSLog(@"delete currentSong in MainView");
     if (playState == playBackStatePlaying) {
@@ -466,7 +580,8 @@
     self.currentSong = nil;
     movingOffset = NO;
     self.myGraphView.currentSong = self.currentSong;
-    [self.myGraphView.viewInfoArray removeAllObjects];
+    self.graphImage = nil;
+    self.myGraphView.graphImageView.image = nil;
     [self.bookMarkArray removeAllObjects];
     //totalTimeLabel.text = @"00:00";
     //samplingRateLabel.text = @"";
@@ -480,9 +595,10 @@
     //NSLog(@"state none:%d line:%d", playState, __LINE__);
     repeatMode = NO;
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
+        [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_on_test.png"] forState:UIControlStateNormal];
+        //repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
+    else [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_off_test.png"] forState:UIControlStateNormal];//repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     [self.myScrollView setContentSize:CGSizeMake(280, self.myGraphView.bounds.size.height)];
     [self.myGraphView setFrame:CGRectMake(0, 0, 280, self.myGraphView.bounds.size.height)];
     [self.myGraphView setUpBookMarkLayer];
@@ -506,20 +622,19 @@
 }
 - (void)registerTimeObserver {
     if (repeatMode) {
-        ViewInfo *startViewInfo = nil;
-        ViewInfo *endViewInfo = nil;
-        CGFloat position = 0.;
-        if (self.startPickerPosition != 0 && self.endPickerPosition != 0) {
-            if (self.startPickerPosition  < self.endPickerPosition)
+        CGFloat startTime,endTime;
+        //CGFloat position = 0.;
+        if (self.startPickerTime != 0 && self.endPickerTime != 0) {
+            if (self.startPickerTime  < self.endPickerTime)
             {
-                startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.startPickerPosition];
-                endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.endPickerPosition];
-                position = self.startPickerPosition;
+                startTime = self.startPickerTime;
+                endTime = self.endPickerTime;
+                //position = self.startPickerTime / delta;
             }
-            else if (self.endPickerPosition < self.startPickerPosition) {
-                startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.endPickerPosition];
-                endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:self.startPickerPosition];
-                position = self.endPickerPosition;
+            else if (self.endPickerTime < self.startPickerTime) {
+                startTime = self.endPickerTime;
+                endTime = self.startPickerTime;
+                //position = self.endPickerTime / delta;
             }
             else {
                 //NSLog(@"This is very weird case");
@@ -535,13 +650,14 @@
                 [avPlayer removeTimeObserver:timeObserver];
                 timeObserver = nil;
             }
-            CMTime endTime = CMTimeMakeWithSeconds([endViewInfo.time floatValue], 1);
+            CMTime endedTime = CMTimeMakeWithSeconds(endTime, 1);
             //NSLog(@"Register time observer %d", __LINE__);
-            timeObserver = [avPlayer addBoundaryTimeObserverForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:endTime]] queue:NULL usingBlock:^(void) {
+            timeObserver = [avPlayer addBoundaryTimeObserverForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:endedTime]] queue:NULL usingBlock:^(void) {
                 //NSLog(@"time observer fired %d", __LINE__);
                 //[avPlayer removeTimeObserver:timeObserver];
                 //timeObserver = nil;
-                [self setCurrentPostion:[startViewInfo.time floatValue]];
+                [self setCurrentPostion:startTime];
+                CGFloat position = startTime / delta;
                 //[self updatePosition];
                 CGFloat moveOffset = position - self.myScrollView.bounds.size.width / 2;
                 
@@ -579,16 +695,21 @@
 - (NSArray *) playItems
 {
 	NSMutableArray *items = [NSMutableArray array];
+    //[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
+    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"zoom_out.png"], @selector(zoom_out))];
 	
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_prev_off.png"], @selector(rewind))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemRewind, self, @selector(rewind))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_prev_off.png"], @selector(rewind))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_play_off.png"], @selector(play))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemPlay, self, @selector(play))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_play_off.png"], @selector(play))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_next_off.png"], @selector(fastforward))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemFastForward, self, @selector(fastforward))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_next_off.png"], @selector(fastforward))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_re_off.png"], @selector(repeatModeOnOff))];
-    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
+    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"zoom_in.png"], @selector(zoom_in))];
+    //[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
 	
 	return items;
 }
@@ -596,16 +717,21 @@
 - (NSArray *) pauseItems
 {
 	NSMutableArray *items = [NSMutableArray array];
+    //[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
+    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"zoom_out.png"], @selector(zoom_out))];
 	
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_prev_off.png"], @selector(rewind))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemRewind, self, @selector(rewind))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_prev_off.png"], @selector(rewind))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_pause_off.png"], @selector(pause))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemPause, self, @selector(pause))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_pause_off.png"], @selector(pause))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_next_off.png"], @selector(fastforward))];
+    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemFastForward, self, @selector(fastforward))];
+    //[items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_next_off.png"], @selector(fastforward))];
 	[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
-    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"btn_re_off.png"], @selector(repeatModeOnOff))];
-    [items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
+    [items addObject:IMGBARBUTTON([UIImage imageNamed:@"zoom_in.png"], @selector(zoom_in))];
+    //[items addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil, nil)];
 	
 	return items;
 }
@@ -664,11 +790,13 @@
         repeatMode = YES;
     }
     if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
+        [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_on_test.png"] forState:UIControlStateNormal];
+        //repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
     }
     else 
     {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
+        [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_off_test.png"] forState:UIControlStateNormal];
+        //repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
     }
     [self registerTimeObserver];
     
@@ -681,34 +809,20 @@
     [avPlayer seekToTime:ReverseOneSeconds];
     [self updatePosition];
 }
-#pragma mark Music notification handlers__________________
-
-- (void) handle_iPodLibraryChanged: (id) notification {
-    
-	// Implement this method to update cached collections of media items when the 
-	// user performs a sync while your application is running. This sample performs 
-	// no explicit media queries, so there is nothing to update.
-    NSLog(@"Library changed");
+- (void) zoom_in
+{
+    [self redrawWithSize:ZOOM_STEP];
 }
-
-
-
-
+- (void) zoom_out
+{
+    [self redrawWithSize:1.0f/ZOOM_STEP];
+}
+#pragma mark Music notification handlers__________________
 - (void)dealloc
 {
-    
-     // This sample doesn't use libray change notifications; this code is here to show how
-     //		it's done if you need it.
-     //[[NSNotificationCenter defaultCenter] removeObserver: self
-     //name: MPMediaLibraryDidChangeNotification
-     //object: player];
-     
-     [[MPMediaLibrary defaultMediaLibrary] endGeneratingLibraryChangeNotifications];
-     
-     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [mediaControllerDelegate release];
     [mpVolumeView release];
+    [graphImage release];
     [self.myGraphView release];
     [bookMarkArray release];
     if (updateTimer) {
@@ -726,14 +840,10 @@
     [endPickerView release];
     [playListViewController release];
     [avPlayer release];
-    [titleView release];
     [songTitleLabel release];
     [songArtistLabel release];
-    [repeatModeView release];
+    //[repeatModeView release];
     [managedObjectContext release];
-    //[mainSlider release];
-    //[startPickerPosition release];
-    //[endPickerPosition release];
     [super dealloc];
 }
 
@@ -742,7 +852,7 @@
     Float32 temp = CMTimeGetSeconds(avPlayer.currentTime);
     //NSLog(@"update position %f", temp);
 	
-    [self.myGraphView setCurrentPlaybackPosition:temp];
+    [self.myGraphView setCurrentPlaybackPosition:temp/delta];
     if (self.myScrollView.contentSize.width < self.myScrollView.bounds.size.width) {
         movingOffset = NO;
         return;
@@ -760,7 +870,7 @@
     }
     if (movingOffset) {
         
-        CGFloat moveOffset = self.myScrollView.contentOffset.x + 1.0f;
+        CGFloat moveOffset = self.myScrollView.contentOffset.x + (1.0f / delta + 10.0f) / 20.0f;
         [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
         if (self.myGraphView.currentPixel < self.myScrollView.contentOffset.x + self.myScrollView.bounds.size.width/2) {
             movingOffset = NO;
@@ -769,7 +879,8 @@
         
         
 }
-- (void)setCurrentPostion:(CGFloat)value {
+- (void)setCurrentPostion:(int)value {
+    //CGFloat temp = value*delta;
     [avPlayer seekToTime:CMTimeMake(value * 1000, 1000)];
 }
 -(void) createPlaybackTimer {
@@ -794,11 +905,11 @@
 		
 	UInt32 minutes = currentTimeSec / 60;
 	UInt32 seconds = currentTimeSec % 60;
-	playbackTimeLabel.text = [NSString stringWithFormat: @"%02d:%02ld", minutes, seconds];
+	playbackTimeLabel.text = [NSString stringWithFormat: @"%02ld:%02ld", minutes, seconds];
     
     minutes = remainTimeSec / 60;
 	seconds = remainTimeSec % 60;
-	remainTimeLabel.text = [NSString stringWithFormat: @"-%02d:%02ld", minutes, seconds];
+	remainTimeLabel.text = [NSString stringWithFormat: @"-%02ld:%02ld", minutes, seconds];
     
     //mainSlider.value = (currentTimeSec / [currentSong.songDuration floatValue]);
 	
@@ -836,28 +947,15 @@
     [bookMarkViewController release];
 
 }
-- (IBAction) tapBookMarkButton:(id)sender {
-    int tag = ((UIButton *)sender).tag;
-    //NSLog(@"Tapping bookmark button:%d", tag);
-    int bookMarkCount = [self.bookMarkArray count];
-    if (bookMarkCount < tag) {
-        //NSLog(@"No book mark available in %d", tag);
-        return;
-    }
-    BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:(tag - 1)];
-    
-    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
-    [self setCurrentPostion:[tempViewInfo.time floatValue]];
-}
+
 -(void)addBookMarkOnPixel:(CGFloat)pixel {
     NSManagedObjectContext *context = [currentSong managedObjectContext];
     NSError *error = nil;
     
     BookMark *bookMark = [NSEntityDescription insertNewObjectForEntityForName:@"BookMark" inManagedObjectContext:context];
    
-    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:pixel - 1];
-    bookMark.duration = tempViewInfo.time;
-    bookMark.position = [NSNumber numberWithFloat:pixel];
+    bookMark.duration = [NSNumber numberWithFloat:pixel*delta];
+    bookMark.delta = [NSNumber numberWithFloat:delta];
     bookMark.keepDate = [NSDate date];
     [self.bookMarkArray addObject:bookMark];
     [currentSong addBookmarksObject:bookMark];
@@ -866,21 +964,6 @@
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }
-}
-- (int) restorePickerIndex:(NSNumber *)position {
-    int bookMarkCount = [self.bookMarkArray count];
-    if (bookMarkCount == 0) {
-        return 0;
-    }
-    for (int i = 0; i < bookMarkCount; i++) {
-        BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:i];
-        NSLog(@"position:%f, temp:%f", [position floatValue], [tempBookMark.position floatValue]);
-        if ([position floatValue] == [tempBookMark.position floatValue]) {
-            NSLog(@"picker view index:%i", i);
-            return i + 1;
-        }
-    }
-    return 0;
 }
 - (IBAction) tapMainButton:(id)sender {
     
@@ -909,20 +992,19 @@
     //NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
     CGFloat start = offset.x;
     CGFloat end = offset.x + 320;
-    if ([self.myGraphView.viewInfoArray count] == 0) {
+    if (self.graphImage.size.width == 0) {
         //NSLog(@"viewInfoArray delete");
         return;
     }
     if (start < 0) {
         start = 0;
     }
-    if (end > [self.myGraphView.viewInfoArray count] - 1) {
-        end = [self.myGraphView.viewInfoArray count] - 1;
+    if (end > self.graphImage.size.width - 1) {
+        end = self.graphImage.size.width - 1;
     }
-    ViewInfo *startViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:start];
-    ViewInfo *endViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:end];
-    UInt64 startTimeSec = [startViewInfo.time floatValue];
-    UInt64 endTimeSec = [endViewInfo.time floatValue];
+    
+    UInt64 startTimeSec = start*delta;
+    UInt64 endTimeSec = end*delta;
 	
 	UInt32 minutes = startTimeSec / 60;
 	UInt32 seconds = startTimeSec % 60;
@@ -946,37 +1028,6 @@
     
     // Release any cached data, images, etc that aren't in use.
 }
-- (void) scrubbingDone: (UISlider *) aSlider
-{
-	[self play];
-    
-    CGFloat moveOffset = self.myGraphView.currentPixel - self.myScrollView.bounds.size.width / 2;
-    
-    if (self.myScrollView.contentSize.width - self.myGraphView.currentPixel < self.myScrollView.bounds.size.width / 2) {
-        moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width; 
-    }
-    if (moveOffset < 0) {
-        moveOffset = 0;
-    }
-    [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
-}
-
-- (void) scrub: (UISlider *) aSlider
-{
-	// Pause the player
-	[self pause];
-	
-	// Calculate the new current time
-    [self setCurrentPostion:aSlider.value * [currentSong.songDuration floatValue]];
-    [self.myGraphView setCurrentPlaybackPosition:aSlider.value * [currentSong.songDuration floatValue]];
-    
-    
-	
-	// Update the title, nav bar
-	//self.title = [NSString stringWithFormat:@"%@ of %@", [self formatTime:self.player.currentTime], [self formatTime:self.player.duration]];
-	//self.navigationItem.rightBarButtonItem = SYSBARBUTTON(UIBarButtonSystemItemPlay, self, @selector(play:));
-}
-
 #pragma mark - View lifecycle
 - (void)settingUpBackgroundView {
     UIImageView *backGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"mainview_bg.png"]];
@@ -1004,42 +1055,6 @@
     //remainTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(12.0)];
     remainTimeLabel.font = [UIFont boldSystemFontOfSize:13.0f];
     [self.view addSubview:remainTimeLabel];
-    
-    //self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 7.0f, 46.0f, 11.0f)];
-    //[startTimeLabel setText:@"00:00"];
-    //[startTimeLabel setTextAlignment:UITextAlignmentLeft];
-    //startTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
-    //startTimeLabel.backgroundColor = [UIColor clearColor];
-    //startTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    //startTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    //[self.view addSubview:startTimeLabel];
-    
-    //self.endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 7.0f, 46.0f, 11.0f)];
-    //[endTimeLabel setText:@"00:00"];
-    //[endTimeLabel setTextAlignment:UITextAlignmentRight];
-    //endTimeLabel.textColor = [UIColor colorWithRed:107.0/255.0f green:114.0/255.0f blue:133.0/255.0f alpha:1.0];
-    //endTimeLabel.backgroundColor = [UIColor clearColor];
-    //endTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    //endTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    //[self.view addSubview:endTimeLabel];
-    
-    //self.samplingRateLabel = [[UILabel alloc] initWithFrame:CGRectMake(21.0f, 230.0f, 89.0f, 11.0f)];
-    //[samplingRateLabel setText:@""];
-    //[samplingRateLabel setTextAlignment:UITextAlignmentLeft];
-    //samplingRateLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
-    //samplingRateLabel.backgroundColor = [UIColor clearColor];
-    //samplingRateLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    //samplingRateLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    //[self.view addSubview:samplingRateLabel];
-    
-    //self.totalTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(253.0f, 230.0f, 46.0f, 11.0f)];
-    //[totalTimeLabel setText:@"00:00"];
-    //[totalTimeLabel setTextAlignment:UITextAlignmentRight];
-    //totalTimeLabel.textColor = [UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0];
-    //totalTimeLabel.backgroundColor = [UIColor clearColor];
-    //totalTimeLabel.font = [UIFont boldSystemFontOfSize:11.0f];
-    //totalTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(11.0)];
-    //[self.view addSubview:totalTimeLabel];
 }
 - (void)settingUpPicker {
     UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
@@ -1119,16 +1134,15 @@
     [mainButton addTarget:self action:@selector(tapMainButton:) forControlEvents: UIControlEventTouchUpInside];
     [self.view addSubview:mainButton];
 }
-- (void)settingUpVolumeSlider {
-    //UIImageView *soundOffImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_off.png"]];
-    //soundOffImage.frame = CGRectMake(21, 407-65 + STATUSBAR_HEIGHT, 14, 10);
-    //[self.view addSubview:soundOffImage];
-    //[soundOffImage release];
+- (void)settingUpRepeatButton {
+    repeatButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	repeatButton.frame = CGRectMake(160 - 38, 195, 76, 21);
     
-    //UIImageView *soundOnImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sound_on.png"]];
-    //soundOnImage.frame = CGRectMake(285, 407-65 + STATUSBAR_HEIGHT, 13, 10);
-    //[self.view addSubview:soundOnImage];
-    //[soundOnImage release];
+    [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_off_test.png"] forState:UIControlStateNormal];
+    [repeatButton addTarget:self action:@selector(repeatModeOnOff) forControlEvents: UIControlEventTouchUpInside];
+    [self.view addSubview:repeatButton];
+}
+- (void)settingUpVolumeSlider {
     
     CGRect frame = CGRectMake(52, 349, 210, 6);
     UISlider *customSlider = [[UISlider alloc] initWithFrame:frame];
@@ -1140,8 +1154,6 @@
 		}
 	}
     volumeViewSlider.backgroundColor = [UIColor clearColor];	
-    //UIImage *stetchLeftTrack = [[UIImage imageNamed:@"bar_on.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
-    //UIImage *stetchRightTrack = [[UIImage imageNamed:@"bar_off.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0];
     [volumeViewSlider setThumbImage: [UIImage imageNamed:@"volume_pos.png"] forState:UIControlStateNormal];
     [volumeViewSlider setMinimumTrackImage:[UIImage imageNamed:@"volume_left.png"] forState:UIControlStateNormal];
     //[volumeViewSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
@@ -1166,25 +1178,22 @@
         //NSLog(@"self playstate:%d", playState);
     }
 }
--(void)checkLibrary
-{
-    MPMediaQuery *everything = [[MPMediaQuery alloc] init];
-    NSArray *itemsFromGenericQuery = [everything items];
-    for (MPMediaItem *song in itemsFromGenericQuery) {
-        NSString *songTitle = [song valueForProperty: MPMediaItemPropertyTitle];
-        NSLog(@"Title:%@", songTitle);
-        NSString *songID = [song valueForProperty: MPMediaItemPropertyPersistentID];
-        NSLog(@"ID:%@", songID);
-        NSString *albumTitle = [song valueForProperty: MPMediaItemPropertyAlbumTitle];
-        NSLog(@"Album Titel:%@", albumTitle);
+- (void) handlePinches:(UIPinchGestureRecognizer*)paramSender{
+    
+    if (paramSender.state == UIGestureRecognizerStateEnded){
+        NSLog(@"State End:%f", paramSender.scale);
+        //CGFloat scale = 0.5f;
+        [self redrawWithSize:paramSender.scale];
+    } else if (paramSender.state == UIGestureRecognizerStateBegan){
+        NSLog(@"State Began:%f", paramSender.scale);
     }
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
-    self.startPickerPosition = 0.f;
-    self.endPickerPosition = 0.f;
+    self.startPickerTime = 0.f;
+    self.endPickerTime = 0.f;
     NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
     //NSLog(@"current language:%@", language);
     //if([language isEqualToString:@"ko"])
@@ -1241,33 +1250,9 @@
     self.navigationItem.rightBarButtonItem = rightBarItem;
     [rightBarItem release];
 
-    //self.navigationItem.rightBarButtonItem.style = UIBarButtonItemStyleBordered;
-    //self.navigationItem.rightBarButtonItem = BARBUTTON(NSLocalizedString(@"BookMark", @"Title for BookMarks"), @selector(goToBookMark:));
-    //self.title = NSLocalizedString (@"Back", @"Title for MainViewController");
     avPlayer = nil;
-    //self.navigationController.navigationBar.tintColor = NAVIGATION_BAR_COLOR;
-    //self.navigationController.navigationBar.translucent = YES;
     
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar.png"] forBarMetrics:UIBarMetricsDefault];
-    //self.navigationController.navigationBar.translucent = YES;
-    //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
-    //NSLog(@"left bar button width:%f, right bar button width:%f, navigation bar width:%f", self.navigationItem.leftBarButtonItem.width, self.navigationItem.rightBarButtonItem.width, self.navigationController.navigationBar.bounds.size.width);
-    /*UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 62)];
-    label.backgroundColor = [UIColor clearColor];
-    label.numberOfLines = 3;
-    label.font = [UIFont boldSystemFontOfSize: 12.0f];
-    label.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-    label.textAlignment = UITextAlignmentCenter;
-    label.textColor = [UIColor whiteColor];
-    NSString *songData;
-    songData = NSLocalizedString(@"MusicWave MusicWave MusicWave MusicWave", @"Default title for song label");//[[songList objectAtIndex:currentIndex] artistName];
-    songData = [songData stringByAppendingString:@"\n"];
-    songData = [songData stringByAppendingString:NSLocalizedString(@"MusicWave", @"Default title for song label")];//[songData stringByAppendingString: [[songList objectAtIndex:currentIndex] songName]];
-    songData = [songData stringByAppendingString:@"\n"];
-    songData = [songData stringByAppendingString:NSLocalizedString(@"MusicWave", @"Default title for song label")];//[songData stringByAppendingString: [[songList objectAtIndex:currentIndex] albumName]];
-    label.text = songData;
-    self.navigationItem.titleView = label;*/
-    
     UILabel *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 62)];
     songDataView.backgroundColor = [UIColor clearColor];
     
@@ -1299,19 +1284,8 @@
     //[label release];
     
     self.navigationItem.titleView = songDataView;
+    [songDataView release];
     
-    //self.currentSong = nil;
-    //self.myScrollView.delegate = self;
-    //HUD = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-    //[self.navigationController.view addSubview:HUD];
-    //HUD.delegate = self;
-    
-    
-    
-    
-    //self.navigationItem.leftBarButtonItem = BARBUTTON(@"My List", @selector(selectSongs:));
-    
-    	
     [self.myGraphView setParent:self];
     //playState = playBackStateNone;
     //[self imageViewTest];
@@ -1320,6 +1294,7 @@
     [self settingUpPicker];
     [self settingUpBookMarkButton];
     [self settingUpVolumeSlider];
+    [self settingUpRepeatButton];
     //[self settingUpMainSlider];
     
     [toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
@@ -1327,15 +1302,15 @@
     
     //mainSlider.enabled = NO;
     
-    self.repeatModeView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    //self.repeatModeView = [[UIImageView alloc] initWithFrame:CGRectZero];
     //self.repeatModeView.contentMode = UIViewContentModeScaleAspectFit;
     
-    self.repeatModeView.frame = CGRectMake(160 - 38, 195, 76, 21);
-    if (repeatMode) {
-        repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
-    }
-    else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
-    [self.view addSubview:repeatModeView];
+    //self.repeatModeView.frame = CGRectMake(160 - 38, 195, 76, 21);
+    //if (repeatMode) {
+        //repeatModeView.image = [UIImage imageNamed:@"repeat_on_test.png"];
+    //}
+    //else repeatModeView.image = [UIImage imageNamed:@"repeat_off_test.png"];
+    //[self.view addSubview:repeatModeView];
     
     CGRect scrollViewRect = CGRectMake(10, 33, 300, 157);
     
@@ -1351,6 +1326,12 @@
     self.myGraphView.backgroundColor = [UIColor clearColor];
     self.myGraphView.parent = self;
     [self.myScrollView addSubview:self.myGraphView];
+    
+    self.graphImage = nil;
+    
+    // Add a pinch gesture recognizer to the table view.
+	UIPinchGestureRecognizer* pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinches:)];
+	[self.myScrollView addGestureRecognizer:pinchRecognizer];
 
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
@@ -1396,12 +1377,12 @@
     //NSLog(@"picker view selected index %d tag:%d", index, picker.tag);
     if (index == 0) {
         if (picker.tag == 0) {
-            self.startPickerPosition = 0.f;
+            self.startPickerTime = 0.f;
         }
         else {
-            self.endPickerPosition = 0.f;
+            self.endPickerTime = 0.f;
         }
-        [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+        [self.myGraphView settingStartEndTime:startPickerTime endPosition:endPickerTime];
         [self.myGraphView.bookMarkLayer setNeedsDisplay];
         [self registerTimeObserver];
         return;
@@ -1414,35 +1395,33 @@
     }
     BookMark *tempBookMark = [self.bookMarkArray objectAtIndex:index - 1];
     if (picker.tag == 0) {
-        self.startPickerPosition = [tempBookMark.position floatValue];
+        self.startPickerTime = [tempBookMark.duration floatValue];
     }
     else {
-        self.endPickerPosition = [tempBookMark.position floatValue];
+        self.endPickerTime = [tempBookMark.duration floatValue];
     }
-    //NSLog(@"Self startPickerPosition:%f, endPickerPosition:%f", self.startPickerPosition, self.endPickerPosition);
-    ViewInfo *tempViewInfo = [self.myGraphView.viewInfoArray objectAtIndex:[tempBookMark.position floatValue]];
-    //NSLog(@"bookMark position:%f, time:%f", [tempBookMark.position floatValue], [tempViewInfo.time floatValue]);
-    [self setCurrentPostion:[tempViewInfo.time floatValue]];
+    //NSLog(@"bookMark old position:%f, delta:%f", [tempBookMark.duration floatValue]/[tempBookMark.delta floatValue], self.delta);
+    [self setCurrentPostion:[tempBookMark.duration floatValue]];
     //[self updatePosition];
-    CGFloat moveOffset = [tempBookMark.position floatValue] - self.myScrollView.bounds.size.width / 2;
+    CGFloat moveOffset = [tempBookMark.duration floatValue]/self.delta - self.myScrollView.bounds.size.width / 2;
    
-    if (self.myScrollView.contentSize.width - [tempBookMark.position floatValue] < self.myScrollView.bounds.size.width / 2) {
+    if (self.myScrollView.contentSize.width - [tempBookMark.duration floatValue]/self.delta < self.myScrollView.bounds.size.width / 2) {
         moveOffset = self.myScrollView.contentSize.width - self.myScrollView.bounds.size.width; 
     }
     if (moveOffset < 0) {
         moveOffset = 0;
     }
     [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
-    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+    [self.myGraphView settingStartEndTime:startPickerTime endPosition:endPickerTime];
     [self.myGraphView.bookMarkLayer setNeedsDisplay];
-    [self.myGraphView setCurrentPlaybackPosition:[tempViewInfo.time floatValue]];
+    [self.myGraphView setCurrentPlaybackPosition:[tempBookMark.duration floatValue]/self.delta];
     [self registerTimeObserver];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     //NSLog(@"main view will appear");
-    [self.myGraphView settingStartEndPosition:startPickerPosition endPosition:endPickerPosition];
+    [self.myGraphView settingStartEndTime:startPickerTime endPosition:endPickerTime];
     [self.myGraphView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];
     [endPickerView reloadData];
@@ -1475,13 +1454,6 @@
         [self registerTimeObserver];
     }
 }
-
-
-- (void) songsPicked: (NSNotification *)notification {
-    //[self updateUserSongListWithMediaCollection:(MPMediaItemCollection *)[notification object]];
-}
-
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
