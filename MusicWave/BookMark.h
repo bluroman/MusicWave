@@ -2,8 +2,8 @@
 //  BookMark.h
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 21..
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Created by Nam Hoon on 13. 1. 12..
+//
 //
 
 #import <Foundation/Foundation.h>
@@ -11,12 +11,11 @@
 
 @class Song;
 
-@interface BookMark : NSManagedObject {
-@private
-}
+@interface BookMark : NSManagedObject
+
 @property (nonatomic, retain) NSDate * keepDate;
-@property (nonatomic, retain) NSNumber * position;
+@property (nonatomic, retain) NSNumber * delta;
 @property (nonatomic, retain) NSNumber * duration;
-@property (nonatomic, retain) Song * song;
+@property (nonatomic, retain) Song *song;
 
 @end

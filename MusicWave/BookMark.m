@@ -2,8 +2,8 @@
 //  BookMark.m
 //  MusicWave
 //
-//  Created by hun nam on 11. 7. 21..
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Created by Nam Hoon on 13. 1. 12..
+//
 //
 
 #import "BookMark.h"
@@ -11,10 +11,10 @@
 
 
 @implementation BookMark
+
 @dynamic keepDate;
-@dynamic position;
+@dynamic delta;
 @dynamic duration;
 @dynamic song;
-
 
 @end

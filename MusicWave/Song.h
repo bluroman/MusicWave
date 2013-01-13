@@ -24,6 +24,7 @@
 @property (nonatomic, retain) NSNumber * songDuration;
 @property (nonatomic, retain) NSString * songArtist;
 @property (nonatomic, retain) NSString * songAlbum;
+@property (nonatomic, retain) NSString * graphPath;
 @property (nonatomic, retain) NSSet *bookmarks;
 @property (nonatomic, retain) NSSet *viewinfos;
 @end
