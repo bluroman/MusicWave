@@ -14,12 +14,14 @@
 
 @interface BookMarkLayerDelegate : NSObject {
     Song *currentSong;
-    CGFloat startPosition;
-    CGFloat endPosition;
+    CGFloat startTime;
+    CGFloat endTime;
+    CGFloat currentDelta;
 }
 @property (nonatomic, retain) Song *currentSong;
-@property (nonatomic, assign) CGFloat startPosition;
-@property (nonatomic, assign) CGFloat endPosition;
+@property (nonatomic, assign) CGFloat startTime;
+@property (nonatomic, assign) CGFloat endTime;
+@property (nonatomic, assign) CGFloat currentDelta;
 
 -(void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context;
 

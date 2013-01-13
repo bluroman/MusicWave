@@ -13,7 +13,7 @@
 
 @implementation BookMarkLayerDelegate
 @synthesize currentSong;
-@synthesize startPosition, endPosition;
+@synthesize startTime, endTime, currentDelta;
 
 -(id)init
 {
@@ -21,8 +21,9 @@
 	if(self != nil)
     {
         currentSong = nil;
-        startPosition = 0.f;
-        endPosition = 0.f;
+        startTime = 0.f;
+        endTime = 0.f;
+        currentDelta = NAN;
     }
     return self;
 }
@@ -34,28 +35,23 @@
 
 -(void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context
 {
-	// We aren't interested in the actual content of this layer, we just want to draw something.
-	// Towards that end, we'll fill the content with a random color,
-	// then fill a randomly generated polygon.
-    
     CGRect bounds = CGContextGetClipBoundingBox(context);
     if (self.currentSong == nil) {
         return;
     }
-    if (self.startPosition == self.endPosition) {
+    if (self.startTime == self.endTime) {
         //NSLog(@"always same........");
     }
-    else if (self.startPosition > 0 && self.endPosition > 0) {
-        if (self.endPosition > self.startPosition) {
-            //layer.opacity = 0.2f;
+    else if (self.startTime > 0 && self.endTime > 0) {
+        if (self.endTime > self.startTime) {
             CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:255.0/255.0f blue:255.0/255.0f alpha:0.5f].CGColor);
-            CGContextAddRect(context, CGRectMake(self.startPosition, 0.0, self.endPosition - self.startPosition, bounds.size.height));
+            CGContextAddRect(context, CGRectMake(self.startTime / self.currentDelta, 0.0, self.endTime / self.currentDelta - self.startTime / self.currentDelta, bounds.size.height));
             CGContextFillPath(context);
         }
         else {
             //layer.opacity = 0.2f;
             CGContextSetFillColorWithColor(context, [UIColor colorWithRed:255.0/255.0f green:255.0/255.0f blue:255.0/255.0f alpha:0.5f].CGColor);
-            CGContextAddRect(context, CGRectMake(self.endPosition, 0.0, self.startPosition - self.endPosition, bounds.size.height));
+            CGContextAddRect(context, CGRectMake(self.endTime / self.currentDelta, 0.0, self.startTime / self.currentDelta - self.endTime / self.currentDelta, bounds.size.height));
             CGContextFillPath(context);
         }
     }
@@ -82,15 +78,15 @@
         char numChar[20] ;
         snprintf(numChar,sizeof(numChar),"%d",i + 1) ;
         CGContextSetRGBStrokeColor(context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1.0);
-        CGContextMoveToPoint(context, [tempBookMark.position floatValue], 0.0);
-        CGContextAddLineToPoint(context, [tempBookMark.position floatValue], bounds.size.height);
+        CGContextMoveToPoint(context, [tempBookMark.duration floatValue]/self.currentDelta, 0.0);
+        CGContextAddLineToPoint(context, [tempBookMark.duration floatValue]/self.currentDelta, bounds.size.height);
         CGContextStrokePath(context);
-        CGContextSelectFont (context, "Helvetica", 11, kCGEncodingMacRoman);
+        CGContextSelectFont (context, "Helvetica", 8, kCGEncodingMacRoman);
         CGContextSetTextDrawingMode (context, kCGTextFillStroke);
         CGContextSetRGBFillColor (context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1);
         CGContextSetRGBStrokeColor (context, 255.0/255.0f, 255.0/255.0f, 255.0/255.0f, 1);
         CGContextSetTextMatrix(context, CGAffineTransformMake(1, 0, 0, -1, 0, 0));
-        CGContextShowTextAtPoint (context, [tempBookMark.position floatValue], 11, numChar, strlen(numChar));
+        CGContextShowTextAtPoint (context, [tempBookMark.duration floatValue]/self.currentDelta, 8, numChar, strlen(numChar));
     }
     [sortDescriptor release];
 	[sortDescriptors release];
