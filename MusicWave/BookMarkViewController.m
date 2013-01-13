@@ -293,6 +293,7 @@
     titleLabel.highlightedTextColor = [UIColor whiteColor];
     
     self.navigationItem.titleView = titleLabel;
+    [titleLabel release];
     rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
     //rightBarButton.buttonType = UIButtonTypeRoundedRect;
     
@@ -440,12 +441,12 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
         BookMark *bookMark = [self.bookMarkArray objectAtIndex:indexPath.row];
-        if ([bookMark.position floatValue]== ((iPodSongsViewController *)mainViewController).startPickerPosition) {
-            ((iPodSongsViewController *)mainViewController).startPickerPosition = 0.f;
+        if ([bookMark.duration floatValue] == ((iPodSongsViewController *)mainViewController).startPickerTime) {
+            ((iPodSongsViewController *)mainViewController).startPickerTime = 0.f;
             [(iPodSongsViewController *)mainViewController unregisterTimeObserver];
         }
-        if ([bookMark.position floatValue] == ((iPodSongsViewController *)mainViewController).endPickerPosition) {
-            ((iPodSongsViewController *)mainViewController).endPickerPosition = 0.f;
+        if ([bookMark.duration floatValue] == ((iPodSongsViewController *)mainViewController).endPickerTime) {
+            ((iPodSongsViewController *)mainViewController).endPickerTime = 0.f;
             [(iPodSongsViewController *)mainViewController unregisterTimeObserver];
         }
         [self.bookMarkArray removeObjectAtIndex:indexPath.row];
