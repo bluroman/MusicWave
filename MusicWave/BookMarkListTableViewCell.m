@@ -131,7 +131,7 @@
         UInt32 minutes = duration / (60 * 100);
         UInt32 seconds = (duration / 100)  - (minutes * 60);
         UInt32 millsec = duration % 100;
-        timeLabel.text = [NSString stringWithFormat: @"%02d:%02d:%02d - %@", minutes, seconds, millsec, song.songTitle];
+        timeLabel.text = [NSString stringWithFormat: @"%02ld:%02ld:%02ld - %@", minutes, seconds, millsec, song.songTitle];
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         [formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
         [formatter setDateStyle:NSDateFormatterLongStyle];
