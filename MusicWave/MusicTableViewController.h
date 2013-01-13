@@ -51,7 +51,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 //@protocol MusicTableViewControllerDelegate; // forward declaration
 
 
-@interface MusicTableViewController : UIViewController <MPMediaPickerControllerDelegate, UITableViewDelegate, UIAlertViewDelegate, NSFetchedResultsControllerDelegate> {
+@interface MusicTableViewController : UIViewController <MPMediaPickerControllerDelegate, UITableViewDelegate, UIAlertViewDelegate, NSFetchedResultsControllerDelegate, UIActionSheetDelegate> {
 
 	//id <MusicTableViewControllerDelegate>	delegate;
 	IBOutlet UITableView					*mediaItemCollectionTable;
@@ -78,7 +78,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 
 - (IBAction) showMediaPicker: (id) sender;
 - (IBAction) doneShowingMusicList: (id) sender;
-- (IBAction) tapCheckLibraryButton: (id)sender;
+- (void) tapCheckLibraryButton;
+- (IBAction) tapMenuButton: (id)sender;
 
 @end
 

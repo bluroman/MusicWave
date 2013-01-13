@@ -56,6 +56,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 @end
 
 #define NAVIGATION_BAR_COLOR    [UIColor colorWithRed:200.0/255.0f green:204.0/255.0f blue:211.0/255.0f alpha:1.0f]
+#define TMP NSTemporaryDirectory()
 
 @implementation MusicTableViewController
 
@@ -71,6 +72,69 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 @synthesize fetchedResultsController=_fetchedResultsController;
 
 @synthesize managedObjectContext;
+- (void)removeGraphImage:(NSString *)myPath
+{
+    BOOL result = NO;
+    NSError *error;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if([fileManager fileExistsAtPath: myPath])
+    {
+        NSLog(@"Remove file exists on:%@", myPath);
+        result = [fileManager removeItemAtPath:myPath error:&error];
+        if (!result) {
+            NSLog(@"Remove file error %@, %@", error, [error userInfo]);
+        }
+    }
+    else NSLog(@"No Remove file found on:%@", myPath);
+    
+}
+- (void)removeAllGraphImageOnCache:(NSString *)myDir
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error = nil;
+    NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+    
+    for (Song *item in _fetchedResultsController.fetchedObjects)
+    {
+        if(item.doneGraphDrawing)
+        {
+            if ([item isEqual:((iPodSongsViewController *)mainViewController).currentSong])
+                continue;
+            BOOL success = [fileManager removeItemAtPath:item.graphPath error:&error];
+            if (!success) {
+                // it failed.
+                NSLog(@"Remove all file error %@, %@", error, [error userInfo]);
+            }
+            else item.doneGraphDrawing = NO;
+        }
+    }
+    // Save the context.
+    if (![context save:&error])
+    {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    [self.mediaItemCollectionTable reloadData];
+    
+}
+- (void)deleteAllSongs
+{
+    NSError *error;
+    NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
+    for (Song *item in _fetchedResultsController.fetchedObjects)
+    {
+        if ([item isEqual:((iPodSongsViewController *)mainViewController).currentSong])
+            continue;
+        [context deleteObject:item];
+    }
+    if (![context save:&error])
+    {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    [self.mediaItemCollectionTable reloadData];
+
+}
 - (void)checkIpodLibrary
 {
     NSError *error;
@@ -89,6 +153,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
         {
             NSLog(@"Not existing song");
             [context deleteObject:item];
+            [self removeGraphImage:item.graphPath];
         }
         [songQuery release];
     }
@@ -182,7 +247,41 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     [musicTableToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
              forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
 }
-- (IBAction) tapCheckLibraryButton: (id)sender
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    [actionSheet release];
+    switch (buttonIndex) {
+        case 0:
+            NSLog(@"Delete all songs");
+            [self deleteAllSongs];
+            break;
+        case 1:
+            NSLog(@"Delete all graph");
+            [self removeAllGraphImageOnCache:TMP];
+            break;
+        case 2:
+            NSLog(@"Update Library");
+            [self tapCheckLibraryButton];
+            break;
+            
+            
+        default:
+            break;
+    }
+}
+- (IBAction)tapMenuButton:(id)sender
+{
+    UIActionSheet *menu = [[UIActionSheet alloc]
+                           initWithTitle: @""
+                           delegate:self
+                           cancelButtonTitle:NSLocalizedString(@"Cancel", @"delete cancel")
+                           destructiveButtonTitle:nil
+                           otherButtonTitles:NSLocalizedString(@"Delete all songs", @"delete all songs on music list"), NSLocalizedString(@"Delete all graph", @"delete all graph on cache"), NSLocalizedString(@"Update library", @"update ipod library"), nil];
+    [menu showInView:self.view];
+
+    
+}
+- (void) tapCheckLibraryButton
 {
     [self checkIpodLibrary];
     [self.mediaItemCollectionTable reloadData];
@@ -250,7 +349,9 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
         NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
-        [context deleteObject:[_fetchedResultsController objectAtIndexPath:self.deleteIndexPath]];
+        Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:self.deleteIndexPath];
+        [self removeGraphImage:song.graphPath];
+        [context deleteObject:song];
         
         // Save the context.
         NSError *error = nil;
@@ -285,7 +386,7 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
     // If appropriate, configure the new managed object.
     newSong.songTitle = [mediaItem valueForProperty:MPMediaItemPropertyTitle];
     newSong.songArtist = [mediaItem valueForProperty:MPMediaItemPropertyArtist];
-    newSong.songDuration = [mediaItem valueForProperty:MPMediaItemPropertyPlaybackDuration];
+    newSong.songDuration = [NSNumber  numberWithFloat:[[mediaItem valueForProperty:MPMediaItemPropertyPlaybackDuration] doubleValue]];
     newSong.persistentId = [mediaItem valueForProperty:MPMediaItemPropertyPersistentID];
     newSong.songAlbum = [mediaItem valueForProperty:MPMediaItemPropertyAlbumTitle];
     NSURL *tempURL = [mediaItem valueForProperty:MPMediaItemPropertyAssetURL];
@@ -323,7 +424,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
             id myObject;
             while ((myObject = [enumer nextObject]) != nil) {
                 MPMediaItem *tempMediaItem = (MPMediaItem *) myObject;
-                NSLog(@"AlbumTitle:%@", [tempMediaItem valueForProperty:MPMediaItemPropertyAlbumTitle]);
+                //NSLog(@"AlbumTitle:%@", [tempMediaItem valueForProperty:MPMediaItemPropertyAlbumTitle]);
+                //NSLog(@"New Duration:%f", [[tempMediaItem valueForProperty:MPMediaItemPropertyPlaybackDuration] floatValue]);
                 //NSLog(@"Title: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyTitle]);
                 //NSLog(@"Artist: %@", [tempMediaItem valueForProperty:MPMediaItemPropertyArtist]);
                 //NSLog(@"Persistent Id: %llu", [[tempMediaItem valueForProperty:MPMediaItemPropertyPersistentID] unsignedLongLongValue]);
@@ -435,7 +537,8 @@ Copyright (C) 2009 Apple Inc. All Rights Reserved.
         }
         //[theDataObject.userSongList removeObjectAtIndex:indexPath.row];
         NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
-        [context deleteObject:[_fetchedResultsController objectAtIndexPath:indexPath]];
+        [self removeGraphImage:deleteSong.graphPath];
+        [context deleteObject:deleteSong];
         
         // Save the context.
         NSError *error = nil;
