@@ -47,9 +47,9 @@
 #define MAX_BOOKMARK 10
 
 @implementation MyGraphView
-@synthesize current, parent, currentPixel, currentSong;
+@synthesize current, parent, currentPixel, currentSong, graphImageView;
 @synthesize bookMarkLayer;
-@synthesize viewInfoArray;
+//@synthesize viewInfoArray;
 
 #define myUpperMargin 0.0f
 
@@ -68,6 +68,8 @@
         bookMarkLayer.delegate = bookMarkLayerDelegate;
         [self setUpBookMarkLayer];
         [self.layer addSublayer:bookMarkLayer];
+        graphImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+        [self addSubview:graphImageView];
 	}
 	return self;
 }
@@ -101,19 +103,18 @@
     
         
 }
-- (void)settingStartEndPosition: (CGFloat)start endPosition:(CGFloat)end {
-    bookMarkLayerDelegate.startPosition = start;
-    bookMarkLayerDelegate.endPosition = end;
+- (void)setDelta: (CGFloat)current_delta {
+    NSLog(@"Settng BookMark layer delta:%f", current_delta);
+    bookMarkLayerDelegate.currentDelta = current_delta;
 }
-- (void) setCurrentPlaybackPosition:(CGFloat)value {
-    int i = 0;
-    ViewInfo *tempViewInfo = nil;
-    for (; i < [self.viewInfoArray count]; i++) {
-        tempViewInfo = [self.viewInfoArray objectAtIndex:i];
-        if(value < [tempViewInfo.time floatValue]  || value == [tempViewInfo.time floatValue])
-            break;
-    }
-    self.currentPixel = [tempViewInfo.x floatValue];
+
+- (void)settingStartEndTime:(CGFloat)start endPosition:(CGFloat)end
+{
+    bookMarkLayerDelegate.startTime = start;
+    bookMarkLayerDelegate.endTime = end;
+}
+- (void) setCurrentPlaybackPosition:(int)pixel {
+    self.currentPixel = pixel;
     //NSLog(@"Now currentPixel:%f", self.currentPixel);
     [current.layer setPosition:CGPointMake(self.currentPixel, current.layer.bounds.size.height / 2)];
 }
@@ -122,7 +123,7 @@
     //NSLog(@"Start touches:pointInView x:%f, y:%f", pointInView.x, pointInView.y);
     
     
-    if ([self.viewInfoArray count] < pointInView.x) {
+    if (self.bounds.size.width < pointInView.x) {
         NSLog(@"something wrong with view info array");
         return;
     }
@@ -130,9 +131,9 @@
     [current.layer setPosition:CGPointMake(self.currentPixel, self.current.layer.bounds.size.height/2)];
     //Get duration of the point and send it to viewcontroller
     iPodSongsViewController *controller = (iPodSongsViewController *)parent;
-    ViewInfo *tempViewInfo = [self.viewInfoArray objectAtIndex:self.currentPixel];
+    //ViewInfo *tempViewInfo = [self.viewInfoArray objectAtIndex:self.currentPixel];
     //NSLog(@"touches current time:%f", [tempViewInfo.time floatValue]);
-    [controller setCurrentPostion:[tempViewInfo.time floatValue]];
+    [controller setCurrentPostion:self.currentPixel * controller.delta];
 }
 - (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
@@ -150,10 +151,6 @@
 
 - (void)drawViewInfoArray {
     CGRect viewRect = self.bounds;
-    int count = [self.viewInfoArray count];
-    CGFloat graphHeight = viewRect.size.height - myUpperMargin;
-    //CGFloat scaleFactor =  graphHeight / 2;
-    double scaleFactor = floor( self.bounds.size.height  / 2.0 );
     int len = 0;
     
     //CGContextSetRGBStrokeColor(context, 59, 65, 83, 1.0);
@@ -175,85 +172,16 @@
         }
         len += 5;
     }
-    //CGContextSetRGBStrokeColor(context, 123.0/255.0f, 218.0/255.0f, 245.0/255.0f, 1.0);
-    //CGContextMoveToPoint(context, 0.0, graphHeight / 2);
-    //CGContextAddLineToPoint(context, viewRect.size.width, graphHeight / 2);
-    //CGContextStrokePath(context);//center line
-    
-    if (count < 1) {
-        //NSLog(@"something wrong with draw view info");
-        return;
-    }
-    CGMutablePathRef maxPath = CGPathCreateMutable();
-    CGContextTranslateCTM(context, 0.0, graphHeight / 2);
-    CGPathMoveToPoint(maxPath, NULL, 0, 0);
-    for (int i = 0; i < count; i++) {
-        ViewInfo *tempViewInfo = [self.viewInfoArray objectAtIndex:i];
-        CGPathAddLineToPoint(maxPath, NULL, [tempViewInfo.x floatValue], scaleFactor * [tempViewInfo.max floatValue]);
-        
-
-    }
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddPath( path, NULL, maxPath );
-    
-    
-    CGAffineTransform xf = CGAffineTransformIdentity;
-    xf = CGAffineTransformScale(xf, 1.0, -1.0);
-  
-    CGPathAddPath( path, &xf, maxPath );
-    //CGPathAddPath(path, NULL, minPath);
-    CGPathCloseSubpath(path);
-    //CGContextSetFillColorWithColor(context, [UIColor colorWithRed:96.0/255.0f green:143.0/255.0f blue:199.0/255.0f alpha:1.0].CGColor);
-    CGContextAddPath(context, path);
-    CGContextClip(context);
-    //CGContextFillPath(context);
-    // Declare the gradient
-    CGGradientRef myGradient; 
-    
-    //	Define the color space
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    // Define the color components of the gradient
-    CGFloat components[8] = { 1.0, 1.0, 1.0, 0.1,  // Start color
-        1.0, 1.0, 1.0, 0.9 }; // End color
-    
-    // Define the location of each component
-    int num_locations = 2; 
-    CGFloat locations[2] = { 0.0, 1.0 };
-    
-    // Create the gradient
-    myGradient = CGGradientCreateWithColorComponents (colorSpace, components, 
-                                                      locations, num_locations); 
-    
-    // Draw the gradient
-    CGContextDrawLinearGradient (context, myGradient, CGPointMake(0, -90),
-                                 CGPointMake(0, 90), 0); 
-    
-	//	Clean up the color space & gradient
-	CGColorSpaceRelease(colorSpace);
-	CGGradientRelease(myGradient);
-
-    //CGContextAddPath(context, path);
-    //CGContextSetRGBStrokeColor(context, 96, 143, 199, 1.0);
-    //[[UIColor colorWithRed:96.0/255.0f green:143.0/255.0f blue:199.0/255.0f alpha:1.0] setStroke];
-    //CGContextDrawPath(context, kCGPathStroke);
-    CGPathRelease(maxPath);
-    //CGPathRelease(minPath);
-    CGPathRelease(path);
-    
-      //NSLog(@"view width:%f, view height:%f, graph height:%f", viewRect.size.width, viewRect.size.height, graphHeight);
+    //NSLog(@"view width:%f, view height:%f, graph height:%f", viewRect.size.width, viewRect.size.height, graphHeight);
 }
 
 
 - (void)dealloc
 {
     [current release];
-    [viewInfoArray release];
     [bookMarkLayerDelegate release];
     [currentSong release];
-    //[soundLineView release];
-    //[startBarView release];
-    //[endBarView release];
+    [graphImageView release];
     [super dealloc];
 }
 
