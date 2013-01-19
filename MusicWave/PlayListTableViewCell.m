@@ -13,11 +13,9 @@
 #pragma mark SubviewFrames category
 
 @interface PlayListTableViewCell (SubviewFrames)
-- (CGRect)_imageViewFrame;
 - (CGRect)_titleLabelFrame;
 - (CGRect)_artistLabelFrame;
-- (CGRect)_graphImageViewFrame;
-- (CGRect)_durationLabelFrame;
+- (CGRect)_playOrHasGraphViewFrame;
 @end
 
 
@@ -26,8 +24,7 @@
 
 @implementation PlayListTableViewCell
 
-@synthesize song, imageView, titleLabel, artistLabel, nowPlaying;
-@synthesize graphView;
+@synthesize song, titleLabel, artistLabel, playOrHasGraphView;
 
 
 #pragma mark -
@@ -36,46 +33,25 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     
 	if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
-        
-        self.backgroundView = [ [[UIImageView alloc] initWithImage:[ [UIImage imageNamed:@"list_bg_off.jpg"] stretchableImageWithLeftCapWidth:0.0 topCapHeight:5.0] ]autorelease];  
-        self.selectedBackgroundView = [ [[UIImageView alloc] initWithImage:[ [UIImage imageNamed:@"list_bg_on.jpg"] stretchableImageWithLeftCapWidth:0.0 topCapHeight:5.0] ]autorelease];
-        imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-		imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self.contentView addSubview:imageView];
-        
         artistLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         artistLabel.textAlignment = UITextAlignmentLeft;
-        [artistLabel setFont:[UIFont systemFontOfSize:12.0]];
-        [artistLabel setTextColor:[UIColor colorWithRed:135.0/255.0f green:139.0/255.0f blue:149.0/255.0f alpha:1.0]];
-        [artistLabel setHighlightedTextColor:[UIColor colorWithRed:142.0/255.0f green:142.0/255.0f blue:134.0/255.0f alpha:1.0]];
+        [artistLabel setFont:[UIFont systemFontOfSize:14.0]];
+        [artistLabel setTextColor:[UIColor colorWithRed:102.0/255.0f green:101.0/255.0f blue:95.0/255.0f alpha:1.0]];
+        [artistLabel setHighlightedTextColor:[UIColor colorWithRed:189.0/255.0f green:188.0/255.0f blue:179.0/255.0f alpha:1.0]];
         [artistLabel setBackgroundColor:[UIColor clearColor]];
         [self.contentView addSubview:artistLabel];
         
-        /*durationLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        durationLabel.textAlignment = UITextAlignmentLeft;
-        //[durationLabel setFont:[UIFont fontWithName:@"Tahoma Bold" size:(11.0)]];
-        [durationLabel setFont:[UIFont systemFontOfSize:11.0]];
-        [durationLabel setTextColor:[UIColor colorWithRed:82.0/255.0f green:89.0/255.0f blue:107.0/255.0f alpha:1.0]];
-        [durationLabel setHighlightedTextColor:[UIColor whiteColor]];
-        [durationLabel setBackgroundColor:[UIColor clearColor]];
-		//durationLabel.minimumFontSize = 7.0;
-		//durationLabel.lineBreakMode = UILineBreakModeTailTruncation;
-        [self.contentView addSubview:durationLabel];*/
-        
         titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         titleLabel.textAlignment = UITextAlignmentLeft;
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:15.0]];
-        [titleLabel setTextColor:[UIColor whiteColor]];
-        [titleLabel setHighlightedTextColor:[UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0]];
+        [titleLabel setFont:[UIFont boldSystemFontOfSize:20.0]];
+        [titleLabel setTextColor:[UIColor colorWithRed:131.0/255.0f green:130.0/255.0f blue:124.0/255.0f alpha:1.0]];
+        [titleLabel setHighlightedTextColor:[UIColor colorWithRed:255.0/255.0f green:253.0/255.0f blue:242.0/255.0f alpha:1.0]];
         [titleLabel setBackgroundColor:[UIColor clearColor]];
         [self.contentView addSubview:titleLabel];
         
-        graphView = [[UIImageView alloc] initWithFrame:CGRectZero];
-		graphView.contentMode = UIViewContentModeScaleAspectFit;
-        [self.contentView addSubview:graphView];
-        
-        self.nowPlaying = NO;
-        
+        playOrHasGraphView = [[UIImageView alloc] initWithFrame:CGRectZero];
+		playOrHasGraphView.contentMode = UIViewContentModeCenter;
+        [self.contentView addSubview:playOrHasGraphView];
     }
     
     return self;
@@ -85,74 +61,39 @@
 #pragma mark -
 #pragma mark Laying out subviews
 
-/*
- To save space, the prep time label disappears during editing.
- */
 - (void)layoutSubviews {
     [super layoutSubviews];
+    //CGFloat title_width = self.contentView.bounds.size.width - self.accessoryView.bounds.size.width;
+    //NSLog(@"title width:%f, content width:%f, accessory width:%f", title_width, self.contentView.bounds.size.width, self.accessoryView.bounds.size.width);
 	
-    [imageView setFrame:[self _imageViewFrame]];
     [titleLabel setFrame:[self _titleLabelFrame]];
     [artistLabel setFrame:[self _artistLabelFrame]];
-    [graphView setFrame:[self _graphImageViewFrame]];
+    [playOrHasGraphView setFrame:[self _playOrHasGraphViewFrame]];
     
-    if (self.editing || self.nowPlaying) {
-        //durationLabel.alpha = 0.0;
-        graphView.alpha = 0.0;
-    } else {
-        //durationLabel.alpha = 1.0;
-        graphView.alpha = 1.0;
-    }
 }
 
+#define TEXT_LEFT_MARGIN    10.0
+#define TITLE_UPPER_MARGIN  4.0
+#define TITLE_LABEL_HEIGHT  28.0
+#define SUBTITLE_LABEL_HEIGHT   20.0
+#define PLAYORHAS_GRAPH_IMAGE_WIDTH 23.0
+#define PLAYORHAS_GRAPH_IMAGE_HEIGHT    23.0
+#define PLAYORHAS_GRAPH_IMAGE_MARGIN    2.0
 
-#define IMAGE_SIZE          56.0
-#define EDITING_INSET       0.0
-#define TEXT_LEFT_MARGIN    16.0
-#define TEXT_RIGHT_MARGIN   5.0
-#define PREP_TIME_WIDTH     30.0
-#define PREP_IMAGE          30.0
-
-/*
- Return the frame of the various subviews -- these are dependent on the editing state of the cell.
- */
-- (CGRect)_imageViewFrame {
-    if (self.editing) {
-        return CGRectMake(EDITING_INSET, 0.0, IMAGE_SIZE, IMAGE_SIZE);
-    }
-	else {
-        return CGRectMake(0.0, 0.0, IMAGE_SIZE, IMAGE_SIZE);
-    }
+- (CGRect)_titleLabelFrame
+{
+    return CGRectMake(TEXT_LEFT_MARGIN, TITLE_UPPER_MARGIN, self.contentView.bounds.size.width - TEXT_LEFT_MARGIN, TITLE_LABEL_HEIGHT);
 }
 
-- (CGRect)_titleLabelFrame {
-    if (self.editing) {
-        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 24.0);
-    }
-	else {
-        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_RIGHT_MARGIN * 2 - PREP_TIME_WIDTH, 24.0);
-    }
+- (CGRect)_artistLabelFrame
+{
+    return CGRectMake(TEXT_LEFT_MARGIN, TITLE_UPPER_MARGIN + TITLE_LABEL_HEIGHT, self.contentView.bounds.size.width - TEXT_LEFT_MARGIN, SUBTITLE_LABEL_HEIGHT);
 }
 
-- (CGRect)_artistLabelFrame {
-    if (self.editing) {
-        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 33.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 16.0);
-    }
-	else {
-        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 33.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_RIGHT_MARGIN * 2 - PREP_TIME_WIDTH, 16.0);
-    }
+- (CGRect)_playOrHasGraphViewFrame
+{
+    return CGRectMake(self.contentView.bounds.size.width - PLAYORHAS_GRAPH_IMAGE_WIDTH - PLAYORHAS_GRAPH_IMAGE_MARGIN, (self.contentView.bounds.size.height - PLAYORHAS_GRAPH_IMAGE_HEIGHT) / 2, PLAYORHAS_GRAPH_IMAGE_WIDTH, PLAYORHAS_GRAPH_IMAGE_HEIGHT);
 }
-
-- (CGRect)_durationLabelFrame {
-    CGRect contentViewBounds = self.contentView.bounds;
-    return CGRectMake(contentViewBounds.size.width - PREP_TIME_WIDTH - TEXT_RIGHT_MARGIN, 25.0, PREP_TIME_WIDTH, 14.0);
-}
-
-- (CGRect)_graphImageViewFrame {
-    //CGRect contentViewBounds = self.contentView.bounds;
-    return CGRectMake(290/*contentViewBounds.size.width - PREP_TIME_WIDTH - TEXT_RIGHT_MARGIN*/, 21.0, 15, 19.0);
-}
-
 
 #pragma mark -
 #pragma mark Song set accessor
@@ -162,16 +103,12 @@
         [song release];
         song = [newSong retain];
 	}
-    imageView.image = song.artworkImage;
-    if (imageView.image == nil) {
-        imageView.image = [UIImage imageNamed:@"artist_img.png"];
-    }
     titleLabel.text = song.songTitle;
-    artistLabel.text = song.songArtist;
-    if ([song.doneGraphDrawing boolValue]) {
-        graphView.image = [UIImage imageNamed:@"graph_t2_on.png"];
-    }
-    else graphView.image = [UIImage imageNamed:@"graph_t2_off.png"];
+    artistLabel.text = [NSString stringWithFormat: @"%@ - %@", song.songAlbum, song.songArtist];
+    if([song.doneGraphDrawing boolValue])
+        playOrHasGraphView.image = [UIImage imageNamed:@"graph_t2_on.png"];
+    else
+        playOrHasGraphView.image = nil;
 }
 
 
@@ -180,10 +117,9 @@
 
 - (void)dealloc {
     [song release];
-    [imageView release];
     [titleLabel release];
     [artistLabel release];
-    [graphView release];
+    [playOrHasGraphView release];
     [super dealloc];
 }
 

@@ -13,17 +13,13 @@
 @interface PlayListTableViewCell : UITableViewCell {
     Song *song;
     
-    UIImageView *imageView;
     UILabel *titleLabel;
     UILabel *artistLabel;
-    UIImageView *graphView;
-    BOOL nowPlaying;
+    UIImageView *playOrHasGraphView;
 }
 @property (nonatomic, retain) Song *song;
 
-@property (nonatomic, retain) UIImageView *imageView;
-@property (nonatomic, retain) UIImageView *graphView;
 @property (nonatomic, retain) UILabel *titleLabel;
 @property (nonatomic, retain) UILabel *artistLabel;
-@property (nonatomic, assign) BOOL nowPlaying;
+@property (nonatomic, retain) UIImageView *playOrHasGraphView;
 @end
