@@ -23,21 +23,18 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     
 	if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
-        self.backgroundView = [ [[UIImageView alloc] initWithImage:[ [UIImage imageNamed:@"list_bg_off.jpg"] stretchableImageWithLeftCapWidth:0.0 topCapHeight:5.0] ]autorelease];  
-        self.selectedBackgroundView = [ [[UIImageView alloc] initWithImage:[ [UIImage imageNamed:@"list_bg_on.jpg"] stretchableImageWithLeftCapWidth:0.0 topCapHeight:5.0] ]autorelease];
-        
         keepDateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         [keepDateLabel setBackgroundColor:[UIColor clearColor]];
-        [keepDateLabel setFont:[UIFont systemFontOfSize:12.0]];
-        [keepDateLabel setTextColor:[UIColor colorWithRed:135.0/255.0f green:139.0/255.0f blue:149.0/255.0f alpha:1.0]];
-        [keepDateLabel setHighlightedTextColor:[UIColor colorWithRed:142.0/255.0f green:142.0/255.0f blue:134.0/255.0f alpha:1.0]];
+        [keepDateLabel setFont:[UIFont systemFontOfSize:14.0]];
+        [keepDateLabel setTextColor:[UIColor colorWithRed:102.0/255.0f green:101.0/255.0f blue:95.0/255.0f alpha:1.0]];
+        [keepDateLabel setHighlightedTextColor:[UIColor colorWithRed:189.0/255.0f green:188.0/255.0f blue:179.0/255.0f alpha:1.0]];
         [self.contentView addSubview:keepDateLabel];
         
         timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         [timeLabel setBackgroundColor:[UIColor clearColor]];
-        [timeLabel setFont:[UIFont boldSystemFontOfSize:15.0]];
-        [timeLabel setTextColor:[UIColor whiteColor]];
-        [timeLabel setHighlightedTextColor:[UIColor colorWithRed:249.0/255.0f green:245.0/255.0f blue:213.0/255.0f alpha:1.0]];
+        [timeLabel setFont:[UIFont boldSystemFontOfSize:20.0]];
+        [timeLabel setTextColor:[UIColor colorWithRed:131.0/255.0f green:130.0/255.0f blue:124.0/255.0f alpha:1.0]];
+        [timeLabel setHighlightedTextColor:[UIColor colorWithRed:255.0/255.0f green:253.0/255.0f blue:242.0/255.0f alpha:1.0]];
         [self.contentView addSubview:timeLabel];
     }
     
@@ -52,7 +49,7 @@
     //NSLog(@"book Mark cell selected:%d", selected);
     if(selected)
     {
-        UIImageView *soundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon_play.png"]];
+        UIImageView *soundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"list-volume.png"]];
         soundImageView.frame = CGRectMake(273, 21, 20, 16);
         self.accessoryView = soundImageView;
         [soundImageView release];
@@ -69,53 +66,27 @@
  */
 - (void)layoutSubviews {
     [super layoutSubviews];
-	
-    [timeLabel setFrame:[self _timeLabelFrame]];
+	[timeLabel setFrame:[self _timeLabelFrame]];
     [keepDateLabel setFrame:[self _keepDateLabelFrame]];
 }
 
 
-#define IMAGE_SIZE          0.0
-#define EDITING_INSET       0.0
-#define TEXT_LEFT_MARGIN    21.0
-#define TEXT_RIGHT_MARGIN   5.0
-#define PREP_TIME_WIDTH     0.0
+#define EDITING_INSET       7.0
+#define TIME_UPPER_MARGIN   4.0
+#define TEXT_LEFT_MARGIN    10.0
+#define TIME_LABEL_HEIGHT  28.0
+#define SUBTITLE_LABEL_HEIGHT   20.0
 
-/*
- Return the frame of the various subviews -- these are dependent on the editing state of the cell.
- */
-- (CGRect)_imageViewFrame {
-    if (self.editing) {
-        return CGRectMake(EDITING_INSET, 0.0, IMAGE_SIZE, IMAGE_SIZE);
-    }
-	else {
-        return CGRectMake(0.0, 0.0, IMAGE_SIZE, IMAGE_SIZE);
-    }
+
+- (CGRect)_timeLabelFrame
+{
+    return CGRectMake(TEXT_LEFT_MARGIN, TIME_UPPER_MARGIN, self.contentView.bounds.size.width - TEXT_LEFT_MARGIN, TIME_LABEL_HEIGHT);
 }
 
-- (CGRect)_timeLabelFrame {
-    if (self.editing) {
-        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 24.0);
-    }
-	else {
-        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 8.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_RIGHT_MARGIN * 2 - PREP_TIME_WIDTH, 24.0);
-    }
+- (CGRect)_keepDateLabelFrame
+{
+    return CGRectMake(TEXT_LEFT_MARGIN, TIME_UPPER_MARGIN + TIME_LABEL_HEIGHT, self.contentView.bounds.size.width - TEXT_LEFT_MARGIN, SUBTITLE_LABEL_HEIGHT);
 }
-
-- (CGRect)_keepDateLabelFrame {
-    if (self.editing) {
-        return CGRectMake(IMAGE_SIZE + EDITING_INSET + TEXT_LEFT_MARGIN, 33.0, self.contentView.bounds.size.width - IMAGE_SIZE - EDITING_INSET - TEXT_LEFT_MARGIN, 16.0);
-    }
-	else {
-        return CGRectMake(IMAGE_SIZE + TEXT_LEFT_MARGIN, 33.0, self.contentView.bounds.size.width - IMAGE_SIZE - TEXT_LEFT_MARGIN, 16.0);
-    }
-}
-
-- (CGRect)_durationLabelFrame {
-    CGRect contentViewBounds = self.contentView.bounds;
-    return CGRectMake(contentViewBounds.size.width - PREP_TIME_WIDTH - TEXT_RIGHT_MARGIN, 4.0, PREP_TIME_WIDTH, 16.0);
-}
-
 
 #pragma mark -
 #pragma mark BookMark set accessor
