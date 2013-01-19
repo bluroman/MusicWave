@@ -56,7 +56,7 @@
 }
 - (IBAction) doneShowingHelpList: (id) sender
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - View lifecycle
@@ -93,25 +93,16 @@
     
     self.navigationItem.titleView = titleView;
     [titleView release];
-    
     UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
-    if ([language isEqualToString:@"ko"]) {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateHighlighted];
-    } else {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateHighlighted];
-    }
-    
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 37.0f, 38.0f);
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateNormal];
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateSelected];
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateHighlighted];
     [leftBarButton addTarget:self action:@selector(doneShowingHelpList:) forControlEvents: UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
-    //[leftBarButton release];
-    
     self.navigationItem.leftBarButtonItem = leftBarItem;
     [leftBarItem release];
+
     self.helpListTable.backgroundColor = [UIColor colorWithRed:240.0/255.0f green:241.0/255.0f blue:243.0/255.0f alpha:1.0];
     
     self.helpListTable.sectionHeaderHeight = HEADER_HEIGHT;

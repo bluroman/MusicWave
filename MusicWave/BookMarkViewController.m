@@ -13,10 +13,10 @@
 #import "MusicWaveAppDelegate.h"
 
 @implementation BookMarkViewController
-@synthesize bookMarkNavItem, bookMarkListTable;
+@synthesize bookMarkListTable;
 @synthesize currentSong, mainViewController;
 @synthesize bookMarkArray;
-@synthesize rightBarButton, rightBarItem, menuBarItem;
+@synthesize rightBarButton, rightBarItem;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -31,14 +31,13 @@
 
 - (void)dealloc
 {
-    [bookMarkNavItem release];
     [bookMarkListTable release];
     [currentSong release];
     [mainViewController release];
     //[rightBarButton release];
     [rightBarItem release];
-    [menuBarItem release];
     [bookMarkToolBar release];
+    [_actionBarItem release];
     [super dealloc];
 }
 
@@ -49,41 +48,11 @@
     
     // Release any cached data, images, etc that aren't in use.
 }
-- (IBAction) tapEditButton: (id)sender {
-    NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    //NSLog(@"current language:%@", language);
-    //if([language isEqualToString:@"ko"])
-        //NSLog(@"current string equal to ko");
-    //else
-        //NSLog(@"current string not equal to ko");
-    if (self.bookMarkListTable.editing) {
-        // Execute tasks for editing status
-        [self.bookMarkListTable setEditing:NO animated:YES];
-        if ([language isEqualToString:@"ko"]) {
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_basic.png"] forState:UIControlStateNormal];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_press.png"] forState:UIControlStateSelected];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_press.png"] forState:UIControlStateHighlighted];
-        } else {
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_basic.png"] forState:UIControlStateNormal];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_press.png"] forState:UIControlStateSelected];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_press.png"] forState:UIControlStateHighlighted];
-        }    
-    } else {
-        [self.bookMarkListTable setEditing:YES animated:YES];
-        if ([language isEqualToString:@"ko"]) {
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_basic.png"] forState:UIControlStateNormal];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateSelected];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_kor_press.png"] forState:UIControlStateHighlighted];
-        } else {
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_basic.png"] forState:UIControlStateNormal];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateSelected];
-            [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_done_eng_press.png"] forState:UIControlStateHighlighted];
-        }
-    }
+- (void) setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing: editing animated: animated];
+    [self.bookMarkListTable setEditing:editing animated:animated];
 }
-- (IBAction) tapBackButton:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
-}
+
 - (void) say: (id)formatstring,...
 {
 	va_list arglist;
@@ -133,6 +102,7 @@
                            cancelButtonTitle:NSLocalizedString(@"Cancel", @"delete cancel")
                            destructiveButtonTitle:nil
                            otherButtonTitles:NSLocalizedString(@"Help", @"Title for help list"), NSLocalizedString(@"Email Support", @"Title for menu email support"), NSLocalizedString(@"Rate MusicWave", @"Title for menu rate"), nil];
+    menu.actionSheetStyle = UIActionSheetStyleBlackOpaque;
     [menu showInView:self.view];
 }
 - (IBAction) tapMenuButton:(id)sender {
@@ -269,17 +239,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
+    //NSString * language = [[NSLocale preferredLanguages] objectAtIndex:0];
     //NSLog(@"current language:%@", language);
     //if([language isEqualToString:@"ko"])
         //NSLog(@"current string equal to ko");
     //else
         //NSLog(@"current string not equal to ko");
     self.bookMarkListTable.rowHeight = 58.0;
+    self.bookMarkListTable.backgroundColor = [UIColor colorWithRed:34.0/255.0f green:33.0/255.0f blue:29.0/255.0f alpha:1.0];
+    self.bookMarkListTable.separatorColor = [UIColor colorWithRed:131.0/255.0f green:130.0/255.0f blue:124.0/255.0f alpha:1.0];
    
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(73, 5, 174, 30)];
     titleLabel.tag = 1;
@@ -294,92 +263,29 @@
     
     self.navigationItem.titleView = titleLabel;
     [titleLabel release];
-    rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    //rightBarButton.buttonType = UIButtonTypeRoundedRect;
-    
-    //rightBarButton = [[UIButton alloc] buttonWithType:UIButtonTypeRoundedRect];
-	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
-    if ([language isEqualToString:@"ko"]) {
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_basic.png"] forState:UIControlStateNormal];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_press.png"] forState:UIControlStateSelected];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_kor_press.png"] forState:UIControlStateHighlighted];
-    } else {
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_basic.png"] forState:UIControlStateNormal];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_press.png"] forState:UIControlStateSelected];
-        [rightBarButton setBackgroundImage:[UIImage imageNamed:@"btn_edit_eng_press.png"] forState:UIControlStateHighlighted];
-    }
-    [rightBarButton addTarget:self action:@selector(tapEditButton:) forControlEvents: UIControlEventTouchUpInside];
-    //UIBarButtonItem *rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
-    //[rightBarButton release];
-    rightBarItem = [[UIBarButtonItem alloc] initWithCustomView:rightBarButton];
-    //[rightBarButton release];
-    
-    self.navigationItem.rightBarButtonItem = rightBarItem;
-    //[rightBarItem release];
-    
-    UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 59.0f, 30.0f);
-    if ([language isEqualToString:@"ko"]) {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_kor_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_kor_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_kor_press.png"] forState:UIControlStateHighlighted];
-    } else {
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_eng_basic.png"] forState:UIControlStateNormal];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_eng_press.png"] forState:UIControlStateSelected];
-        [leftBarButton setBackgroundImage:[UIImage imageNamed:@"btn_back_eng_press.png"] forState:UIControlStateHighlighted];
-    }
-    [leftBarButton addTarget:self action:@selector(tapBackButton:) forControlEvents: UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
-    //[leftBarButton release];
-    
-    self.navigationItem.leftBarButtonItem = leftBarItem;
-    [leftBarItem release];
-    
-    self.menuBarItem.title = NSLocalizedString(@"Menu", @"Title for menu");
-    
-    
-    //self.editButtonItem.customView = rightBarButton;
-    //[rightBarItem release];
-    
-    //self.title = NSLocalizedString(@"BookMarks", @"Title for BookMark List");
+        
+    self.editButtonItem.tintColor = [UIColor blackColor];
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    //self.actionBarItem.title = NSLocalizedString(@"Menu", @"Title for menu");
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     //self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    self.bookMarkListTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
-    self.bookMarkListTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
+    //self.bookMarkListTable.backgroundColor = [UIColor colorWithRed:45.0/255.0f green:51.0/255.0f blue:69.0/255.0f alpha:1.0];
+    //self.bookMarkListTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
     [bookMarkToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
              forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
     
-    
-    /*UIToolbar *tb = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 44.0f)];
-	tb.center = CGPointMake(160.0f, 400.0f);
-	NSMutableArray *tbitems = [NSMutableArray array];
-    
-	[tbitems addObject:BARBUTTON(@"Title", @selector(action))];
-	[tbitems addObject:SYSBARBUTTON(UIBarButtonSystemItemAdd, @selector(action))];
-	[tbitems addObject:IMGBARBUTTON([UIImage imageNamed:@"TBUmbrella.png"], @selector(action))];
-	[tbitems addObject:CUSTOMBARBUTTON([[[UISwitch alloc] init] autorelease])];
-	[tbitems addObject:SYSBARBUTTON(UIBarButtonSystemItemFlexibleSpace, nil)];
-	[tbitems addObject:IMGBARBUTTON([UIImage imageNamed:@"TBPuzzle.png"], @selector(action))];
-	
-	// Add fixed 20 pixel width
-	UIBarButtonItem *bbi = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil] autorelease];
-	bbi.width = 20.0f;
-	[tbitems addObject:bbi];
-	
-	tb.items = tbitems;
-	[self.view addSubview:tb];
-	[tb release];*/
 }
 
 - (void)viewDidUnload
 {
     [bookMarkToolBar release];
     bookMarkToolBar = nil;
+    [self setActionBarItem:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-    menuBarItem = nil;
+    //menuBarItem = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
