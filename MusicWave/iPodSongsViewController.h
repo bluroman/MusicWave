@@ -98,6 +98,4 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 -(void) setUpAVPlayerForURL: (NSURL*) url;
 - (void) musicTableViewControllerDidFinish: (UIViewController *) controller;
 - (void) deleteCurrentSong;
-- (void) cacheImage;
-- (UIImage *) getCachedImage;
 @end

@@ -15,12 +15,8 @@
 #import "MusicTableViewController.h"
 #import "BookMark.h"
 #import "AutoScrollLabel.h"
-#define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
-#define BARBUTTON(TITLE, SELECTOR) 	[[[UIBarButtonItem alloc] initWithTitle:TITLE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
-#define IMGBARBUTTON(IMAGE, SELECTOR) [[[UIBarButtonItem alloc] initWithImage:IMAGE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
-#define TMP NSTemporaryDirectory()
-#define imgExt @"png"
-#define imageToData(x) UIImagePNGRepresentation(x)
+#import "CommonUtil.h"
+
 #define ZOOM_STEP 2.0f
 
 @implementation iPodSongsViewController
@@ -43,67 +39,6 @@
 @synthesize startPickerTime, endPickerTime;
 @synthesize delta;
 //@synthesize selectedCurrentSong;
-+ (NSString *) assetCacheFolder  {
-    NSArray  *assetFolderRoot = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    return [NSString stringWithFormat:@"%@/audio", [assetFolderRoot objectAtIndex:0]];
-}
-+ (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
-    //UIGraphicsBeginImageContext(newSize);
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-}
-
-
-- (NSString *) cachedAudioPictogramPathForCurrentSong{
-    NSString *assetFolder = [[self class] assetCacheFolder];
-    NSNumber * libraryId = currentSong.persistentId;
-    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
-    return [NSString stringWithFormat:@"%@/%@", assetFolder, assetPictogramFilename];
-    
-}
-
-- (UIImage *) getCachedImage
-{
-    NSNumber * libraryId = currentSong.persistentId;
-    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
-    
-    UIImage *image = nil;
-    
-    // Check for a cached version
-    if([[NSFileManager defaultManager] fileExistsAtPath: uniquePath])
-    {
-        NSLog(@"File exists on cache:%@", uniquePath);
-        image = [UIImage imageWithContentsOfFile: uniquePath]; // this is the cached image
-    }
-    else
-    {
-        NSLog(@"No File exists on cache:%@", uniquePath);
-    }
-    
-    return image;
-}
-- (void) cacheImage
-{
-    
-    // Generate a unique path to a resource representing the image you want
-    NSNumber * libraryId = currentSong.persistentId;
-    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
-    
-    // Check for file existence
-    if(![[NSFileManager defaultManager] fileExistsAtPath: uniquePath] && self.graphImage != nil)
-    {
-        // The file doesn't exist, we should get a copy of it
-        NSLog(@"File does not exist so write file to:%@", uniquePath);
-        
-        [imageToData(self.graphImage) writeToFile: uniquePath atomically: YES];
-        currentSong.graphPath = uniquePath;
-    }
-}
 -(UIImage *) audioImageGraph:(SInt16 *) samples
                 normalizeMax:(SInt16) normalizeMax
                  sampleCount:(NSInteger) sampleCount
@@ -333,7 +268,8 @@
         NSLog(@"Maximum scale factor:%f", self.graphImage.size.width / self.myScrollView.frame.size.width);
         //delta = [currentSong.songDuration floatValue]/self.graphImage.size.width;
         
-        [self cacheImage];
+        //[self cacheImage];
+        currentSong.graphPath = [CommonUtil cacheImage:currentSong.persistentId fileToWrite:self.graphImage];
         currentSong.doneGraphDrawing = [NSNumber numberWithBool:YES];
         
         
@@ -365,14 +301,14 @@
     if (newWidth < self.myScrollView.frame.size.width) {
         if (self.myScrollView.contentSize.width == self.myScrollView.frame.size.width)
             return;
-        NSLog(@"Too small so setting to default");
+        //NSLog(@"Too small so setting to default");
         newWidth = self.myScrollView.frame.size.width;
     }
     else if (newWidth > maximumWidth)
     {
         if (self.myScrollView.contentSize.width == maximumWidth)
             return;
-        NSLog(@"Too large so setting to original");
+        //NSLog(@"Too large so setting to original");
         newWidth = maximumWidth;
     }
     CGSize newSize = CGSizeMake(newWidth, self.myScrollView.frame.size.height);
@@ -441,7 +377,11 @@
         [self pause];
     }
     self.myScrollView.currentSong = currentSong;
-    self.graphImage = [self getCachedImage];
+    //self.graphImage = [self getCachedImage];
+    if (self.currentSong.doneGraphDrawing) {
+        self.graphImage = [CommonUtil getCachedImage:self.currentSong.persistentId];
+    }
+    
     //self.graphImage = currentSong.graphImage;
     UInt64 songSampleRate = 0;
     UInt64 channelsPerFrame = 0;
@@ -743,28 +683,28 @@
 }
 - (void) fastforwardDown
 {
-    NSLog(@"fastforward down");
+    //NSLog(@"fastforward down");
     if (playState != playBackStatePlaying)
         return;
     avPlayer.rate = +2.0f;
 }
 - (void) fastforwardRelease
 {
-    NSLog(@"fastforward release");
+    //NSLog(@"fastforward release");
     if (playState != playBackStatePlaying)
         return;
     avPlayer.rate = 1.0f;
 }
 - (void) rewindDown
 {
-    NSLog(@"rewind down");
+    //NSLog(@"rewind down");
     if (playState != playBackStatePlaying)
         return;
     avPlayer.rate = -2.0f;
 }
 - (void) rewindRelease
 {
-    NSLog(@"rewind release");
+    //NSLog(@"rewind release");
     if (playState != playBackStatePlaying)
         return;
     avPlayer.rate = 1.0f;
@@ -890,9 +830,10 @@
     controller.mainViewController = self;
     //MusicWaveAppDelegate *appDelegate = (MusicWaveAppDelegate *)[[UIApplication sharedApplication] delegate];
     controller.managedObjectContext = self.managedObjectContext;
-    controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    [self.navigationController pushViewController:controller animated:YES];
+    //controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     
-    [self presentModalViewController: controller animated: YES];
+    //[self presentModalViewController: controller animated: YES];
     [controller release];
 }
 - (IBAction) goToBookMark:(id)sender {
@@ -1134,8 +1075,12 @@
 }
 - (void)settingUpToolBarButton {
     CGFloat gap = 28.0f;
+    CGFloat factor = 0.0f;
+    if([CommonUtil IS_IPHONE5_RETINA])
+        factor = 88.0f;
+        
     minimizeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	minimizeButton.frame = CGRectMake(gap + 1, 396, 30.0f, 30.0f);
+	minimizeButton.frame = CGRectMake(gap + 1, 396 + factor, 30.0f, 30.0f);
     
     [minimizeButton setBackgroundImage:[UIImage imageNamed:@"zoom_out.png"] forState:UIControlStateNormal];
     [minimizeButton setBackgroundImage:[UIImage imageNamed:@"zoom_out.png"] forState:UIControlStateSelected];
@@ -1144,7 +1089,7 @@
     minimizeButton.showsTouchWhenHighlighted = YES;
     [self.view addSubview:minimizeButton];
     rewindButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	rewindButton.frame = CGRectMake(2*gap+ 30 + 1, 396, 30.0f, 30.0f);
+	rewindButton.frame = CGRectMake(2*gap+ 30 + 1, 396 + factor, 30.0f, 30.0f);
     
     [rewindButton setBackgroundImage:[UIImage imageNamed:@"btn_prev_off.png"] forState:UIControlStateNormal];
     [rewindButton setBackgroundImage:[UIImage imageNamed:@"btn_prev_on.png"] forState:UIControlStateSelected];
@@ -1155,7 +1100,7 @@
     [self.view addSubview:rewindButton];
     
     playOrPauseButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	playOrPauseButton.frame = CGRectMake(3*gap+ 30*2 + 1, 396, 30.0f, 30.0f);
+	playOrPauseButton.frame = CGRectMake(3*gap+ 30*2 + 1, 396 + factor, 30.0f, 30.0f);
     
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_play_off.png"] forState:UIControlStateNormal];
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_play_on.png"] forState:UIControlStateSelected];
@@ -1165,7 +1110,7 @@
     [self.view addSubview:playOrPauseButton];
     
     forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	forwardButton.frame = CGRectMake(4*gap + 30*3 + 1, 396, 30.0f, 30.0f);
+	forwardButton.frame = CGRectMake(4*gap + 30*3 + 1, 396 + factor, 30.0f, 30.0f);
     
     [forwardButton setBackgroundImage:[UIImage imageNamed:@"btn_next_off.png"] forState:UIControlStateNormal];
     [forwardButton setBackgroundImage:[UIImage imageNamed:@"btn_next_on.png"] forState:UIControlStateSelected];
@@ -1176,7 +1121,7 @@
     [self.view addSubview:forwardButton];
     
     maximizeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	maximizeButton.frame = CGRectMake(5*gap + 30*4 + 1, 396, 30.0f, 30.0f);
+	maximizeButton.frame = CGRectMake(5*gap + 30*4 + 1, 396 + factor, 30.0f, 30.0f);
     
     [maximizeButton setBackgroundImage:[UIImage imageNamed:@"zoom_in.png"] forState:UIControlStateNormal];
     [maximizeButton setBackgroundImage:[UIImage imageNamed:@"zoom_in.png"] forState:UIControlStateSelected];
@@ -1186,33 +1131,33 @@
     [self.view addSubview:maximizeButton];
 }
 - (void)toolBarIsNil {
-    minimizeButton.enabled = NO;
-    maximizeButton.enabled = NO;
-    rewindButton.enabled = NO;
-    playOrPauseButton.enabled = NO;
-    forwardButton.enabled = NO;
+    minimizeButton.layer.opacity = 0.0;
+    maximizeButton.layer.opacity = 0;
+    rewindButton.layer.opacity = 0;
+    playOrPauseButton.layer.opacity = 0;
+    forwardButton.layer.opacity = 0;
 }
 - (void)toolBarPlay {
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_play_off.png"] forState:UIControlStateNormal];
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_play_on.png"] forState:UIControlStateSelected];
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_play_on.png"] forState:UIControlStateHighlighted];
     [playOrPauseButton addTarget:self action:@selector(play) forControlEvents: UIControlEventTouchUpInside];
-    minimizeButton.enabled = YES;
-    maximizeButton.enabled = YES;
-    rewindButton.enabled = YES;
-    playOrPauseButton.enabled = YES;
-    forwardButton.enabled = YES;
+    minimizeButton.layer.opacity = 1;
+    maximizeButton.layer.opacity = 1;
+    rewindButton.layer.opacity = 1;
+    playOrPauseButton.layer.opacity = 1;
+    forwardButton.layer.opacity = 1;
 }
 - (void)toolBarPause {
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_pause_off.png"] forState:UIControlStateNormal];
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_pause_on.png"] forState:UIControlStateSelected];
     [playOrPauseButton setBackgroundImage:[UIImage imageNamed:@"btn_pause_on.png"] forState:UIControlStateHighlighted];
     [playOrPauseButton addTarget:self action:@selector(pause) forControlEvents: UIControlEventTouchUpInside];
-    minimizeButton.enabled = YES;
-    maximizeButton.enabled = YES;
-    rewindButton.enabled = YES;
-    playOrPauseButton.enabled = YES;
-    forwardButton.enabled = YES;
+    minimizeButton.layer.opacity = 1;
+    maximizeButton.layer.opacity = 1;
+    rewindButton.layer.opacity = 1;
+    playOrPauseButton.layer.opacity = 1;
+    forwardButton.layer.opacity = 1;
 }
 
 - (void)applicationWillResign {
@@ -1261,6 +1206,7 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     //self.navigationController.navigationBar.tintColor = COOKBOOK_PURPLE_COLOR;
     //self.navigationController.navigationBar.translucent = YES;
+    self.view.backgroundColor = [UIColor blackColor];
     
     UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
 	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 60.0f, 36.0f);
@@ -1302,7 +1248,7 @@
 
     avPlayer = nil;
     
-    self.title = NSLocalizedString(@"Playing", @"Default title for main controller");
+    self.title = NSLocalizedString(@"Now Playing", @"Default title for main controller");
     
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
     UILabel *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 62)];

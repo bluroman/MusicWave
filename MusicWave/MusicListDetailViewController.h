@@ -11,12 +11,13 @@
 
 @interface MusicListDetailViewController : UIViewController
 {
-    UINavigationItem *navItem;
     Song *currentSong;
     UIImageView *graphImageView;
     NSString *fileName;
     NSDate *creationDate;
+    BOOL isPlaying;
 }
+@property (retain, nonatomic) IBOutlet UIImageView *nowPlayingImageView;
 @property (retain, nonatomic) IBOutlet UILabel *notFoundLabel;
 @property (retain, nonatomic) IBOutlet UIToolbar *toolBar;
 @property (nonatomic, retain) NSString *fileName;
@@ -30,9 +31,8 @@
 @property (retain, nonatomic) IBOutlet UILabel *albumLabel;
 @property (retain, nonatomic) IBOutlet UILabel *durationLabel;
 @property (retain, nonatomic) IBOutlet UIImageView *albumImageView;
-@property (retain, nonatomic) IBOutlet UINavigationBar *navBar;
-@property (retain, nonatomic) IBOutlet UINavigationItem *navItem;
 @property (nonatomic, retain) Song *currentSong;
+@property (nonatomic, assign) BOOL isPlaying;
 
 - (IBAction)graphDeleteAction:(id)sender;
 @end

@@ -8,17 +8,16 @@
 
 #import "MusicListDetailViewController.h"
 #import "Song.h"
+#import "CommonUtil.h"
 
-#define TMP NSTemporaryDirectory()
-#define imgExt @"png"
 @interface MusicListDetailViewController ()
 
 @end
 
 @implementation MusicListDetailViewController
 @synthesize currentSong;
-@synthesize navItem;
 @synthesize fileName, creationDate;
+@synthesize isPlaying;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -29,34 +28,19 @@
     }
     return self;
 }
-- (void)removeGraphImage:(NSString *)myPath
-{
-    BOOL result = NO;
-    NSError *error;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if([fileManager fileExistsAtPath: myPath])
-    {
-        NSLog(@"Remove file exists on:%@", myPath);
-        result = [fileManager removeItemAtPath:myPath error:&error];
-        if (!result)
-        {
-            NSLog(@"Remove file error %@, %@", error, [error userInfo]);
-        }
-    }
-    else NSLog(@"No Remove file found on:%@", myPath);
-}
 
 - (IBAction)graphDeleteAction:(id)sender
 {
     if (currentSong.doneGraphDrawing)
     {
-        [self removeGraphImage:currentSong.graphPath];
+        //[self removeGraphImage:currentSong.graphPath];
+        [CommonUtil removeGraphImage:currentSong.graphPath];
         currentSong.doneGraphDrawing = NO;
         
         //Reset current UI Here.
         graphImageView.image = nil;
         self.fileNameLabel.text = nil;
-        self.notFoundLabel.text = @"File Not Found";
+        self.notFoundLabel.text = NSLocalizedString(@"No Graph Found", @"no graph found label");
         self.createDateLabel.text = nil;
         self.trashBarButtonItem.enabled = NO;
         
@@ -69,60 +53,39 @@
         }
     }
 }
-- (UIImage *) getCachedImage
-{
-    NSNumber * libraryId = currentSong.persistentId;
-    NSString *assetPictogramFilename = [NSString stringWithFormat:@"asset_%@.%@",libraryId,imgExt];
-    
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
-    
-    UIImage *image = nil;
-    
-    // Check for a cached version
-    if([[NSFileManager defaultManager] fileExistsAtPath: uniquePath])
-    {
-        NSLog(@"File exists on cache:%@", uniquePath);
-        fileName = assetPictogramFilename;
-        image = [UIImage imageWithContentsOfFile: uniquePath]; // this is the cached image
-        NSDictionary* attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:uniquePath error:nil];
-        
-        if (attrs != nil) {
-            creationDate = (NSDate*)[attrs objectForKey: NSFileCreationDate];
-        }
-        else {
-            NSLog(@"attribut error not found");
-        }
-
-    }
-    else
-    {
-        NSLog(@"No File exists on cache:%@", uniquePath);
-    }
-    
-    return image;
-}
 - (void) goMusicTable
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    //[self dismissViewControllerAnimated:YES completion:nil];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [self.navBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
+    //[self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
     self.view.backgroundColor = [UIColor colorWithRed:34.0/255.0f green:33.0/255.0f blue:29.0/255.0f alpha:1.0];
+    self.title = NSLocalizedString(@"Music Info", @"Music Info Title");
 
-    UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    /*UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
 	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 37.0f, 38.0f);
     [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateNormal];
     [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateSelected];
     [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateHighlighted];
     [leftBarButton addTarget:self action:@selector(goMusicTable) forControlEvents: UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
-    self.navItem.leftBarButtonItem = leftBarItem;
-    [leftBarItem release];
+    self.navigationItem.leftBarButtonItem = leftBarItem;
+    [leftBarItem release];*/
+    if (self.isPlaying) {
+        self.nowPlayingImageView.image = [UIImage imageNamed:@"list-volume.png"];
+        self.trashBarButtonItem.enabled = NO;
+    }
     
-    self.albumImageView.image = currentSong.artworkImage;
+    
+    if (currentSong.artworkImage == nil) {
+        self.albumImageView.image = [UIImage imageNamed:@"artist_img.png"];
+    }
+    else self.albumImageView.image = currentSong.artworkImage;
+    
     self.artistLabel.text = currentSong.songArtist;
     self.albumLabel.text = currentSong.songAlbum;
     UInt32 duration = [currentSong.songDuration floatValue] * 100;
@@ -132,29 +95,32 @@
     self.durationLabel.text = [NSString stringWithFormat: @"%02ldmin %02ldsec", minutes, seconds];
     
     [self.toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
-    navItem.title = @"Info";
+
     graphImageView = [[UIImageView alloc] initWithFrame:self.graphBgImageView.frame];
     graphImageView.image = nil;
     graphImageView.backgroundColor = [UIColor clearColor];
     if (currentSong.doneGraphDrawing)
     {
-        graphImageView.image = [self getCachedImage];
+        //graphImageView.image = [self getCachedImage];
+        graphImageView.image = [CommonUtil getCachedImage:currentSong.persistentId];
+        self.creationDate = [CommonUtil assetCreationDate:currentSong.persistentId];
+        self.fileName = [CommonUtil assetPictogramFileName:currentSong.persistentId];
         self.notFoundLabel.text = nil;
-        self.fileNameLabel.text = [NSString stringWithFormat:@"Filename: %@", self.fileName];
+        self.fileNameLabel.text = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"Filename", @"graph file label"), self.fileName];
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         [formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
         [formatter setDateStyle:NSDateFormatterMediumStyle];
         [formatter setTimeStyle:NSDateFormatterShortStyle];
-        self.createDateLabel.text = [NSString stringWithFormat:@"Created: %@", [formatter stringForObjectValue:self.creationDate]];
+        self.createDateLabel.text = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"Created", @"file creation date label"), [formatter stringForObjectValue:self.creationDate]];
         [formatter release];
     }
     else
     {
-        self.notFoundLabel.text = @"No Graph Found";
+        self.notFoundLabel.text = NSLocalizedString(@"No Graph Found", @"no graph found label");
         self.trashBarButtonItem.enabled = NO;
     }
     [self.view addSubview:graphImageView];
-    [graphImageView release];
+    //[graphImageView release];
 }
 
 - (void)didReceiveMemoryWarning
@@ -164,8 +130,7 @@
 }
 
 - (void)dealloc {
-    [navItem release];
-    [_navBar release];
+    //[navItem release];
     [currentSong release];
     [_albumImageView release];
     [_artistLabel release];
@@ -179,11 +144,10 @@
     [_createDateLabel release];
     [_notFoundLabel release];
     [_trashBarButtonItem release];
+    [_nowPlayingImageView release];
     [super dealloc];
 }
 - (void)viewDidUnload {
-    [self setNavItem:nil];
-    [self setNavBar:nil];
     [self setAlbumImageView:nil];
     [self setArtistLabel:nil];
     [self setAlbumLabel:nil];
@@ -194,6 +158,7 @@
     [self setCreateDateLabel:nil];
     [self setNotFoundLabel:nil];
     [self setTrashBarButtonItem:nil];
+    [self setNowPlayingImageView:nil];
     [super viewDidUnload];
 }
 @end

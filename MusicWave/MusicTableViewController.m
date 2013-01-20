@@ -11,37 +11,39 @@
 #import "iPodSongsViewController.h"
 #import "PlayListTableViewCell.h"
 #import "MusicListDetailViewController.h"
+#import "CommonUtil.h"
+@interface NSManagedObject (FirstLetter)
+- (NSString *)uppercaseFirstLetterOfName;
+@end
 
+@implementation NSManagedObject (FirstLetter)
+- (NSString *)uppercaseFirstLetterOfName {
+    [self willAccessValueForKey:@"uppercaseFirstLetterOfName"];
+    NSString *aString = [[self valueForKey:@"songTitle"] uppercaseString];
+    
+    // support UTF-16:
+    NSString *stringToReturn = [aString substringWithRange:[aString rangeOfComposedCharacterSequenceAtIndex:0]];
+    
+    // OR no UTF-16 support:
+    //NSString *stringToReturn = [aString substringToIndex:1];
+    
+    [self didAccessValueForKey:@"uppercaseFirstLetterOfName"];
+    return stringToReturn;
+}
+@end
 @interface MusicTableViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
-#define TMP NSTemporaryDirectory()
 @implementation MusicTableViewController
 @synthesize mediaItemCollectionTable;
 @synthesize mainViewController;
 @synthesize deleteIndexPath;
-@synthesize navigationItem, navigationBar;
 @synthesize fetchedResultsController=_fetchedResultsController;
 @synthesize managedObjectContext;
-- (void)removeGraphImage:(NSString *)myPath
-{
-    BOOL result = NO;
-    NSError *error;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if([fileManager fileExistsAtPath: myPath])
-    {
-        NSLog(@"Remove file exists on:%@", myPath);
-        result = [fileManager removeItemAtPath:myPath error:&error];
-        if (!result)
-        {
-            NSLog(@"Remove file error %@, %@", error, [error userInfo]);
-        }
-    }
-    else NSLog(@"No Remove file found on:%@", myPath);
-}
+@synthesize filteredListContent;
 - (void)removeAllGraphImageOnCache:(NSString *)myDir
 {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
+    //NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error = nil;
     NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
     for (Song *item in _fetchedResultsController.fetchedObjects)
@@ -50,14 +52,12 @@
         {
             if ([item isEqual:((iPodSongsViewController *)mainViewController).currentSong])
                 continue;
-            BOOL success = [fileManager removeItemAtPath:item.graphPath error:&error];
-            if (!success)
-            {
-                NSLog(@"Remove all file error %@, %@", error, [error userInfo]);
-            }
-            else item.doneGraphDrawing = NO;
+            [CommonUtil removeGraphImage:item.graphPath];
+            item.doneGraphDrawing = NO;
         }
+        
     }
+    //[CommonUtil removeTMPDirectory];
     if (![context save:&error])
     {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -73,6 +73,11 @@
     {
         if ([item isEqual:((iPodSongsViewController *)mainViewController).currentSong])
             continue;
+        if (item.doneGraphDrawing)
+        {
+            [CommonUtil removeGraphImage:item.graphPath];
+        }
+        
         [context deleteObject:item];
     }
     if (![context save:&error])
@@ -97,8 +102,9 @@
         else
         {
             NSLog(@"Not existing song");
+            
+            [CommonUtil removeGraphImage:item.graphPath];
             [context deleteObject:item];
-            [self removeGraphImage:item.graphPath];
         }
         [songQuery release];
     }
@@ -112,19 +118,15 @@
 {
     self.navigationItem.rightBarButtonItem = self.cancelButton;
     self.deletButton.enabled = YES;
-    self.graphDeleteButton.enabled = YES;
     self.mediaItemCollectionTable.allowsMultipleSelectionDuringEditing = YES;
     [self.mediaItemCollectionTable setEditing:YES animated:YES];
 }
 - (IBAction)cancelAction:(id)sender
 {
-    self.navigationItem.rightBarButtonItem = self.editButton;
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.mediaItemCollectionTable.allowsMultipleSelectionDuringEditing = NO;
     [self.mediaItemCollectionTable setEditing:NO animated:YES];
-    self.deletButton.title = NSLocalizedString(@"Delete", @"music list delete default title");
-    self.graphDeleteButton.title = NSLocalizedString(@"Delete Graph", @"music list graph delete default title");
     self.deletButton.enabled = NO;
-    self.graphDeleteButton.enabled = NO;
 }
 - (IBAction)deleteAction:(id)sender
 {
@@ -135,9 +137,11 @@
         for (NSIndexPath *selectionIndex in selectedRows)
         {
             Song *deleteSong = [_fetchedResultsController objectAtIndexPath:selectionIndex];
+            if ([deleteSong isEqual:((iPodSongsViewController *)mainViewController).currentSong])
+                continue;
             if (deleteSong.doneGraphDrawing)
             {
-                [self removeGraphImage:deleteSong.graphPath];
+                [CommonUtil removeGraphImage:deleteSong.graphPath];
             }
             [context deleteObject:deleteSong];
         }
@@ -149,40 +153,8 @@
         abort();
     }
     [self.mediaItemCollectionTable setEditing:NO animated:YES];
-    self.navigationItem.rightBarButtonItem = self.editButton;
-    [self.mediaItemCollectionTable setEditing:NO animated:YES];
-    self.deletButton.title = NSLocalizedString(@"Delete", @"music list delete default title");
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.deletButton.enabled = NO;
-    self.graphDeleteButton.enabled = NO;
-}
-- (IBAction)graphDeleteAction:(id)sender
-{
-    NSArray *selectedRows = [self.mediaItemCollectionTable indexPathsForSelectedRows];
-    NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
-    if (selectedRows.count > 0)
-    {
-        for (NSIndexPath *selectionIndex in selectedRows)
-        {
-            Song *deleteSong = [_fetchedResultsController objectAtIndexPath:selectionIndex];
-            if (deleteSong.doneGraphDrawing)
-            {
-                [self removeGraphImage:deleteSong.graphPath];
-                deleteSong.doneGraphDrawing = NO;
-            }
-        }
-    }
-    NSError *error = nil;
-    if (![context save:&error])
-    {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
-    [self.mediaItemCollectionTable setEditing:NO animated:YES];
-    self.navigationItem.rightBarButtonItem = self.editButton;
-    [self.mediaItemCollectionTable setEditing:NO animated:YES];
-    self.deletButton.title = NSLocalizedString(@"Delete", @"music list delete default title");
-    self.deletButton.enabled = NO;
-    self.graphDeleteButton.enabled = NO;
 }
 - (void)viewDidLoad
 {
@@ -195,7 +167,7 @@
     self.mediaItemCollectionTable.rowHeight = 58.0;
     self.mediaItemCollectionTable.backgroundColor = [UIColor colorWithRed:34.0/255.0f green:33.0/255.0f blue:29.0/255.0f alpha:1.0];
     self.mediaItemCollectionTable.separatorColor = [UIColor colorWithRed:131.0/255.0f green:130.0/255.0f blue:124.0/255.0f alpha:1.0];
-    [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
+    //[self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(73, 5, 174, 30)];
     titleLabel.tag = 1;
     titleLabel.backgroundColor = [UIColor clearColor];
@@ -206,13 +178,27 @@
     titleLabel.text = NSLocalizedString(@"My List", @"Music List Title");
     titleLabel.highlightedTextColor = [UIColor whiteColor];
     self.navigationItem.titleView = titleLabel;
-    self.navigationItem.rightBarButtonItem = self.editButton;
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItem.action = @selector(editAction:);
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor blackColor];
-    self.navigationItem.leftBarButtonItem.tintColor = [UIColor blueColor];
-    self.navigationItem.leftBarButtonItem.title = NSLocalizedString(@"Close", @"Music List close");
+    
+    self.title = NSLocalizedString(@"My List", @"Music List Title");
+    
+    /*UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 37.0f, 38.0f);
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateNormal];
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateSelected];
+    [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateHighlighted];
+    [leftBarButton addTarget:self action:@selector(doneShowingMusicList) forControlEvents: UIControlEventTouchUpInside];
+    UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    self.navigationItem.leftBarButtonItem = leftBarItem;
+    [leftBarItem release];*/
+    //self.navigationItem.leftBarButtonItem.tintColor = [UIColor blueColor];
+    //self.navigationItem.leftBarButtonItem.title = NSLocalizedString(@"Close", @"Music List close");
     self.deletButton.enabled = NO;
-    self.graphDeleteButton.enabled = NO;
     [musicTableToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    self.filteredListContent = [NSMutableArray arrayWithCapacity:[[_fetchedResultsController fetchedObjects] count]];
+    
 }
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -248,9 +234,10 @@
     [self checkIpodLibrary];
     [self.mediaItemCollectionTable reloadData];
 }
-- (IBAction) doneShowingMusicList: (id) sender
+- (void) doneShowingMusicList
 {
-	[(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
+	//[self dismissViewControllerAnimated:YES completion:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 - (IBAction) showMediaPicker: (id) sender
 {
@@ -270,6 +257,16 @@
 - (void) mediaPickerDidCancel: (MPMediaPickerController *) mediaPicker
 {
     [self dismissModalViewControllerAnimated: YES];
+}
+- (void)configureCell:(PlayListTableViewCell *)cell contentSong:(Song *)song
+{
+    cell.song = song;
+    if ([cell.song isEqual:((iPodSongsViewController *)mainViewController).currentSong])
+    {
+        cell.artistLabel.highlighted = YES;
+        cell.titleLabel.highlighted = YES;
+        cell.playOrHasGraphView.image = [UIImage imageNamed:@"list-volume.png"];
+    }
 }
 - (void)configureCell:(PlayListTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
@@ -297,7 +294,8 @@
     if (buttonIndex == 1) {
         NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
         Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:self.deleteIndexPath];
-        [self removeGraphImage:song.graphPath];
+        //[self removeGraphImage:song.graphPath];
+        [CommonUtil removeGraphImage:song.graphPath];
         [context deleteObject:song];
         NSError *error = nil;
         if (![context save:&error])
@@ -374,21 +372,80 @@
 #pragma mark Table view methods________________________
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+        return 1;
+    return [[_fetchedResultsController sections] count];
 }
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+
+//- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
+//{
+    //return [_fetchedResultsController sectionIndexTitles];
+//}
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
 {
-    return [[[_fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
+    return [_fetchedResultsController sectionForSectionIndexTitle:title atIndex:index];
 }
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+	{
+        return [self.filteredListContent count];
+    }
+
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
+    return [sectionInfo numberOfObjects];
+}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+        return nil;
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
+    return [sectionInfo name];
+}
+/*- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+        return nil;
+    // create the parent view
+    UIView * customSectionView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
+    customSectionView.backgroundColor = [[UIColor colorWithRed:0 green:0 blue:0 alpha:1.000] colorWithAlphaComponent:0.9];
+    // create the label
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:section];
+    UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, -5, 300, customSectionView.frame.size.height)];
+    headerLabel.backgroundColor = [UIColor clearColor];
+    headerLabel.opaque = NO;
+    headerLabel.textColor = [UIColor whiteColor];
+    headerLabel.highlightedTextColor = [UIColor whiteColor];
+    headerLabel.text = [sectionInfo name];
+    // package and return
+    [customSectionView addSubview:headerLabel];
+    [headerLabel release];
+    
+    return [customSectionView autorelease];
+}*/
+//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+//{
+    //return 1;
+//}
+//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+//{
+    //return [[[_fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
+//}
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"accessory Button Tapped");
+    //NSLog(@"accessory Button Tapped");
     Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
     MusicListDetailViewController *detailViewController = [[MusicListDetailViewController alloc] initWithNibName:@"MusicListDetailViewController" bundle:nil];
-    detailViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    //detailViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
     detailViewController.currentSong = song;
+    detailViewController.isPlaying = [song isEqual:((iPodSongsViewController *)mainViewController).currentSong];
     
-    [self presentModalViewController: detailViewController animated: YES];
+    //[self presentModalViewController: detailViewController animated: YES];
+    [self.navigationController pushViewController:detailViewController animated:YES];
+    //controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    
+    //[self presentModalViewController: controller animated: YES];
+
     [detailViewController release];
 }
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -408,26 +465,44 @@
                 }
             }
         }
-        self.deletButton.title = [NSString stringWithFormat: NSLocalizedString(@"Delete (%d)", @"music table delete song title"), selectedRows.count];
-        self.graphDeleteButton.title = [NSString stringWithFormat: NSLocalizedString(@"Delete graph (%d)", @"music table delete graph title"), graphCount];
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"PlayListViewCellIdentifier";
     PlayListTableViewCell *cell = (PlayListTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
+    if (cell == nil)
+    {
         cell = [[[PlayListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
     }
-    [self configureCell:cell atIndexPath:indexPath];
-    cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+    Song *song = nil;
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+	{
+        song = [self.filteredListContent objectAtIndex:indexPath.row];
+    }
+	else
+	{
+        song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
+    }
+    [self configureCell:cell contentSong:song];
+    
     return cell;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (!self.mediaItemCollectionTable.isEditing)
     {
-        Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
+        Song *song = nil;
+        if (tableView == self.searchDisplayController.searchResultsTableView)
+        {
+            song = [self.filteredListContent objectAtIndex:indexPath.row];
+        }
+        else
+        {
+            song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
+        }
+
         MPMediaPropertyPredicate *predicate = [MPMediaPropertyPredicate predicateWithValue:song.persistentId forProperty:MPMediaItemPropertyPersistentID];
         MPMediaQuery *songQuery = [[MPMediaQuery alloc] init];
         [songQuery addFilterPredicate: predicate];
@@ -444,10 +519,17 @@
             [alert release];
             return;
         }
+        /*if (self.navigationItem.rightBarButtonItem == nil) {
+            self.navigationItem.rightBarButtonItem = self.editButtonItem;
+            self.navigationItem.rightBarButtonItem.action = @selector(editAction:);
+        }
+        if (self.navigationItem.leftBarButtonItem.enabled == NO) {
+            self.navigationItem.leftBarButtonItem.enabled = YES;
+        }*/
         ((iPodSongsViewController *)mainViewController).currentSong = song;
         [(iPodSongsViewController *)mainViewController updateCurrentSong];
-        [tableView deselectRowAtIndexPath: indexPath animated: YES];
-        [(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
+        [self.navigationController popToViewController:mainViewController animated:YES];
+        //[(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
     }
     else
     {
@@ -464,8 +546,6 @@
                 }
             }
         }
-        self.deletButton.title = [NSString stringWithFormat: NSLocalizedString(@"Delete (%d)", @"music table delete song title"), selectedRows.count];
-        self.graphDeleteButton.title = [NSString stringWithFormat: NSLocalizedString(@"Delete graph (%d)", @"music table delete graph title"), graphCount];
     }
 }
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -480,7 +560,8 @@
             return;
         }
         NSManagedObjectContext *context = [_fetchedResultsController managedObjectContext];
-        [self removeGraphImage:deleteSong.graphPath];
+        //[self removeGraphImage:deleteSong.graphPath];
+        [CommonUtil removeGraphImage:deleteSong.graphPath];
         [context deleteObject:deleteSong];
         NSError *error = nil;
         if (![context save:&error])
@@ -494,16 +575,80 @@
     }
     else NSLog(@"EditingSyle:%d", editingStyle);
 }
+#pragma mark -
+#pragma mark Content Filtering
+
+- (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
+{
+    [self.filteredListContent removeAllObjects];
+	
+	/*
+	 Search the main list for products whose type matches the scope (if selected) and whose name matches searchText; add items that match to the filtered array.
+	 */
+    NSMutableArray *allSongList = [[_fetchedResultsController fetchedObjects] mutableCopy];
+	for (Song *song in allSongList)
+	{
+        NSComparisonResult result = [song.songTitle compare:searchText options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch) range:NSMakeRange(0, [searchText length])];
+            if (result == NSOrderedSame)
+			{
+				[self.filteredListContent addObject:song];
+            }
+    
+	}
+    [allSongList release];
+}
+
+
+#pragma mark -
+#pragma mark UISearchDisplayController Delegate Methods
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+    [self filterContentForSearchText:searchString scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:[self.searchDisplayController.searchBar selectedScopeButtonIndex]]];
+    
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption
+{
+    [self filterContentForSearchText:[self.searchDisplayController.searchBar text] scope:
+     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:searchOption]];
+    
+    // Return YES to cause the search result table view to be reloaded.
+    return YES;
+}
+- (void)searchDisplayController:(UISearchDisplayController *)controller didLoadSearchResultsTableView:(UITableView *)tableView
+{
+    tableView.rowHeight = 58.0f;
+    tableView.backgroundColor = [UIColor colorWithRed:34.0/255.0f green:33.0/255.0f blue:29.0/255.0f alpha:1.0];
+    tableView.separatorColor = [UIColor colorWithRed:131.0/255.0f green:130.0/255.0f blue:124.0/255.0f alpha:1.0];
+    
+}
+- (void)searchDisplayController:(UISearchDisplayController *)controller willShowSearchResultsTableView:(UITableView *)tableView
+{
+    self.navigationItem.rightBarButtonItem = nil;
+    //self.navigationItem.leftBarButtonItem.enabled = NO;
+}
+- (void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView
+{
+    //NSLog(@"unload search results table view");
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItem.action = @selector(editAction:);
+    //self.navigationItem.leftBarButtonItem.enabled = YES;
+}
+
 #pragma mark Application state management_____________
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 - (void)viewDidUnload {
     [self setDeletButton:nil];
-    [self setGraphDeleteButton:nil];
     [self setCancelButton:nil];
-    [self setEditButton:nil];
     musicTableToolBar = nil;
+    self.filteredListContent = nil;
     self.fetchedResultsController = nil;
 }
 - (void)dealloc {
@@ -511,13 +656,10 @@
     [managedObjectContext release];
     [mainViewController release];
     [deleteIndexPath release];
-    [navigationItem release];
-    [navigationBar release];
     [musicTableToolBar release];
-    [_editButton release];
     [_cancelButton release];
     [_deletButton release];
-    [_graphDeleteButton release];
+    [filteredListContent release];
     [super dealloc];
 }
 #pragma mark - Fetched results controller
@@ -530,10 +672,10 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Song" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"songTitle" ascending:YES];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"songTitle" ascending:YES selector:@selector(localizedStandardCompare:)];
     NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
     [fetchRequest setSortDescriptors:sortDescriptors];
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:@"uppercaseFirstLetterOfName" cacheName:@"Root"];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     [aFetchedResultsController release];

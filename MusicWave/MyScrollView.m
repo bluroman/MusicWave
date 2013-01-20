@@ -104,7 +104,7 @@
     
 }
 - (void)setDelta: (CGFloat)current_delta {
-    NSLog(@"Settng BookMark layer delta:%f", current_delta);
+    //NSLog(@"Settng BookMark layer delta:%f", current_delta);
     bookMarkLayerDelegate.currentDelta = current_delta;
 }
 
