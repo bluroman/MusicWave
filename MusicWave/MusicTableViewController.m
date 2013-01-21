@@ -434,7 +434,10 @@
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
     //NSLog(@"accessory Button Tapped");
-    Song *song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
+    Song *song = nil;
+    if (tableView == self.searchDisplayController.searchResultsTableView)
+        song = [self.filteredListContent objectAtIndex:indexPath.row];
+    else song = (Song *)[_fetchedResultsController objectAtIndexPath:indexPath];
     MusicListDetailViewController *detailViewController = [[MusicListDetailViewController alloc] initWithNibName:@"MusicListDetailViewController" bundle:nil];
     //detailViewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
     detailViewController.currentSong = song;
