@@ -84,7 +84,7 @@
     [super drawRect:rect];
     if (context == nil) context = UIGraphicsGetCurrentContext();
     
-    [self drawViewInfoArray];
+    //[self drawViewInfoArray];
     
     //endBarView.frame = CGRectMake(self.bounds.size.width - 2, 86, 2, 9);
     
