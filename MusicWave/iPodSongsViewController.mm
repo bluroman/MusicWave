@@ -34,7 +34,7 @@
 @synthesize playState;
 @synthesize bookMarkArray;
 //@synthesize repeatModeView;
-@synthesize songTitleLabel, songArtistLabel;
+@synthesize songTitleLabel, songArtistLabel, albumTitleLabel;
 @synthesize managedObjectContext;
 @synthesize startPickerTime, endPickerTime;
 @synthesize delta;
@@ -414,6 +414,7 @@
     //samplingRateLabel.text = [NSString stringWithFormat:@"%dHz", songSampleRate];
     self.songTitleLabel.text = currentSong.songTitle;
     self.songArtistLabel.text = currentSong.songArtist;
+    self.albumTitleLabel.text = currentSong.songAlbum;
     playState = playBackStateNone;
     repeatMode = NO;
     self.startPickerTime = 0.f;
@@ -510,6 +511,7 @@
     endTimeLabel.text = @"00:00";
     self.songTitleLabel.text = @"MusicWave";
     self.songArtistLabel.text = @"";
+    self.albumTitleLabel.text = @"";
     playState = playBackStateNone;
     [startPickerView reloadData];
     [endPickerView reloadData];
@@ -749,6 +751,7 @@
     [avPlayer release];
     [songTitleLabel release];
     [songArtistLabel release];
+    [albumTitleLabel release];
     //[repeatModeView release];
     [managedObjectContext release];
     [super dealloc];
@@ -1251,41 +1254,42 @@
     self.title = NSLocalizedString(@"Now Playing", @"Default title for main controller");
     
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
-    UILabel *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 62)];
+    UIView *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 44)];
     songDataView.backgroundColor = [UIColor clearColor];
+      
+    self.songArtistLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, -1, songDataView.bounds.size.width, 19)];
+    self.songArtistLabel.font = [UIFont boldSystemFontOfSize:12];
+    self.songArtistLabel.shadowColor = [UIColor blackColor];
+    self.songArtistLabel.shadowOffset = CGSizeMake(0, -1);
+    self.songArtistLabel.textAlignment = UITextAlignmentCenter;
+    self.songArtistLabel.textColor = [UIColor lightTextColor];
+    self.songArtistLabel.text = @"";
+    self.songArtistLabel.labelSpacing = 30;
+    self.songArtistLabel.pauseInterval = 1.7;
+    self.songArtistLabel.scrollSpeed = 30;
+    [songDataView addSubview:self.songArtistLabel];
     
-    //UILabel *label;
-    self.songTitleLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, 5, songDataView.bounds.size.width, 30)];
-    self.songTitleLabel.tag = 1;
-    self.songTitleLabel.backgroundColor = [UIColor clearColor];
-    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:22];
-    self.songTitleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-    //self.songTitleLabel.adjustsFontSizeToFitWidth = NO;
+    self.songTitleLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, 12, songDataView.bounds.size.width, 19)];
+    self.songTitleLabel.font = [UIFont boldSystemFontOfSize:12];
     self.songTitleLabel.textAlignment = UITextAlignmentCenter;
     self.songTitleLabel.textColor = [UIColor whiteColor];
     self.songTitleLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
     self.songTitleLabel.labelSpacing = 30;
     self.songTitleLabel.pauseInterval = 1.7;
     self.songTitleLabel.scrollSpeed = 30;
-    //self.songTitleLabel.highlightedTextColor = [UIColor whiteColor];
     [songDataView addSubview:self.songTitleLabel];
-    //[label release];
     
-    self.songArtistLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, 33, songDataView.bounds.size.width, 22)];
-    self.songArtistLabel.tag = 2;
-    self.songArtistLabel.backgroundColor = [UIColor clearColor];
-    self.songArtistLabel.font = [UIFont systemFontOfSize:14];
-    self.songArtistLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-    //self.songArtistLabel.adjustsFontSizeToFitWidth = NO;
-    self.songArtistLabel.textAlignment = UITextAlignmentCenter;
-    self.songArtistLabel.textColor = [UIColor whiteColor];
-    self.songArtistLabel.text = NSLocalizedString(@"MusicWave", @"Default title for song label");
-    self.songArtistLabel.labelSpacing = 30;
-    self.songArtistLabel.pauseInterval = 1.7;
-    self.songArtistLabel.scrollSpeed = 30;
-    //self.songArtistLabel.highlightedTextColor = [UIColor whiteColor];
-    [songDataView addSubview:self.songArtistLabel];
-    //[label release];
+    self.albumTitleLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, 25, songDataView.bounds.size.width, 19)];
+    self.albumTitleLabel.font = [UIFont boldSystemFontOfSize:12];
+    self.albumTitleLabel.shadowColor = [UIColor blackColor];
+    [self.albumTitleLabel setShadowOffset:CGSizeMake(0, -1)];
+    self.albumTitleLabel.textAlignment = UITextAlignmentCenter;
+    self.albumTitleLabel.textColor = [UIColor lightTextColor];
+    self.albumTitleLabel.text = @"";
+    self.albumTitleLabel.labelSpacing = 30;
+    self.albumTitleLabel.pauseInterval = 1.7;
+    self.albumTitleLabel.scrollSpeed = 30;
+    [songDataView addSubview:self.albumTitleLabel];
     
     self.navigationItem.titleView = songDataView;
     [songDataView release];

@@ -40,6 +40,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     UILabel *endTimeLabel;
     AutoScrollLabel *songTitleLabel;
     AutoScrollLabel *songArtistLabel;
+    AutoScrollLabel *albumTitleLabel;
     IBOutlet UIButton *mainButton;
     UIButton *repeatButton;
     V8HorizontalPickerView *startPickerView;
@@ -81,6 +82,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 //@property (nonatomic, retain) UIImageView *repeatModeView;
 @property (nonatomic, retain) AutoScrollLabel *songTitleLabel;
 @property (nonatomic, retain) AutoScrollLabel *songArtistLabel;
+@property (nonatomic, retain) AutoScrollLabel *albumTitleLabel;
 @property (nonatomic, assign) CGFloat startPickerTime;
 @property (nonatomic, assign) CGFloat endPickerTime;
 @property (nonatomic, assign) CGFloat delta;
