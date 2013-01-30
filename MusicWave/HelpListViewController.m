@@ -161,7 +161,7 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;//(interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 -(NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
     //NSLog(@"sections count:%d", [self.helps count]);
@@ -214,6 +214,7 @@
 -(CGFloat)tableView:(UITableView*)tableView heightForRowAtIndexPath:(NSIndexPath*)indexPath {
     
 	SectionInfo *sectionInfo = [self.sectionInfoArray objectAtIndex:indexPath.section];
+    NSLog(@"height:%f, Row Index:%d", [[sectionInfo objectInRowHeightsAtIndex:indexPath.row] floatValue],indexPath.row);
     return [[sectionInfo objectInRowHeightsAtIndex:indexPath.row] floatValue];
     // Alternatively, return rowHeight.
 }
