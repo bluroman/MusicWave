@@ -24,7 +24,7 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @interface iPodSongsViewController : UIViewController <MBProgressHUDDelegate, UIScrollViewDelegate, V8HorizontalPickerViewDelegate, V8HorizontalPickerViewDataSource, UINavigationControllerDelegate>
 {
     MPVolumeView *mpVolumeView;
-    MyScrollView *scrollView;
+    MyScrollView *myScrollView;
     NSTimer *updateTimer;
     NSTimer *playbackTimer;
     NSMutableArray *bookMarkArray;
@@ -59,16 +59,46 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
     CGFloat maximumWidth;
     BOOL movingOffset;
     UIImage *graphImage;
+    MPVolumeView *volumeView;
     //BOOL selectedCurrentSong;
+    UIView *songDataView;
+    UIImageView *leftBackGround;
+    UIImageView *rightBackGround;
+    UIImageView *graphBackGround;
+    UIImageView *graphBelowBackGround;
+    UIImageView *soundBackGround;
+    UIImageView *aboveBar;
+    UIImageView *belowBar;
+    CGRect leftPickerPortraitFrame;
+    CGRect leftPickerBgPortraitFrame;
+    CGRect rightPickerPortraitFrame;
+    CGRect rightPickerBgPortraitFrame;
+    CGRect mainButtonPortraitFrame;
+    CGRect minimizeButtonPortraitFrame;
+    CGRect rewindButtonPortraitFrame;
+    CGRect playOrPauseButtonPortraitFrame;
+    CGRect forwardButtonPortraitFrame;
+    CGRect maximizeButtonPortraitFrame;
+    CGRect aboveBarPortraitFrame;
+    CGRect graphBackGroundPortraitFrame;
+    CGRect belowBarPortraitFrame;
+    CGRect startTimeLabelPortraitFrame;
+    CGRect endTimeLabelPortraitFrame;
+    CGRect playbackTimeLabelPortraitFrame;
+    CGRect remainTimeLabelPortraitFrame;
+    CGRect graphBelowBackGroundPortraitFrame;
+    CGRect scrollViewPortraitFrame;
+    CGRect repeatButtonPortraitFrame;
+    CGRect volumeViewPortraitFrame;
 }
-@property (nonatomic, strong) MyScrollView *myScrollView;
+@property (nonatomic, retain) MyScrollView *myScrollView;
 //@property (nonatomic, strong) MyGraphView *myGraphView;
 @property (nonatomic, retain) UIImage *graphImage;
 //@property (nonatomic, retain) UIView *graphView;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain) NSMutableArray *bookMarkArray;
 @property (nonatomic, retain) Song *currentSong;
-@property (nonatomic, retain) UIScrollView *scrollView;
+//@property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UILabel *playbackTimeLabel;
 @property (nonatomic, retain) UILabel *remainTimeLabel;
 @property (nonatomic, retain) UILabel *startTimeLabel;
@@ -86,6 +116,8 @@ enum playBackState { playBackStateNone = 0, playBackStatePlaying, playBackStateP
 @property (nonatomic, assign) CGFloat startPickerTime;
 @property (nonatomic, assign) CGFloat endPickerTime;
 @property (nonatomic, assign) CGFloat delta;
+@property (nonatomic, retain) UIImageView *aboveBar;
+@property (nonatomic, retain) UIImageView *graphBackGround;
 //@property (nonatomic, assign) BOOL selectedCurrentSong;
 //- (IBAction) selectSongs: (id)sender;
 - (IBAction) tapMainButton: (id)sender;

@@ -9,6 +9,13 @@
 #import "CommonUtil.h"
 
 @implementation CommonUtil
++ (NSString *) applicationDocumentsDirectory
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    //NSLog(@"Document directory:%@", basePath);
+    return basePath;
+}
 + (BOOL) IS_IPHONE5_RETINA{
     BOOL isiPhone5Retina = NO;
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
@@ -51,7 +58,7 @@
 + (NSDate *) assetCreationDate:(NSNumber *)libraryId
 {
     NSString *assetPictogramFilename = [[self class] assetPictogramFileName:libraryId];
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
+    NSString *uniquePath = [[[self class] applicationDocumentsDirectory] stringByAppendingPathComponent: assetPictogramFilename];
     NSDate *creationDate;
 
     if([[NSFileManager defaultManager] fileExistsAtPath: uniquePath])
@@ -85,7 +92,7 @@
 + (UIImage *) getCachedImage:(NSNumber *)libraryId
 {
     NSString *assetPictogramFilename = [[self class] assetPictogramFileName:libraryId];
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
+    NSString *uniquePath = [[[self class] applicationDocumentsDirectory] stringByAppendingPathComponent: assetPictogramFilename];
     
     UIImage *image = nil;
     
@@ -103,7 +110,7 @@
 + (NSString *) cacheImage:(NSNumber *)libraryId fileToWrite:(UIImage *)imageToWrite
 {
     NSString *assetPictogramFilename = [[self class] assetPictogramFileName:libraryId];
-    NSString *uniquePath = [TMP stringByAppendingPathComponent: assetPictogramFilename];
+    NSString *uniquePath = [[[self class] applicationDocumentsDirectory] stringByAppendingPathComponent: assetPictogramFilename];
     NSString *returnedGraphPath = nil;
     
     if(![[NSFileManager defaultManager] fileExistsAtPath: uniquePath] && imageToWrite != nil)
@@ -133,14 +140,14 @@
 + (void)removeTMPDirectory
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSDirectoryEnumerator* en = [fileManager enumeratorAtPath:TMP];
+    NSDirectoryEnumerator* en = [fileManager enumeratorAtPath:[[self class] applicationDocumentsDirectory]];
     NSError* err = nil;
     BOOL res;
 
     NSString* file;
     while (file = [en nextObject])
     {
-        res = [fileManager removeItemAtPath:[TMP stringByAppendingPathComponent:file] error:&err];
+        res = [fileManager removeItemAtPath:[[[self class] applicationDocumentsDirectory] stringByAppendingPathComponent:file] error:&err];
         if (!res && err) {
             NSLog(@"oops: %@", err);
         }

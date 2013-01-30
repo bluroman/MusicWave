@@ -37,7 +37,8 @@
     //self.window.rootViewController = self.navigationController;
     [self setUpHelpListArray];
     mainViewController.managedObjectContext = self.managedObjectContext;
-    [self.window addSubview:self.navigationController.view];
+    [self.window setRootViewController:self.navigationController];
+    //[self.window addSubview:self.navigationController.view];
     //[self createEditableCopyOfDatabaseIfNeeded];
     [self.window makeKeyAndVisible];
     
@@ -49,7 +50,10 @@
 	[[AVAudioSession sharedInstance] setActive: YES error: nil];
     return YES;
 }
-
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+{
+    return UIInterfaceOrientationMaskAll;
+}
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     /*
@@ -86,6 +90,10 @@
     // Saves changes in the application's managed object context before the application terminates.
     [self saveContext];
 }
+//- (NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window
+//{
+    //return UIInterfaceOrientationMaskAll;
+//}
 
 - (void)dealloc
 {

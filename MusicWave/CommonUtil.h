@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#define TMP NSTemporaryDirectory()
+//#define TMP NSTemporaryDirectory()
 #define imgExt @"png"
 #define imageToData(x) UIImagePNGRepresentation(x)
 #define SYSBARBUTTON(ITEM, TARGET, SELECTOR) [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:ITEM target:TARGET action:SELECTOR] autorelease]
@@ -15,6 +15,7 @@
 #define IMGBARBUTTON(IMAGE, SELECTOR) [[[UIBarButtonItem alloc] initWithImage:IMAGE style:UIBarButtonItemStylePlain target:self action:SELECTOR] autorelease]
 
 @interface CommonUtil : NSObject
++ (NSString *) applicationDocumentsDirectory;
 + (NSString *) assetCacheFolder;
 + (NSString *) cachedAudioPictogramPathForCurrentSong:(NSNumber *)libraryId;
 + (UIImage *) getCachedImage:(NSNumber *)libraryId;

@@ -95,6 +95,8 @@
     self.durationLabel.text = [NSString stringWithFormat: @"%02ldmin %02ldsec", minutes, seconds];
     
     [self.toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    [self.toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back_landscape.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsLandscapePhone];
+    self.toolBar.autoresizingMask = self.toolBar.autoresizingMask | UIViewAutoresizingFlexibleHeight;
 
     graphImageView = [[UIImageView alloc] initWithFrame:self.graphBgImageView.frame];
     graphImageView.image = nil;
@@ -161,4 +163,83 @@
     [self setNowPlayingImageView:nil];
     [super viewDidUnload];
 }
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self layoutByOrientation];
+}
+- (void) layoutByOrientation {
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation))
+    {
+        NSLog(@"Portrait mode");
+        NSLog(@"Artist Label frame: width %f, height %f origin %f %f", self.artistLabel.frame.size.width, self.artistLabel.frame.size.height, self.artistLabel.frame.origin.x, self.artistLabel.frame.origin.y);
+        NSLog(@"Album Label frame: width %f, height %f origin %f %f", self.albumLabel.frame.size.width, self.albumLabel.frame.size.height, self.albumLabel.frame.origin.x, self.albumLabel.frame.origin.y);
+        NSLog(@"Duration Label frame: width %f, height %f origin %f %f", self.durationLabel.frame.size.width, self.durationLabel.frame.size.height, self.durationLabel.frame.origin.x, self.durationLabel.frame.origin.y);
+        NSLog(@"Now Playing image frame: width %f, height %f origin %f %f", self.nowPlayingImageView.frame.size.width, self.nowPlayingImageView.frame.size.height, self.nowPlayingImageView.frame.origin.x, self.nowPlayingImageView.frame.origin.y);
+        NSLog(@"Graph Bg frame: width %f, height %f origin %f %f", self.graphBgImageView.frame.size.width, self.graphBgImageView.frame.size.height, self.graphBgImageView.frame.origin.x, self.graphBgImageView.frame.origin.y);
+        self.albumImageView.frame = CGRectMake(3, 4, 80, 80);
+        self.artistLabel.frame = CGRectMake(86, 4, 234, 21);
+        self.albumLabel.frame = CGRectMake(86, 26, 234, 21);
+        self.durationLabel.frame = CGRectMake(86, 63, 132, 21);
+        self.nowPlayingImageView.frame = CGRectMake(277, 63, 23, 16);
+        graphImageView.frame = CGRectMake(0, 89, 320, 171);
+        self.notFoundLabel.frame = CGRectMake(0, 164, 320, 21);
+        self.fileNameLabel.frame = CGRectMake(3, 268, 317, 21);
+        self.createDateLabel.frame = CGRectMake(3, 288, 317, 21);
+    }
+    else if (UIInterfaceOrientationIsLandscape(orientation))
+    {
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+        NSLog(@"Landscape mode");
+        NSLog(@"Artist Label frame: width %f, height %f origin %f %f", self.artistLabel.frame.size.width, self.artistLabel.frame.size.height, self.artistLabel.frame.origin.x, self.artistLabel.frame.origin.y);
+        self.albumImageView.frame = CGRectMake(3, 4, 40, 40);
+        self.artistLabel.frame = CGRectMake(46, 4, 234, 21);
+        self.albumLabel.frame = CGRectMake(46, 26, 234, 21);
+        self.durationLabel.frame = CGRectMake(300, 4, 132, 21);
+        self.nowPlayingImageView.frame = CGRectMake(300, 26, 23, 16);
+        graphImageView.frame = CGRectMake(0, 49, size.width, 150);
+        self.notFoundLabel.frame = CGRectMake(0, 91, size.width, 21);
+        self.fileNameLabel.frame = CGRectMake(3, 200, 317, 21);
+        self.createDateLabel.frame = CGRectMake(3, 220, 317, 21);
+    }
+    else NSLog(@"Other mode");
+}
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    NSLog(@"willRotateTo:%d", orientation);
+}
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    NSLog(@"Go To:%d", toInterfaceOrientation);
+    // we grab the screen frame first off; these are always
+    // in portrait mode
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    //CGRect startPickerPortraitFrame = CGRectZero;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        NSLog(@"Detail List current orientation:%d", orientation);
+    }
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        // we're going to landscape, which means we gotta swap them
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+    }
+    [self layoutByOrientation];
+    
+    //[self layoutByOrientation];
+    // size is now the width and height that we will have after the rotation
+    NSLog(@"orientation %d size: w:%f h:%f", toInterfaceOrientation, size.width, size.height);
+}
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+    NSLog(@"detail list autorotaion:%d", interfaceOrientation);
+    return YES;//(interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
 @end

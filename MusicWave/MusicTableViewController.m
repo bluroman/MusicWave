@@ -184,7 +184,7 @@
     
     self.title = NSLocalizedString(@"My List", @"Music List Title");
     
-    /*UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
 	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 37.0f, 38.0f);
     [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateNormal];
     [leftBarButton setBackgroundImage:[UIImage imageNamed:@"stichClose.png"] forState:UIControlStateSelected];
@@ -192,11 +192,13 @@
     [leftBarButton addTarget:self action:@selector(doneShowingMusicList) forControlEvents: UIControlEventTouchUpInside];
     UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
     self.navigationItem.leftBarButtonItem = leftBarItem;
-    [leftBarItem release];*/
+    [leftBarItem release];
     //self.navigationItem.leftBarButtonItem.tintColor = [UIColor blueColor];
     //self.navigationItem.leftBarButtonItem.title = NSLocalizedString(@"Close", @"Music List close");
     self.deletButton.enabled = NO;
     [musicTableToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    [musicTableToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back_landscape.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsLandscapePhone];
+    musicTableToolBar.autoresizingMask = musicTableToolBar.autoresizingMask | UIViewAutoresizingFlexibleHeight;
     self.filteredListContent = [NSMutableArray arrayWithCapacity:[[_fetchedResultsController fetchedObjects] count]];
     
 }
@@ -209,7 +211,7 @@
             [self deleteAllSongs];
             break;
         case 1:
-            [self removeAllGraphImageOnCache:TMP];
+            [self removeAllGraphImageOnCache:[[self class] applicationDocumentsDirectory]];
             break;
         case 2:
             [self tapCheckLibraryButton];
@@ -237,7 +239,18 @@
 - (void) doneShowingMusicList
 {
 	//[self dismissViewControllerAnimated:YES completion:nil];
-    [self.navigationController popViewControllerAnimated:YES];
+    //[self.navigationController popViewControllerAnimated:YES];
+    //NSLog(@"Here comes ");
+    
+    [UIView animateWithDuration:0.75
+                     animations:^{
+                         [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+                         
+                         [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.navigationController.view cache:NO];
+                         
+                     }];
+    [self.navigationController popViewControllerAnimated:NO];
+    
 }
 - (IBAction) showMediaPicker: (id) sender
 {
@@ -531,7 +544,8 @@
         }*/
         ((iPodSongsViewController *)mainViewController).currentSong = song;
         [(iPodSongsViewController *)mainViewController updateCurrentSong];
-        [self.navigationController popToViewController:mainViewController animated:YES];
+        [self doneShowingMusicList];
+        //[self.navigationController popToViewController:mainViewController animated:YES];
         //[(iPodSongsViewController *)mainViewController musicTableViewControllerDidFinish:self];
     }
     else
@@ -733,5 +747,40 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.mediaItemCollectionTable endUpdates];
+}
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"willRotateTo:%d", orientation);
+}
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //NSLog(@"Go To:%d", toInterfaceOrientation);
+    // we grab the screen frame first off; these are always
+    // in portrait mode
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    //CGRect startPickerPortraitFrame = CGRectZero;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        //NSLog(@"current orientation:%d", orientation);
+        //NSLog(@"Portrait Music Table size width:%f, height:%f", self.mediaItemCollectionTable.frame.size.width, self.mediaItemCollectionTable.frame.size.height);
+    }
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        // we're going to landscape, which means we gotta swap them
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+        //NSLog(@"Music Table size width:%f, height:%f", self.mediaItemCollectionTable.frame.size.width, self.mediaItemCollectionTable.frame.size.height);
+    }
+
+    //[self layoutByOrientation];
+    // size is now the width and height that we will have after the rotation
+    //NSLog(@"orientation %d size: w:%f h:%f", toInterfaceOrientation, size.width, size.height);
+}
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+    //NSLog(@"music table autorotaion:%d", interfaceOrientation);
+    return YES;//(interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 @end

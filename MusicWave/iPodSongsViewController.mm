@@ -18,10 +18,9 @@
 #import "CommonUtil.h"
 
 #define ZOOM_STEP 2.0f
-
 @implementation iPodSongsViewController
 //@synthesize graphView;
-@synthesize scrollView, graphImage;
+@synthesize myScrollView, graphImage;
 @synthesize currentSong;
 @synthesize playbackTimeLabel;
 @synthesize remainTimeLabel;
@@ -38,6 +37,7 @@
 @synthesize managedObjectContext;
 @synthesize startPickerTime, endPickerTime;
 @synthesize delta;
+@synthesize aboveBar, graphBackGround;
 //@synthesize selectedCurrentSong;
 -(UIImage *) audioImageGraph:(SInt16 *) samples
                 normalizeMax:(SInt16) normalizeMax
@@ -337,6 +337,7 @@
         moveOffset = 0;
     }
     [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+    [self changeStartEndOffset:self.myScrollView.contentOffset];
     //NSLog(@"update position %f", temp);
 	
     [self.myScrollView setCurrentPlaybackPosition:temp/delta];
@@ -360,6 +361,7 @@
     
     [self.myScrollView setUpBookMarkLayer];
     self.myScrollView.contentOffset = CGPointMake(0.0, 0.0);
+    [self changeStartEndOffset:self.myScrollView.contentOffset];
     [self.myScrollView settingStartEndTime:startPickerTime endPosition:endPickerTime];
     [self.myScrollView setNeedsDisplay];
     [self setUpAVPlayerForURL:[NSURL URLWithString:currentSong.songURL]];
@@ -377,7 +379,6 @@
         [self pause];
     }
     self.myScrollView.currentSong = currentSong;
-    //self.graphImage = [self getCachedImage];
     if (self.currentSong.doneGraphDrawing) {
         self.graphImage = [CommonUtil getCachedImage:self.currentSong.persistentId];
     }
@@ -412,6 +413,10 @@
 	//UInt32 seconds = songDuration % 60;
 	//totalTimeLabel.text = [NSString stringWithFormat: @"%02d:%02d", minutes, seconds];
     //samplingRateLabel.text = [NSString stringWithFormat:@"%dHz", songSampleRate];
+    playbackTimeLabel.text = @"00:00";
+    remainTimeLabel.text = @"00:00";
+    startTimeLabel.text = @"00:00";
+    endTimeLabel.text = @"00:00";
     self.songTitleLabel.text = currentSong.songTitle;
     self.songArtistLabel.text = currentSong.songArtist;
     self.albumTitleLabel.text = currentSong.songAlbum;
@@ -448,7 +453,7 @@
 - (void)drawingCurrentGraphViewDispatchQueue {
     dispatch_queue_t concurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     BOOL isGraphDrawing = [currentSong.doneGraphDrawing boolValue];
-    MBProgressHUD *HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    MBProgressHUD *HUD = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
     HUD.mode = MBProgressHUDModeIndeterminate;
     if (!isGraphDrawing) {
         HUD.labelText = NSLocalizedString(@"Loading", @"Main View Hud loading hud label");
@@ -480,7 +485,7 @@
             //[self loadComplete:idVar];
             [self loadCompleteImage];
             
-            [MBProgressHUD hideHUDForView:self.view animated:YES];
+            [MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
             
         });
         self.navigationItem.leftBarButtonItem.enabled = YES;
@@ -592,6 +597,7 @@
                     moveOffset = 0;
                 }
                 [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+                [self changeStartEndOffset:self.myScrollView.contentOffset];
             }];
             
         }
@@ -754,6 +760,9 @@
     [albumTitleLabel release];
     //[repeatModeView release];
     [managedObjectContext release];
+    [aboveBar release];
+    [graphBackGround release];
+    [myScrollView release];
     [super dealloc];
 }
 
@@ -831,12 +840,14 @@
     
     MusicTableViewController *controller = [[MusicTableViewController alloc] initWithNibName: @"MusicTableView" bundle: nil];
     controller.mainViewController = self;
-    //MusicWaveAppDelegate *appDelegate = (MusicWaveAppDelegate *)[[UIApplication sharedApplication] delegate];
     controller.managedObjectContext = self.managedObjectContext;
-    [self.navigationController pushViewController:controller animated:YES];
-    //controller.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    
-    //[self presentModalViewController: controller animated: YES];
+    [UIView animateWithDuration:0.75
+                     animations:^{
+                         [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+                         [self.navigationController pushViewController:controller animated:NO];
+                         
+                         [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.navigationController.view cache:NO];
+                     }];
     [controller release];
 }
 - (IBAction) goToBookMark:(id)sender {
@@ -886,13 +897,24 @@
         }*/
     //}
 }
-
-- (void) scrollViewDidScroll: (UIScrollView *) aScrollView
+- (void) changeStartEndOffset: (CGPoint)currentOffset
 {
-    CGPoint offset = aScrollView.contentOffset;
-    //NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
-    CGFloat start = offset.x;
-    CGFloat end = offset.x + 320;
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation))
+    {
+        
+    }
+    else if (UIInterfaceOrientationIsLandscape(orientation))
+    {
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+    }
+    else NSLog(@"Not Portrait or Landscape");
+    
+    CGFloat start = currentOffset.x;
+    CGFloat end = currentOffset.x + size.width;
     if (self.graphImage.size.width == 0) {
         //NSLog(@"viewInfoArray delete");
         return;
@@ -914,6 +936,14 @@
     minutes = endTimeSec / 60;
 	seconds = endTimeSec % 60;
 	endTimeLabel.text = [NSString stringWithFormat: @"%02ld:%02ld", minutes, seconds];
+
+}
+
+- (void) scrollViewDidScroll: (UIScrollView *) aScrollView
+{
+    CGPoint offset = aScrollView.contentOffset;
+    //NSLog(@"scroll did scroll offset x:%f y:%f", offset.x, offset.y);
+    [self changeStartEndOffset:offset];
 }
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)aScrollView
 {
@@ -931,26 +961,44 @@
 }
 #pragma mark - View lifecycle
 - (void)settingUpBackgroundView {
-    /*UIImageView *upper_toolbar = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"toolbar_back.png"]];
-    upper_toolbar.frame = CGRectMake(0,  0, 320, 44);
-    [self.view addSubview:upper_toolbar];
-    [upper_toolbar release];*/
-    UIImageView *backGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"mainview_bg2.png"]];
-    backGround.frame = CGRectMake(0,  0, 320, 392);
-    [self.view addSubview:backGround];
-    [backGround release];
-    UIImageView *upper_bar = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"upper_bar.png"]];
-    upper_bar.frame = CGRectMake(0,  0, 320, 32);
-    [self.view addSubview:upper_bar];
-    [upper_bar release];
-    UIImageView *tool_bar = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"toolbar_back.png"]];
-    tool_bar.frame = CGRectMake(0,  392, 320, 44);
-    [self.view addSubview:tool_bar];
-    [tool_bar release];
+    aboveBar = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"upper_bar.png"]];
+    aboveBar.frame = CGRectMake(0, 0, self.view.bounds.size.width, 32);
+    //aboveBar.contentMode = UIViewContentModeScaleToFill;
+    [self.view addSubview:aboveBar];
+    
+    graphBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_bg.png"]];
+    graphBackGround.frame = CGRectMake(0, 28, self.view.bounds.size.width, 171);
+    //graphBackGround.contentMode = UIViewContentModeScaleToFill;
+    [self.view addSubview:graphBackGround];
+    
+    belowBar = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"upper_bar.png"]];
+    belowBar.frame = CGRectMake(0, 199, self.view.bounds.size.width, 32);
+    //aboveBar.contentMode = UIViewContentModeScaleToFill;
+    [self.view addSubview:belowBar];
+    
+        
+    graphBelowBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_below.png"]];
+    graphBelowBackGround.frame = CGRectMake(0, 230, self.view.bounds.size.width, 140);
+    [self.view addSubview:graphBelowBackGround];
+    
+    soundBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"soundslider_bar.png"]];
+    soundBackGround.frame = CGRectMake(0, 358, self.view.bounds.size.width, 34);
+    [self.view addSubview:soundBackGround];
+    
     //UIImageView *graph_below = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"graph_below.png"]];
     //graph_below.frame = CGRectMake(0,  240, 320, 143);
     //[self.view addSubview:graph_below];
     //[graph_below release];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"background setting orientation:%d", orientation);
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"Is Portrait or Unknown");
+        aboveBarPortraitFrame = aboveBar.frame;
+        graphBackGroundPortraitFrame = graphBackGround.frame;
+        belowBarPortraitFrame = belowBar.frame;
+        graphBelowBackGroundPortraitFrame = graphBelowBackGround.frame;
+    }
+
     
 
 }
@@ -994,6 +1042,17 @@
     //remainTimeLabel.font = [UIFont fontWithName:@"Tahoma Bold" size:(12.0)];
     remainTimeLabel.font = [UIFont boldSystemFontOfSize:13.0f];
     [self.view addSubview:remainTimeLabel];
+    
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"TimeLabel setting orientation:%d", orientation);
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"Is Portrait or Unknown");
+        startTimeLabelPortraitFrame = startTimeLabel.frame;
+        endTimeLabelPortraitFrame = endTimeLabel.frame;
+        playbackTimeLabelPortraitFrame = playbackTimeLabel.frame;
+        remainTimeLabelPortraitFrame = remainTimeLabel.frame;
+    }
+
 }
 - (void)settingUpRepeatButton {
     repeatButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1002,13 +1061,18 @@
     [repeatButton setBackgroundImage:[UIImage imageNamed:@"repeat_off_test.png"] forState:UIControlStateNormal];
     [repeatButton addTarget:self action:@selector(repeatModeOnOff) forControlEvents: UIControlEventTouchUpInside];
     [self.view addSubview:repeatButton];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"Is Portrait or Unknown");
+        repeatButtonPortraitFrame = repeatButton.frame;
+    }
 }
 
 - (void)settingUpPicker {
-    UIImageView *leftBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
+    leftBackGround = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]] autorelease];
     leftBackGround.frame = CGRectMake(57 - 41, 249 + 12, 82, 69);
     [self.view addSubview:leftBackGround];
-    [leftBackGround release];
+    //[leftBackGround release];
 
     CGRect leftFrame = CGRectMake(57 - 41, 250 + 12, 82, 45);
 	startPickerView = [[V8HorizontalPickerView alloc] initWithFrame:leftFrame];
@@ -1026,10 +1090,10 @@
     [startLeftFade release];
     [self.view addSubview:startPickerView];
     
-    UIImageView *rightBackGround = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]];
+    rightBackGround = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"picker_background.png"]] autorelease];
     rightBackGround.frame = CGRectMake(206 + 57 - 41, 249+ 12, 82, 69);
     [self.view addSubview:rightBackGround];
-    [rightBackGround release];
+    //[rightBackGround release];
     CGRect rightFrame = CGRectMake(206 + 57 - 41, 250+ 12, 82, 45);
 	endPickerView = [[V8HorizontalPickerView alloc] initWithFrame:rightFrame];
 	endPickerView.backgroundColor   = [UIColor clearColor];
@@ -1045,6 +1109,15 @@
     endPickerView.leftEdgeView = endLeftFade;
     [endLeftFade release];
     [self.view addSubview:endPickerView];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"picker setting orientation:%d", orientation);
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"Is Portrait");
+        leftPickerPortraitFrame = leftFrame;
+        leftPickerBgPortraitFrame = leftBackGround.frame;
+        rightPickerPortraitFrame = rightFrame;
+        rightPickerBgPortraitFrame = rightBackGround.frame;
+    }
 }
 - (void)settingUpBookMarkButton {
     mainButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1055,12 +1128,17 @@
     [mainButton setBackgroundImage:[UIImage imageNamed:@"bookmark_on.png"] forState:UIControlStateHighlighted];
     [mainButton addTarget:self action:@selector(tapMainButton:) forControlEvents: UIControlEventTouchUpInside];
     [self.view addSubview:mainButton];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"main button orientation:");
+        mainButtonPortraitFrame = mainButton.frame;
+    }
 }
 - (void)settingUpVolumeSlider {
     
     CGRect frame = CGRectMake(52, 345 + 18, 210, 6);
     UISlider *customSlider = [[UISlider alloc] initWithFrame:frame];
-    MPVolumeView *volumeView = [[[MPVolumeView alloc] initWithFrame:[customSlider frame]] autorelease];
+    volumeView = [[[MPVolumeView alloc] initWithFrame:[customSlider frame]] autorelease];
     UISlider *volumeViewSlider = nil;
     for (UIView *view in [volumeView subviews]){
 		if ([[[view class] description] isEqualToString:@"MPVolumeSlider"]) {
@@ -1069,12 +1147,18 @@
 	}
     volumeViewSlider.backgroundColor = [UIColor clearColor];	
     [volumeViewSlider setThumbImage: [UIImage imageNamed:@"sound_controll.png"] forState:UIControlStateNormal];
-    [volumeViewSlider setMinimumTrackImage:[UIImage imageNamed:@"volume_left.png"] forState:UIControlStateNormal];
-    //[volumeViewSlider setMaximumTrackImage:stetchRightTrack forState:UIControlStateNormal];
+    [volumeViewSlider setMinimumTrackImage:[UIImage imageNamed:@"bar_on.png"] forState:UIControlStateNormal];
+    [volumeViewSlider setMaximumTrackImage:[UIImage imageNamed:@"bar_off.png"] forState:UIControlStateNormal];
     [customSlider removeFromSuperview];
     [self.view addSubview:volumeView];
     [customSlider release];
     //[volumeView release];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"main button orientation:");
+        volumeViewPortraitFrame = volumeView.frame;
+    }
+
 }
 - (void)settingUpToolBarButton {
     CGFloat gap = 28.0f;
@@ -1132,6 +1216,15 @@
     [maximizeButton addTarget:self action:@selector(zoom_in) forControlEvents: UIControlEventTouchUpInside];
     maximizeButton.showsTouchWhenHighlighted = YES;
     [self.view addSubview:maximizeButton];
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation) || orientation == UIDeviceOrientationUnknown) {
+        //NSLog(@"toolbar button orientation:");
+        minimizeButtonPortraitFrame = minimizeButton.frame;
+        maximizeButtonPortraitFrame = maximizeButton.frame;
+        rewindButtonPortraitFrame = rewindButton.frame;
+        playOrPauseButtonPortraitFrame = playOrPauseButton.frame;
+        forwardButtonPortraitFrame = forwardButton.frame;
+    }
 }
 - (void)toolBarIsNil {
     minimizeButton.layer.opacity = 0.0;
@@ -1201,6 +1294,8 @@
         //NSLog(@"current string equal to ko");
     //else
         //NSLog(@"current string not equal to ko");
+    //UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"view did load :%d", orientation);
     
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(songsPicked:) name:@"SongsPicked" object:nil];
@@ -1212,7 +1307,7 @@
     self.view.backgroundColor = [UIColor blackColor];
     
     UIButton *leftBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 60.0f, 36.0f);
+	leftBarButton.frame = CGRectMake(0.0f, 0.0f, 53.0f, 32.0f);
     if ([language isEqualToString:@"ko"]) {
         [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_off_kor.png"] forState:UIControlStateNormal];
         [leftBarButton setBackgroundImage:[UIImage imageNamed:@"music_on_kor.png"] forState:UIControlStateSelected];
@@ -1228,13 +1323,13 @@
     UIBarButtonItem *leftBarItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
     self.navigationItem.leftBarButtonItem = leftBarItem;
     //self.navigationItem.leftBarButtonItem.enabled = NO;
-    //[leftBarItem release];
+    [leftBarItem release];
 
     //self.navigationItem.leftBarButtonItem.style = UIBarButtonItemStyleBordered;
     //self.navigationItem.leftBarButtonItem = BARBUTTON(NSLocalizedString(@"Music",@"Title for My List"), @selector(goToMyList:));
     
     UIButton *rightBarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 60.0f, 36.0f);
+	rightBarButton.frame = CGRectMake(0.0f, 0.0f, 53.0f, 32.0f);
     if ([language isEqualToString:@"ko"]) {
         [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_off_kor.png"] forState:UIControlStateNormal];
         [rightBarButton setBackgroundImage:[UIImage imageNamed:@"bookmark_right_on_kor.png"] forState:UIControlStateSelected];
@@ -1254,8 +1349,10 @@
     self.title = NSLocalizedString(@"Now Playing", @"Default title for main controller");
     
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2.png"] forBarMetrics:UIBarMetricsDefault];
-    UIView *songDataView = [[UILabel alloc] initWithFrame:CGRectMake(72, 0, 174, 44)];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar2_landscape.png"] forBarMetrics:UIBarMetricsLandscapePhone];
+    songDataView = [[[UIView alloc] initWithFrame:CGRectMake(72, 0, 174, 44)] autorelease];
     songDataView.backgroundColor = [UIColor clearColor];
+    [songDataView setAutoresizesSubviews:YES];
       
     self.songArtistLabel = [[AutoScrollLabel alloc] initWithFrame:CGRectMake(0, -1, songDataView.bounds.size.width, 19)];
     self.songArtistLabel.font = [UIFont boldSystemFontOfSize:12];
@@ -1292,7 +1389,7 @@
     [songDataView addSubview:self.albumTitleLabel];
     
     self.navigationItem.titleView = songDataView;
-    [songDataView release];
+    //[songDataView release];
     
     //[self.myScrollView setParent:self];
     //playState = playBackStateNone;
@@ -1309,6 +1406,7 @@
     //[toolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
     
     CGRect scrollViewRect = CGRectMake(10, 35, 300, 164);
+    scrollViewPortraitFrame = scrollViewRect;
     
     self.myScrollView = [[MyScrollView alloc] initWithFrame:scrollViewRect];
     self.myScrollView.scrollEnabled = YES;
@@ -1410,6 +1508,7 @@
         moveOffset = 0;
     }
     [self.myScrollView setContentOffset:CGPointMake(moveOffset, 0.0)];
+    [self changeStartEndOffset:self.myScrollView.contentOffset];
     [self.myScrollView settingStartEndTime:startPickerTime endPosition:endPickerTime];
     [self.myScrollView.bookMarkLayer setNeedsDisplay];
     [self.myScrollView setCurrentPlaybackPosition:[tempBookMark.duration floatValue]/self.delta];
@@ -1419,6 +1518,9 @@
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     //NSLog(@"main view will appear");
+    //UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"current orientation:%d", orientation);
+    [self layoutByOrientation];
     [self.myScrollView settingStartEndTime:startPickerTime endPosition:endPickerTime];
     [self.myScrollView.bookMarkLayer setNeedsDisplay];
     [startPickerView reloadData];
@@ -1446,6 +1548,7 @@
     [avPlayer seekToTime:kCMTimeZero];
     [self.myScrollView.layer setNeedsDisplay];
     [self.myScrollView setContentOffset:CGPointMake(0.0, 0.0)];
+    [self changeStartEndOffset:self.myScrollView.contentOffset];
     movingOffset = NO;
     [self pause];
     if (repeatMode) {
@@ -1461,11 +1564,189 @@
     startPickerView = nil;
     endPickerView = nil;
 }
+- (void)layoutByOrientation
+{
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    CGFloat margin = 10.0f;
+    CGFloat heightMargin = 5.0f;
+    CGFloat landscapeBarHeight = 32.0f;
+    CGFloat gap = 15.0f;
+    CGFloat mainButtonLandscapeWidth = 50.0f;
+    CGFloat timelabelLandscapeMargin = 18.0f;
+    //CGRect startPickerPortraitFrame = CGRectZero;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+
+    // let's figure out if width/height must be swapped
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        // we're going to landscape, which means we gotta swap them
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+        aboveBar.frame = CGRectMake(0, 0, size.width, 32);
+        aboveBar.image = [UIImage imageNamed:@"upper_bar_landscape2.png"];
+        [self.view addSubview:aboveBar];
+        
+        graphBackGround.frame = CGRectMake(0, 28, size.width, 171);
+        //graphBackGround.image = [UIImage imageNamed:@"graph_bg.png"];
+        //[self.view addSubview:graphBackGround];
+        belowBar.frame = CGRectMake(0, 199, size.width, 32);
+        belowBar.image = [UIImage imageNamed:@"upper_bar_landscape2.png"];
+        [self.view addSubview:belowBar];
+        graphBelowBackGround.frame = CGRectMake(0, 230, size.width, 58);
+        if ([startTimeLabel superview]) {
+            [startTimeLabel removeFromSuperview];
+            startTimeLabel.frame = CGRectMake(timelabelLandscapeMargin, 5, 60, 20);
+            [self.view addSubview:startTimeLabel];
+        }
+        if ([endTimeLabel superview]) {
+            [endTimeLabel removeFromSuperview];
+            endTimeLabel.frame = CGRectMake(size.width - timelabelLandscapeMargin - 60, 5, 60, 20);
+            [self.view addSubview:endTimeLabel];
+        }
+        if ([playbackTimeLabel superview]) {
+            [playbackTimeLabel removeFromSuperview];
+            playbackTimeLabel.frame = CGRectMake(timelabelLandscapeMargin, 206, 60, 20);
+            [self.view addSubview:playbackTimeLabel];
+        }
+        if ([remainTimeLabel superview]) {
+            [remainTimeLabel removeFromSuperview];
+            remainTimeLabel.frame = CGRectMake(size.width - timelabelLandscapeMargin - 60, 206, 60, 20);
+            [self.view addSubview:remainTimeLabel];
+        }
+        //CGRect scrollViewRect = CGRectMake(10, 35, 300, 164);
+        self.myScrollView.frame = CGRectMake(10, 35, size.width, 164);
+        if ([repeatButton superview]) {
+            //[repeatButton removeTarget:nil action:NULL forControlEvents:UIControlEventAllTouchEvents];
+            //[repeatButton removeFromSuperview];
+            repeatButton.frame = CGRectMake((size.width - 76) / 2, 205, 76, 21);
+            //[repeatButton removeTarget:nil action:NULL forControlEvents:UIControlEventTouchUpInside];
+
+            //[repeatButton addTarget:self action:@selector(repeatModeOnOff) forControlEvents: UIControlEventTouchUpInside];
+            [self.view addSubview:repeatButton];
+        }
+        //repeatButton.frame = CGRectMake((size.width - 76) / 2, 205, 76, 21);
+        //self.scrollView.graphImageView.frame =
+        
+        
+        //originalSize = startPickerView.frame.size;
+        //originalBgSize = leftBackGround.frame.size;
+        //NSLog(@"original size:%f, %f", originalSize.width, originalSize.height);
+        leftBackGround.frame = CGRectMake(margin, size.height - heightMargin - leftPickerPortraitFrame.size.height - landscapeBarHeight, leftPickerBgPortraitFrame.size.width, leftPickerBgPortraitFrame.size.height);
+        startPickerView.frame = CGRectMake(margin, size.height - heightMargin - leftPickerPortraitFrame.size.height - landscapeBarHeight, leftPickerPortraitFrame.size.width, leftPickerPortraitFrame.size.height);
+        
+        mainButton.frame = CGRectMake(margin + startPickerView.frame.size.width + gap, size.height - heightMargin - mainButtonLandscapeWidth - landscapeBarHeight, mainButtonLandscapeWidth, mainButtonLandscapeWidth);
+        
+        rightBackGround.frame = CGRectMake(gap + mainButton.frame.origin.x + mainButton.frame.size.width, size.height - heightMargin - rightPickerPortraitFrame.size.height - landscapeBarHeight, rightPickerBgPortraitFrame.size.width, rightPickerBgPortraitFrame.size.height);
+        endPickerView.frame = CGRectMake(gap + mainButton.frame.origin.x + mainButton.frame.size.width, size.height - heightMargin - rightPickerPortraitFrame.size.height - landscapeBarHeight, rightPickerPortraitFrame.size.width, rightPickerPortraitFrame.size.height);
+        minimizeButton.frame = CGRectMake(gap + endPickerView.frame.origin.x + endPickerView.frame.size.width, size.height - margin - minimizeButtonPortraitFrame.size.height - landscapeBarHeight, minimizeButtonPortraitFrame.size.width, minimizeButtonPortraitFrame.size.height);
+        rewindButton.frame = CGRectMake(gap + minimizeButton.frame.origin.x + minimizeButton.frame.size.width, size.height - margin - rewindButtonPortraitFrame.size.height - landscapeBarHeight, rewindButtonPortraitFrame.size.width, rewindButtonPortraitFrame.size.height);
+        playOrPauseButton.frame = CGRectMake(gap + rewindButton.frame.origin.x + rewindButton.frame.size.width, size.height - margin - playOrPauseButtonPortraitFrame.size.height - landscapeBarHeight, playOrPauseButtonPortraitFrame.size.width, playOrPauseButtonPortraitFrame.size.height);
+        forwardButton.frame = CGRectMake(gap + playOrPauseButton.frame.origin.x + playOrPauseButton.frame.size.width, size.height - margin - forwardButtonPortraitFrame.size.height - landscapeBarHeight, forwardButtonPortraitFrame.size.width, forwardButtonPortraitFrame.size.height);
+        maximizeButton.frame = CGRectMake(gap + forwardButton.frame.origin.x + forwardButton.frame.size.width, size.height - margin - maximizeButtonPortraitFrame.size.height - landscapeBarHeight, maximizeButtonPortraitFrame.size.width, maximizeButtonPortraitFrame.size.height);
+        //graphBackGround.frame = CGRectMake(0, 0, size.width, 231);
+    }
+    else if(UIInterfaceOrientationIsPortrait(orientation))
+    {
+        aboveBar.frame = aboveBarPortraitFrame;
+        aboveBar.image = [UIImage imageNamed:@"upper_bar.png"];
+        [self.view addSubview:aboveBar];
+        graphBackGround.frame = graphBackGroundPortraitFrame;
+        //graphBackGround.image = [UIImage imageNamed:@"graph_bg.png"];
+        //[self.view addSubview:graphBackGround];
+        belowBar.frame = belowBarPortraitFrame;
+        belowBar.image = [UIImage imageNamed:@"upper_bar.png"];
+        [self.view addSubview:belowBar];
+        graphBelowBackGround.frame = graphBelowBackGroundPortraitFrame;
+        if ([startTimeLabel superview]) {
+            [startTimeLabel removeFromSuperview];
+            startTimeLabel.frame = startTimeLabelPortraitFrame;
+            [self.view addSubview:startTimeLabel];
+        }
+        if ([endTimeLabel superview]) {
+            [endTimeLabel removeFromSuperview];
+            endTimeLabel.frame = endTimeLabelPortraitFrame;
+            [self.view addSubview:endTimeLabel];
+        }
+        if ([playbackTimeLabel superview]) {
+            [playbackTimeLabel removeFromSuperview];
+            playbackTimeLabel.frame = playbackTimeLabelPortraitFrame;
+            [self.view addSubview:playbackTimeLabel];
+        }
+        if ([remainTimeLabel superview]) {
+            [remainTimeLabel removeFromSuperview];
+            remainTimeLabel.frame = remainTimeLabelPortraitFrame;
+            [self.view addSubview:remainTimeLabel];
+        }
+        self.myScrollView.frame = scrollViewPortraitFrame;
+        if ([repeatButton superview]) {
+            //[repeatButton removeTarget:nil action:NULL forControlEvents:UIControlEventAllTouchEvents];
+            //[repeatButton removeFromSuperview];
+            repeatButton.frame = repeatButtonPortraitFrame;
+            //[repeatButton removeTarget:nil action:NULL forControlEvents:UIControlEventTouchUpInside];
+            //[repeatButton addTarget:self action:@selector(repeatModeOnOff) forControlEvents: UIControlEventTouchUpInside];
+            [self.view addSubview:repeatButton];
+        }
+        
+        startPickerView.frame = leftPickerPortraitFrame;
+        leftBackGround.frame = leftPickerBgPortraitFrame;
+        mainButton.frame = mainButtonPortraitFrame;
+        endPickerView.frame = rightPickerPortraitFrame;
+        rightBackGround.frame = rightPickerBgPortraitFrame;
+        minimizeButton.frame = minimizeButtonPortraitFrame;
+        rewindButton.frame = rewindButtonPortraitFrame;
+        playOrPauseButton.frame = playOrPauseButtonPortraitFrame;
+        forwardButton.frame = forwardButtonPortraitFrame;
+        maximizeButton.frame = maximizeButtonPortraitFrame;
+        //graphBackGround.frame = CGRectMake(0, 0, 320, 231);
+        //NSLog(@"picker view x:%f, y:%f, width:%f, height:%f", startPickerView.frame.origin.x, startPickerView.frame.origin.y, startPickerView.frame.size.width, startPickerView.frame.size.height);
+        //NSLog(@"left picker background view x:%f, y:%f, width:%f, height:%f", leftBackGround.frame.origin.x, leftBackGround.frame.origin.y, leftBackGround.frame.size.width, leftBackGround.frame.size.height);
+    }
+    else NSLog(@"not portrait, nor landscape");
+    // size is now the width and height that we will have after the rotation
+    //NSLog(@"lay out by orientation %d size: w:%f h:%f", orientation, size.width, size.height);
+
+}
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"willRotateTo:%d", orientation);
+}
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //NSLog(@"Go To:%d", toInterfaceOrientation);
+    // we grab the screen frame first off; these are always
+    // in portrait mode
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    //CGSize size = bounds.size;
+    //CGRect startPickerPortraitFrame = CGRectZero;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        //NSLog(@"current orientation:%d", orientation);
+    }
+    [self layoutByOrientation];
+    // size is now the width and height that we will have after the rotation
+    //NSLog(@"orientation %d size: w:%f h:%f", toInterfaceOrientation, size.width, size.height);
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;//(interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+- (BOOL)shouldAutorotate {
+    
+    UIDeviceOrientation interfaceOrientationFromDevice = [UIDevice currentDevice].orientation;
+    //BOOL result = [self allowAutoRotate:interfaceOrientationFromDevice];
+    //NSString *currentDeviceOrientation = UIDeviceOrientationToNSString(interfaceOrientationFromDevice);
+    NSLog(@"shouldAutorotate:(current orientation %d)", interfaceOrientationFromDevice);
+    //return result;
+    
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    
+    return UIInterfaceOrientationMaskAll;
 }
 
 @end
