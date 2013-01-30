@@ -274,6 +274,9 @@
     //self.bookMarkListTable.separatorColor = [UIColor colorWithRed:32.0/255.0f green:36.0/255.0f blue:45.0/255.0f alpha:1.0];
     [bookMarkToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back.png"]
              forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsDefault];
+    [bookMarkToolBar setBackgroundImage:[UIImage imageNamed:@"toolbar_back_landscape.png"] forToolbarPosition:UIToolbarPositionBottom barMetrics:UIBarMetricsLandscapePhone];
+    bookMarkToolBar.autoresizingMask = bookMarkToolBar.autoresizingMask | UIViewAutoresizingFlexibleHeight;
+
     
 }
 
@@ -291,7 +294,7 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;//(interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 #pragma mark - Table view data source
@@ -326,7 +329,7 @@
     cell.bookMark = bookMark;
     //cell.song = currentSong;
     
-	[tableView deselectRowAtIndexPath: indexPath animated: YES];
+	//[tableView deselectRowAtIndexPath: indexPath animated: YES];
     
     return cell;
 }
@@ -404,7 +407,37 @@
     if (((iPodSongsViewController *)mainViewController).playState == playBackStatePaused) {
         [(iPodSongsViewController *)mainViewController play];
     }
+    [self.navigationController popViewControllerAnimated:YES];
+    
 }
-
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    //NSLog(@"willRotateTo:%d", orientation);
+}
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //NSLog(@"Go To:%d", toInterfaceOrientation);
+    // we grab the screen frame first off; these are always
+    // in portrait mode
+    CGRect bounds = [[UIScreen mainScreen] applicationFrame];
+    CGSize size = bounds.size;
+    //CGRect startPickerPortraitFrame = CGRectZero;
+    UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        //NSLog(@"current orientation:%d", orientation);
+        //NSLog(@"Portrait BookMark Table size width:%f, height:%f", self.bookMarkListTable.frame.size.width, self.bookMarkListTable.frame.size.height);
+    }
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        // we're going to landscape, which means we gotta swap them
+        size.width = bounds.size.height;
+        size.height = bounds.size.width;
+        //NSLog(@"BookMark Table size width:%f, height:%f", self.bookMarkListTable.frame.size.width, self.bookMarkListTable.frame.size.height);
+    }
+    
+    //[self layoutByOrientation];
+    // size is now the width and height that we will have after the rotation
+    //NSLog(@"orientation %d size: w:%f h:%f", toInterfaceOrientation, size.width, size.height);
+}
 
 @end
